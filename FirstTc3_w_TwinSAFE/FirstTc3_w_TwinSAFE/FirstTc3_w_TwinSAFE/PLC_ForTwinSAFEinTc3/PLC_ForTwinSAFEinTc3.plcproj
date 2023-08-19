@@ -1,0 +1,351 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{d0039a97-810b-4a65-a172-375f6ab513d4}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>MyApplication</RootNamespace>
+    <AssemblyName>MyApplication</AssemblyName>
+    <Name>PLC_ForTwinSAFEinTc3</Name>
+    <Application>{c0fbac82-9bc5-4073-8b0b-b3fdb37eb466}</Application>
+    <TypeSystem>{df7b2c6f-6b74-4fa6-b304-e4a2ab0cfd88}</TypeSystem>
+    <Implicit_Task_Info>{4de204b4-9f48-44b1-8af6-173043ba3bb5}</Implicit_Task_Info>
+    <Implicit_KindOfTask>{b33d43ca-3ffa-46a7-a40a-772e32ba692b}</Implicit_KindOfTask>
+    <Implicit_Jitter_Distribution>{db872018-e8ee-4e05-96b4-07c7f05569ec}</Implicit_Jitter_Distribution>
+    <ExternalTypes>
+      <Type Guid="{18071995-0000-0000-0000-000000000019}">HRESULT</Type>
+      <Type Guid="{18071995-0000-0000-0000-000000000025}">IID</Type>
+      <Type Guid="{00000030-0000-0000-e000-000000000064}">ITComObjectServer</Type>
+      <Type Guid="{02000002-0000-0000-e000-000000000064}">ITcTask</Type>
+      <Type Guid="{00000001-0000-0000-e000-000000000064}">ITcUnknown</Type>
+      <Type Guid="{d91e046a-a488-4d27-8d43-0f3c40ed5081}">PlcAppSystemInfo</Type>
+      <Type Guid="{6a76d020-03a2-465c-a678-c341951e9ef3}">PlcTaskSystemInfo</Type>
+    </ExternalTypes>
+    <FileVersion>1.0.0.0</FileVersion>
+    <LibraryReferences>{c783a057-be99-4d80-b9ff-f444a6229c27}</LibraryReferences>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\Debug\</OutputPath>
+    <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\Release\</OutputPath>
+    <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="DUTs\MDP\ST_MDP_CPU.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DUTs\MDP\ST_MDP_MainboardTBL1.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DUTs\MDP\ST_MDP_TimeTBL1.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DUTs\MDP\ST_MDP_MainboardTBL2.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DUTs\MDP\ST_MDP_MainboardTBL3.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DUTs\MDP\ST_MDP_MainboardTBL4.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DUTs\MDP\ST_MDP_NIC_Properties.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DUTs\MDP\ST_MDP_TimeTBL2.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DUTs\Safety\DUT_ST_InfoData.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DUTs\Safety\DUT_ST_InfoDataConnectionIn.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DUTs\Safety\DUT_ST_InfoDataConnectionOut.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DUTs\Safety\DUT_ST_InfoDataFB.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="GlobalImagePool.TcGIPO">
+      <SubType>Code</SubType>
+      <ObjectGuid>{463669b1-5960-4b91-a013-4fa95bef64c9}</ObjectGuid>
+    </Compile>
+    <Compile Include="GlobalTextList.TcGTLO">
+      <SubType>Code</SubType>
+      <ObjectGuid>{675ecd98-3bba-414b-b0ac-dbbc7b6aaddb}</ObjectGuid>
+    </Compile>
+    <Compile Include="GVLs\GVL_HMI.TcGVL">
+      <SubType>Code</SubType>
+      <ObjectGuid>{fadcebc1-9e7d-4437-b1aa-205a8cd486c9}</ObjectGuid>
+    </Compile>
+    <Compile Include="GVLs\GVL_IO.TcGVL">
+      <SubType>Code</SubType>
+      <ObjectGuid>{36068108-451d-4637-8fa0-0edefd4a9f3b}</ObjectGuid>
+    </Compile>
+    <Compile Include="PlcTask.TcTTO">
+      <SubType>Code</SubType>
+      <ObjectGuid>{970fbe4a-7e2b-4bad-9764-ab1320b28a63}</ObjectGuid>
+    </Compile>
+    <Compile Include="POUs\Control_System_Diagnostics\EtherCAT_Diag.TcPOU">
+      <SubType>Code</SubType>
+      <ObjectGuid>{f6817d24-5ac6-4383-b1d2-87fd62e7f4a5}</ObjectGuid>
+    </Compile>
+    <Compile Include="POUs\Control_System_Diagnostics\System_Functions.TcPOU">
+      <SubType>Code</SubType>
+      <ObjectGuid>{1ea758fa-b210-44d7-82c0-6097527974ef}</ObjectGuid>
+    </Compile>
+    <Compile Include="POUs\MAIN.TcPOU">
+      <SubType>Code</SubType>
+      <ObjectGuid>{bdbba0bc-76dc-458e-8a02-492360a9da4d}</ObjectGuid>
+    </Compile>
+    <Compile Include="POUs\MDP_Function_Blocks\FB_MDP_CPU_Read.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\MDP_Function_Blocks\FB_MDP_Mainboard_ReadTBL1.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\MDP_Function_Blocks\FB_MDP_Time_ReadTBL1.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\MDP_Function_Blocks\FB_MDP_Mainboard_ReadTBL2.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\MDP_Function_Blocks\FB_MDP_Mainboard_ReadTBL3.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\MDP_Function_Blocks\FB_MDP_Mainboard_ReadTBL4.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\MDP_Function_Blocks\FB_MDP_NIC_Read.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Safety_Diagnostics\AX5805_ADS_Reads.TcPOU">
+      <SubType>Code</SubType>
+      <ObjectGuid>{ff321f23-86e8-4eb1-8143-c561d348969f}</ObjectGuid>
+    </Compile>
+    <Compile Include="POUs\Safety_Diagnostics\EL1904_ADS_Reads.TcPOU">
+      <SubType>Code</SubType>
+      <ObjectGuid>{86a6f1d6-b2b6-478d-993b-7c6fdf788f58}</ObjectGuid>
+    </Compile>
+    <Compile Include="POUs\Safety_Diagnostics\EL2904_ADS_Reads.TcPOU">
+      <SubType>Code</SubType>
+      <ObjectGuid>{b87b7741-971e-4337-a2ee-efe1ab85853d}</ObjectGuid>
+    </Compile>
+    <Compile Include="POUs\Safety_Diagnostics\EL6900_ADS_Reads.TcPOU">
+      <SubType>Code</SubType>
+      <ObjectGuid>{80d5e2bd-8b1f-4810-9bf1-90fd5758dfbf}</ObjectGuid>
+    </Compile>
+    <Compile Include="POUs\Safety_Diagnostics\EL6930_ADS_Reads.TcPOU">
+      <SubType>Code</SubType>
+      <ObjectGuid>{93e1c098-b67a-4f17-8492-1ab37f66e1cd}</ObjectGuid>
+    </Compile>
+    <Compile Include="POUs\Safety_Diagnostics\EP1908_ADS_Reads.TcPOU">
+      <SubType>Code</SubType>
+      <ObjectGuid>{4c213206-9d2a-444e-9ece-156abd090329}</ObjectGuid>
+    </Compile>
+    <Compile Include="POUs\TwinSAFE_Function_Blocks_Info\FB_InfoAND.TcPOU">
+      <SubType>Code</SubType>
+      <ObjectGuid>{c741368c-3ac3-4ff3-b58d-da200bb5834d}</ObjectGuid>
+    </Compile>
+    <Compile Include="POUs\TwinSAFE_Function_Blocks_Info\FB_InfoConnectionIn.TcPOU">
+      <SubType>Code</SubType>
+      <ObjectGuid>{4fc2d19e-fca3-4a31-84f4-ee3be03a255f}</ObjectGuid>
+    </Compile>
+    <Compile Include="POUs\TwinSAFE_Function_Blocks_Info\FB_InfoConnectionOut.TcPOU">
+      <SubType>Code</SubType>
+      <ObjectGuid>{a747a293-2a93-4969-b846-57402b2e7368}</ObjectGuid>
+    </Compile>
+    <Compile Include="POUs\TwinSAFE_Function_Blocks_Info\FB_InfoConnectionShutdown.TcPOU">
+      <SubType>Code</SubType>
+      <ObjectGuid>{75e3fe8b-a683-44b4-aa7c-3d1dc9cd5940}</ObjectGuid>
+    </Compile>
+    <Compile Include="POUs\TwinSAFE_Function_Blocks_Info\FB_InfoDecoupler.TcPOU">
+      <SubType>Code</SubType>
+      <ObjectGuid>{2ff0dfed-39a0-4e2e-a748-05636e7ae2f5}</ObjectGuid>
+    </Compile>
+    <Compile Include="POUs\TwinSAFE_Function_Blocks_Info\FB_InfoEDM.TcPOU">
+      <SubType>Code</SubType>
+      <ObjectGuid>{e6f103c6-93dc-4ef0-9458-c368091d07f8}</ObjectGuid>
+    </Compile>
+    <Compile Include="POUs\TwinSAFE_Function_Blocks_Info\FB_InfoEStop.TcPOU">
+      <SubType>Code</SubType>
+      <ObjectGuid>{51b39e46-4f03-452e-b5a3-a5f7f87cfa92}</ObjectGuid>
+    </Compile>
+    <Compile Include="POUs\TwinSAFE_Function_Blocks_Info\FB_InfoMON.TcPOU">
+      <SubType>Code</SubType>
+      <ObjectGuid>{b90b6e11-248d-4ce7-be92-0402ccbcc515}</ObjectGuid>
+    </Compile>
+    <Compile Include="POUs\TwinSAFE_Function_Blocks_Info\FB_InfoMuting.TcPOU">
+      <SubType>Code</SubType>
+      <ObjectGuid>{40e734e3-ed9b-434e-b026-203b9973a67d}</ObjectGuid>
+    </Compile>
+    <Compile Include="POUs\TwinSAFE_Function_Blocks_Info\FB_InfoOperationMode.TcPOU">
+      <SubType>Code</SubType>
+      <ObjectGuid>{91f34563-89cb-4436-873b-e8b2e3650585}</ObjectGuid>
+    </Compile>
+    <Compile Include="POUs\TwinSAFE_Function_Blocks_Info\FB_InfoOR.TcPOU">
+      <SubType>Code</SubType>
+      <ObjectGuid>{487f7c84-9bc4-4a46-a9a2-3628facba1b3}</ObjectGuid>
+    </Compile>
+    <Compile Include="POUs\TwinSAFE_Function_Blocks_Info\FB_InfoRS.TcPOU">
+      <SubType>Code</SubType>
+      <ObjectGuid>{ae7b1c1b-c41c-4949-98d8-4191c5f0decc}</ObjectGuid>
+    </Compile>
+    <Compile Include="POUs\TwinSAFE_Function_Blocks_Info\FB_InfoSafetyGroup.TcPOU">
+      <SubType>Code</SubType>
+      <ObjectGuid>{9bfb34c6-3e5e-41f8-b4bf-6737b8cc7369}</ObjectGuid>
+    </Compile>
+    <Compile Include="POUs\TwinSAFE_Function_Blocks_Info\FB_InfoSR.TcPOU">
+      <SubType>Code</SubType>
+      <ObjectGuid>{06ca4102-29c7-4579-90c2-e5d7480de659}</ObjectGuid>
+    </Compile>
+    <Compile Include="POUs\TwinSAFE_Function_Blocks_Info\FB_InfoTOF.TcPOU">
+      <SubType>Code</SubType>
+      <ObjectGuid>{5ddf3f62-35e5-4ae8-90f0-4fc7e1694064}</ObjectGuid>
+    </Compile>
+    <Compile Include="POUs\TwinSAFE_Function_Blocks_Info\FB_InfoTON.TcPOU">
+      <SubType>Code</SubType>
+      <ObjectGuid>{5c7de7e7-2871-40c6-8900-ff54e1eb6275}</ObjectGuid>
+    </Compile>
+    <Compile Include="POUs\TwinSAFE_Function_Blocks_Info\FB_InfoTwoHand.TcPOU">
+      <SubType>Code</SubType>
+      <ObjectGuid>{d1d536c1-ab30-4d43-8d82-9ede83388e9d}</ObjectGuid>
+    </Compile>
+    <Compile Include="Visualization Manager.TcVMO">
+      <SubType>Code</SubType>
+      <ObjectGuid>{88d8d32c-6e72-435c-9a59-c47f17c1ffec}</ObjectGuid>
+    </Compile>
+    <Compile Include="VISUs\AX5805_Specific_Diagnostics.TcVIS">
+      <SubType>Code</SubType>
+      <ObjectGuid>{681d1355-4aa0-4d1b-957b-a9e99484e672}</ObjectGuid>
+      <DependentUpon>Visualization Manager.TcVMO</DependentUpon>
+    </Compile>
+    <Compile Include="VISUs\AX5805_Specific_Diagnostics.TcVIS" />
+    <Compile Include="VISUs\AX5805_Specific_Diagnostics.TcVIS" />
+    <Compile Include="VISUs\EL1904_Specific_Diagnostics.TcVIS">
+      <SubType>Code</SubType>
+      <ObjectGuid>{c787502f-95ff-47cb-8021-79a9dc3784a4}</ObjectGuid>
+      <DependentUpon>Visualization Manager.TcVMO</DependentUpon>
+    </Compile>
+    <Compile Include="VISUs\EL1904_Specific_Diagnostics.TcVIS" />
+    <Compile Include="VISUs\EL1904_Specific_Diagnostics.TcVIS" />
+    <Compile Include="VISUs\EL2904_Specific_Diagnostics.TcVIS">
+      <SubType>Code</SubType>
+      <ObjectGuid>{40e77353-2d0e-4d9d-92e0-7953e3672395}</ObjectGuid>
+      <DependentUpon>Visualization Manager.TcVMO</DependentUpon>
+    </Compile>
+    <Compile Include="VISUs\EL2904_Specific_Diagnostics.TcVIS" />
+    <Compile Include="VISUs\EL2904_Specific_Diagnostics.TcVIS" />
+    <Compile Include="VISUs\EL2904_Specific_Diagnostics.TcVIS" />
+    <Compile Include="VISUs\EL6900_Specific_Diagnostics.TcVIS">
+      <SubType>Code</SubType>
+      <DependentUpon>Visualization Manager.TcVMO</DependentUpon>
+    </Compile>
+    <Compile Include="VISUs\EL6930_Specific_Diagnostics.TcVIS">
+      <SubType>Code</SubType>
+      <DependentUpon>Visualization Manager.TcVMO</DependentUpon>
+    </Compile>
+    <Compile Include="VISUs\EP1908_Specific_Diagnostics.TcVIS">
+      <SubType>Code</SubType>
+      <ObjectGuid>{5aa348b4-08bf-47a0-88e9-a3aa05c9958c}</ObjectGuid>
+      <DependentUpon>Visualization Manager.TcVMO</DependentUpon>
+    </Compile>
+    <Compile Include="VISUs\EP1908_Specific_Diagnostics.TcVIS" />
+    <Compile Include="VISUs\EP1908_Specific_Diagnostics.TcVIS" />
+    <Compile Include="VISUs\EP1908_Specific_Diagnostics.TcVIS" />
+    <Compile Include="VISUs\EP6900_Specific_Diagnostics.TcVIS">
+      <SubType>Code</SubType>
+      <ObjectGuid>{e0d6b025-212d-4d56-bf5b-4154631af6a0}</ObjectGuid>
+      <DependentUpon>Visualization Manager.TcVMO</DependentUpon>
+    </Compile>
+    <Compile Include="VISUs\EP6900_Specific_Diagnostics.TcVIS" />
+    <Compile Include="VISUs\EP6930_Specific_Diagnostics.TcVIS">
+      <SubType>Code</SubType>
+      <ObjectGuid>{a0f28c66-5222-42c5-b0cc-7f38d089543c}</ObjectGuid>
+      <DependentUpon>Visualization Manager.TcVMO</DependentUpon>
+    </Compile>
+    <Compile Include="VISUs\EP6930_Specific_Diagnostics.TcVIS" />
+    <Compile Include="VISUs\EtherCAT_Diag1.TcVIS">
+      <SubType>Code</SubType>
+      <ObjectGuid>{e106253d-815d-4bb5-9cde-fb194eb0b815}</ObjectGuid>
+      <DependentUpon>Visualization Manager.TcVMO</DependentUpon>
+    </Compile>
+    <Compile Include="VISUs\EtherCAT_Diag1.TcVIS" />
+    <Compile Include="VISUs\EtherCAT_Diag1.TcVIS" />
+    <Compile Include="VISUs\EtherCAT_Diag2.TcVIS">
+      <SubType>Code</SubType>
+      <ObjectGuid>{c47ef602-3c17-4ba1-af93-d5a8736ac622}</ObjectGuid>
+      <DependentUpon>Visualization Manager.TcVMO</DependentUpon>
+    </Compile>
+    <Compile Include="VISUs\EtherCAT_Diag2.TcVIS" />
+    <Compile Include="VISUs\EtherCAT_Diag2.TcVIS" />
+    <Compile Include="VISUs\TwinCAT_INFO.TcVIS">
+      <SubType>Code</SubType>
+      <ObjectGuid>{319d32cd-6358-4f17-a08d-5447f8085241}</ObjectGuid>
+      <DependentUpon>Visualization Manager.TcVMO</DependentUpon>
+    </Compile>
+    <Compile Include="VISUs\TwinCAT_INFO.TcVIS" />
+    <Compile Include="VISUs\TwinCAT_INFO.TcVIS" />
+    <Compile Include="VISUs\TwinSAFE.TcVIS">
+      <SubType>Code</SubType>
+      <ObjectGuid>{a4d5bb29-e369-453d-bc62-6d8ba81dbeb6}</ObjectGuid>
+      <DependentUpon>Visualization Manager.TcVMO</DependentUpon>
+    </Compile>
+    <Compile Include="VISUs\TwinSAFE.TcVIS" />
+    <Compile Include="VISUs\TwinSAFE.TcVIS" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="DUTs" />
+    <Folder Include="DUTs\MDP" />
+    <Folder Include="DUTs\Safety" />
+    <Folder Include="GVLs" />
+    <Folder Include="POUs\Control_System_Diagnostics" />
+    <Folder Include="POUs\MDP_Function_Blocks" />
+    <Folder Include="POUs\Safety_Diagnostics" />
+    <Folder Include="POUs\TwinSAFE_Function_Blocks_Info" />
+    <Folder Include="VISUs" />
+    <Folder Include="POUs" />
+    <Folder Include="VISUs\pics\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="PLC_ForTwinSAFEinTc3.tmc">
+      <SubType>Content</SubType>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <LibraryReference Include="Tc2_EtherCAT,3.3.0.0,Beckhoff Automation GmbH">
+      <Namespace>Tc2_EtherCAT</Namespace>
+    </LibraryReference>
+    <LibraryReference Include="Tc2_MC2,3.3.1.0,Beckhoff Automation GmbH">
+      <Namespace>Tc2_MC2</Namespace>
+    </LibraryReference>
+    <LibraryReference Include="Tc2_MC2_Drive,3.3.0.0,Beckhoff Automation GmbH">
+      <Namespace>Tc2_MC2_Drive</Namespace>
+    </LibraryReference>
+    <LibraryReference Include="Tc2_MDP,3.3.0.0,Beckhoff Automation GmbH">
+      <Namespace>Tc2_MDP</Namespace>
+    </LibraryReference>
+    <LibraryReference Include="Tc2_Standard,3.3.0.0,Beckhoff Automation GmbH">
+      <Namespace>Tc2_Standard</Namespace>
+    </LibraryReference>
+    <LibraryReference Include="Tc2_System,3.3.1.0,Beckhoff Automation GmbH">
+      <Namespace>Tc2_System</Namespace>
+    </LibraryReference>
+    <LibraryReference Include="Tc2_Utilities,3.3.0.0,Beckhoff Automation GmbH">
+      <Namespace>Tc2_Utilities</Namespace>
+    </LibraryReference>
+    <LibraryReference Include="Tc3_Interfaces,3.3.0.0,Beckhoff Automation GmbH">
+      <Namespace>Tc3_Interfaces</Namespace>
+    </LibraryReference>
+    <LibraryReference Include="Tc3_Module,3.3.0.0,Beckhoff Automation GmbH">
+      <Namespace>Tc3_Module</Namespace>
+    </LibraryReference>
+  </ItemGroup>
+  <ProjectExtensions />
+</Project>

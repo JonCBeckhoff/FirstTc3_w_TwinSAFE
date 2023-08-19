@@ -1,0 +1,45 @@
+﻿<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.0.14">
+  <POU Name="FB_InfoConnectionShutdown" Id="{75e3fe8b-a683-44b4-aa7c-3d1dc9cd5940}">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_InfoConnectionShutdown
+VAR_INPUT
+	stInfoData 		: 		DUT_ST_InfoDataFB ;
+END_VAR
+VAR_OUTPUT
+	sState 			: 		STRING ;
+	sDiag  			: 		STRING ;
+END_VAR
+VAR
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[// Connection Shutdown FB's State
+IF stInfoData.usiMapState 			= 	0 THEN
+				sState 				:=	'Undefined' ;
+	ELSIF stInfoData.usiMapState 	= 	2 THEN
+				sState 				:= 	'STOP' ;
+	ELSIF stInfoData.usiMapState 	= 	3 THEN
+				sState 				:= 	'SAFE' ;
+	ELSIF stInfoData.usiMapState 	= 	4 THEN
+				sState 				:= 	'Error' ;
+	ELSIF stInfoData.usiMapState 	= 	5 THEN
+				sState 				:= 	'Reset' ;
+	ELSIF stInfoData.usiMapState 	= 	10 THEN
+				sState 				:= 	'Active' ;
+	ELSIF stInfoData.usiMapState 	= 	11 THEN
+				sState 				:= 	'Deactive' ;
+	ELSE
+				sState 				:= 	'Unknown' ;
+END_IF
+
+// Connection Shutdown FB's Diagnostics
+IF stInfoData.uiMapDiag 			= 	0 THEN
+				sDiag 				:= 	'No Error' ;
+ELSIF  stInfoData.uiMapDiag 		= 	1 THEN
+				sDiag 				:= 	'Discrepancy Error Input Group1' ;
+ELSE
+				sDiag 				:= 	'Unknown' ;
+END_IF]]></ST>
+    </Implementation>
+    <ObjectProperties />
+  </POU>
+</TcPlcObject>

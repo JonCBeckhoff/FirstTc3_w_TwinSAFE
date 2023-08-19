@@ -1,0 +1,14 @@
+﻿<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.0.18">
+  <DUT Name="ST_MDP_MainboardTBL2" Id="{0e52b1c0-d8c9-49dd-a4a7-8459ba0cf99f}">
+    <Declaration><![CDATA[TYPE ST_MDP_MainboardTBL2 :
+STRUCT
+	uiLen						:UINT;			// Length
+	usiMainboardRevision		:USINT;			// CX Mainboard Revision
+	usiMainboardBiosMajVers		:USINT;			// CX Mainboard BIOS Major Revision
+	usiMainboardBiosMinVers		:USINT;			// CX Mainboard BIOS Minor Revision
+END_STRUCT
+END_TYPE
+]]></Declaration>
+    <ObjectProperties />
+  </DUT>
+</TcPlcObject>

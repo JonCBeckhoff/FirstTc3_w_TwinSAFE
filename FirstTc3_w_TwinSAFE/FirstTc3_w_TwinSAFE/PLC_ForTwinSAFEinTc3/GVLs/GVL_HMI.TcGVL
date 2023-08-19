@@ -1,0 +1,523 @@
+﻿<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.0.19">
+  <GVL Name="GVL_HMI" Id="{fadcebc1-9e7d-4437-b1aa-205a8cd486c9}">
+    <Declaration><![CDATA[VAR_GLOBAL
+//		8-2-2012
+// 		This Program has been supplied by Beckhoff Automation As-Is and is intended only as an example 
+//		implementation. Functionality is not guaranteed. 
+//	
+	// TwinSAFE project CRC	
+	g_uiHMI_ProjectCRC						: 	UINT ;
+	g_udiHMI_SerialNumber					: 	UDINT ;	
+
+	// Commands to TwinSAFE controller's safety  group
+	g_xHMI_ErrAckPB							: 	BOOL ;
+	g_xHMI_EStopResetPB						: 	BOOL ;
+
+	// Feedback from TwinSAFE controller's safety group
+	g_xHMI_SafetyGroup1_FBerrorLT			: 	BOOL ;
+	g_xHMI_SafetyGroup1_COMerrorLT			: 	BOOL ;
+	
+	// Feedback from TwinSAFE controller's Function Blocks
+	g_xHMI_EDMerrorLT						: 	BOOL ;
+	g_xHMI_EStop_CompleteLT					: 	BOOL ;
+	g_xHMI_EStop_errorLT					: 	BOOL ;
+	g_xHMI_EStop_OFF_Delay_CompleteLT		: 	BOOL ;
+	g_xHMI_EStop_ON_Delay_CompleteLT		: 	BOOL ;
+	
+	// Safety Group1 Info 
+	g_sHMI_StatusGroup1						: 	STRING ;
+	
+	// Safety Connection1 Info
+	g_sHMI_StateConn1						: 	STRING ;
+	g_sHMI_DiagConn1						: 	STRING ;
+	g_xHMI_EL1904Ch1						: 	BOOL ;
+	g_xHMI_EL1904Ch2						: 	BOOL ;
+	g_xHMI_EL1904Ch3						: 	BOOL ;
+	g_xHMI_EL1904Ch4						: 	BOOL ;
+
+	// Safety Connection2 Info
+	g_sHMI_StateConn2						: 	STRING ;
+	g_sHMI_DiagConn2						: 	STRING ;
+	g_xHMI_EL2904Ch1						: 	BOOL ;
+	g_xHMI_EL2904Ch2						: 	BOOL ;
+	g_xHMI_EL2904Ch3						: 	BOOL ;
+	g_xHMI_EL2904Ch4						: 	BOOL ;
+
+	// Future Safety Connection Info for EP1908-0002
+	g_xHMI_EP1908Ch1						: 	BOOL ;
+	g_xHMI_EP1908Ch2						: 	BOOL ;	
+	g_xHMI_EP1908Ch3						: 	BOOL ;
+	g_xHMI_EP1908Ch4						: 	BOOL ;
+	g_xHMI_EP1908Ch5						: 	BOOL ;
+	g_xHMI_EP1908Ch6						: 	BOOL ;
+	g_xHMI_EP1908Ch7						: 	BOOL ;	
+	g_xHMI_EP1908Ch8						: 	BOOL ;
+	
+	// Safety AND#1 FB Info
+	g_sHMI_StatusAND1						:	STRING ;
+
+	// Safety EStop#1 FB Info
+	g_sHMI_StatusEStop1						: 	STRING ;	
+	g_sHMI_DiagEStop1						: 	STRING ;	
+
+	// Safety AND#2 FB Info
+	g_sHMI_StatusAND2						: 	STRING ;
+
+	// Safety TON FB Info
+	g_sHMI_StatusTON						: 	STRING ;
+
+	// Safety TOF FB Info
+	g_sHMI_StatusTOF						: 	STRING ;
+
+	// Safety EDM FB Info
+	g_sHMI_StatusEDM						: 	STRING ;
+	g_sHMI_DiagEDM							: 	STRING ;
+
+	//ADS Read Function Block Constants
+	gc_sADSNetID							: 	STRING 		:= '10.12.160.29.2.1' ;
+	gc_uiEL2004_EtherCATAdr					:	UINT 		:= 1001 ;
+	gc_uiEL1904_EtherCATAdr					:	UINT 		:= 1002 ;
+	gc_uiEL2904_EtherCATAdr					:	UINT 		:= 1003 ;
+	gc_uiEL6900_EtherCATAdr					:	UINT 		:= 1004 ;
+	gc_uiEL1008_EtherCATAdr					:	UINT 		:= 1005 ;
+	gc_uiEL2008_EtherCATAdr					:	UINT 		:= 1006 ;
+	gc_uiEL3002_EtherCATAdr					:	UINT 		:= 1007 ;
+	gc_uiEL4032_EtherCATAdr					:	UINT 		:= 1008 ;
+	gc_uiEL7201_1_EtherCATAdr				:	UINT 		:= 1009 ;
+	gc_uiEL7201_2_EtherCATAdr				:	UINT 		:= 1010 ;
+	gc_uiEK1122_EtherCATAdr					:	UINT 		:= 1011 ;
+	
+	//EL1904 Safety Terminal CoE Objects of Interest(via ADS Reads)
+	g_dwHMI_EL1904Sn						: 	DWORD ;  //EL1904 Serial Number
+	g_wHMI_EL1904DSw						: 	WORD ;   //EL1904 DIP Switch Setting
+	g_sHMI_EL1904_HWvers					: 	STRING(2) ;//EL1904 Hardware Version
+	g_sHMI_EL1904_FWvers					: 	STRING(2) ;	//EL1904 Firmware Version
+	g_wHMI_EL1904PriMCTemp					: 	WORD ;   //EL1904 MC1 Actual Termperature In DegC
+	g_wHMI_EL1904SecMCTemp					: 	WORD ;   //EL1904 MC2 Actual Termperature In DegC
+	g_wHMI_EL1904SecMC_Volts				: 	LREAL ;  //EL1904 MC1 Actual Voltage (3.3v is nominal)
+	g_wHMI_EL1904PriMC_Volts				: 	LREAL ;  //EL1904 MC2 Actual Voltage (3.3v is nominal)
+	g_xHMI_EL1904SenT1						: 	BOOL ;   //EL1904 Sensor Test Error on CH1
+	g_xHMI_EL1904SenT2						: 	BOOL ;   //EL1904 Sensor Test Error on CH2
+	g_xHMI_EL1904SenT3						: 	BOOL ;   //EL1904 Sensor Test Error on CH3
+	g_xHMI_EL1904SenT4						: 	BOOL ;   //EL1904 Sensor Test Error on CH4
+	g_xHMI_EL1904_2CHEval_Pair1				: 	BOOL ;   //EL1904 2CH-Eval Error Pair1 (CH1 and CH2 not same value)
+	g_xHMI_EL1904_2CHEval_Pair2				: 	BOOL ;   //EL1904 2CH-Eval Error Pair2 (CH3 and CH4 not same value)
+	g_xHMI_EL1904_SMiPair_Pair1				: 	BOOL ;   //EL1904 Safety Mat Error Pair1 (CH1 and CH2 not same value)
+	g_xHMI_EL1904_SMiPair_Pair2				: 	BOOL ;   //EL1904 Safety Mat Error Pair2 (CH3 and CH4 not same value)
+	g_xHMI_EL1904_SMExtSupply_CH1			: 	BOOL ;   //EL1904 Safety Mat Error - External Supply CH1 (CH1 test pulses missing)
+	g_xHMI_EL1904_SMExtSupply_CH2			: 	BOOL ;   //EL1904 Safety Mat Error - External Supply CH2 (CH2 test pulses missing)
+	g_xHMI_EL1904_SMExtSupply_CH3			: 	BOOL ;   //EL1904 Safety Mat Error - External Supply CH3 (CH3 test pulses missing)
+	g_xHMI_EL1904_SMExtSupply_CH4			: 	BOOL ;   //EL1904 Safety Mat Error - External Supply CH4 (CH4 test pulses missing)
+	g_xHMI_EL1904_ErrClearPB				: 	BOOL ;   //EL1904 HMI Screen Errors Clear Pushbutton
+	
+	//EL1904 Safety Terminal FEATURES
+	g_sHMI_EL1904_OperatingMode				: 	STRING ;  //EL1904 FEATURE - Operating Mode
+	g_xHMI_EL1904_SensTestActive1			: 	BOOL ;	  //EL1904 FEATURE - CH1 Sensor Test Active
+	g_xHMI_EL1904_SensTestActive2			: 	BOOL ;	  //EL1904 FEATURE - CH2 Sensor Test Active
+	g_xHMI_EL1904_SensTestActive3			: 	BOOL ;	  //EL1904 FEATURE - CH3 Sensor Test Active
+	g_xHMI_EL1904_SensTestActive4			: 	BOOL ;	  //EL1904 FEATURE - CH4 Sensor Test Active
+	g_sHMI_EL1904_LogicCh1andCh2			: 	STRING ;  //EL1904 FEATURE - CH1 and CH2 Logic
+	g_sHMI_EL1904_LogicCh3andCh4			: 	STRING ;  //EL1904 FEATURE - CH3 and CH4 Logic
+	
+	//EL2904 Safety Terminal CoE Objects of Interest(via ADS Reads)
+	g_dwHMI_EL2904Sn						:	DWORD ;  //EL2904 Serial Number
+	g_wHMI_EL2904DSw						: 	WORD ;   //EL2904 DIP Switch Setting
+	g_sHMI_EL2904_HWvers					: 	STRING(2) ;//EL2904 Hardware Version
+	g_sHMI_EL2904_FWvers					: 	STRING(2) ;//EL2904 Firmware Version
+	g_wHMI_EL2904PriMCTemp					: 	WORD ;   //EL2904 MC1 Actual Termperature In DegC
+	g_wHMI_EL2904SecMCTemp					: 	WORD ;   //EL2904 MC2 Actual Termperature In DegC
+	g_wHMI_EL2904SecMC_Volts				: 	LREAL ;  //EL2904 MC1 Actual Voltage (3.3v is nominal)
+	g_wHMI_EL2904PriMC_Volts				: 	LREAL ;  //EL2904 MC2 Actual Voltage (3.3v is nominal)
+	g_xHMI_EL2904_ExtSup_CrossCirErr_Out1	: 	BOOL ;   //EL2904 ExtSupply, Cross-Circuit (No Test Pulses) Error on CH1
+	g_xHMI_EL2904_ExtSup_CrossCirErr_Out2	: 	BOOL ;   //EL2904 ExtSupply, Cross-Circuit (No Test Pulses) Error on CH2
+	g_xHMI_EL2904_ExtSup_CrossCirErr_Out3	: 	BOOL ;   //EL2904 ExtSupply, Cross-Circuit (No Test Pulses) Error on CH3
+	g_xHMI_EL2904_ExtSup_CrossCirErr_Out4	: 	BOOL ;   //EL2904 ExtSupply, Cross-Circuit (No Test Pulses) Error on CH4
+	g_xHMI_EL2904_OutLoadErr_Out1			: 	BOOL ;   //EL2904 Open Load, I<20mA, or I>500mA on CH1
+	g_xHMI_EL2904_OutLoadErr_Out2			: 	BOOL ;   //EL2904 Open Load, I<20mA, or I>500mA on CH2
+	g_xHMI_EL2904_OutLoadErr_Out3			: 	BOOL ;   //EL2904 Open Load, I<20mA, or I>500mA on CH3
+	g_xHMI_EL2904_OutLoadErr_Out4			: 	BOOL ;   //EL2904 Open Load, I<20mA, or I>500mA on CH4
+	g_xHMI_EL2904_PwrRailVoltageHi			: 	BOOL ;   //EL2904 Power Rail Voltage Went Above Spec (24VDC + 20% = 28.8v)
+	g_xHMI_EL2904_PwrRailVoltageLo			: 	BOOL ;   //EL2904 Power Rail Voltage Went Below Spec (24VDC - 15% = 20.4v)
+	g_xHMI_EL2904_TempErr_OTMc1				: 	BOOL ;   //EL2904 MicroController1 Too Hot (Internal temp - not an ambient temp)
+	g_xHMI_EL2904_TempErr_OTMc2				: 	BOOL ;   //EL2904 MicroController2 Too Hot (Internal temp - not an ambient temp)
+	g_xHMI_EL2904_TempErr_OTOutBoard		: 	BOOL ;   //EL2904 Outputs Board Too Hot (Too Much Load Current!)
+	g_xHMI_EL2904_TempErr_UTMc1				: 	BOOL ;   //EL2904 MicroController1 Too Cold (Internal temp - not an ambient temp)
+	g_xHMI_EL2904_TempErr_UTMc2				: 	BOOL ;   //EL2904 MicroController2 Too Cold (Internal temp - not an ambient temp)
+	g_xHMI_EL2904_TempErr_UTOutBoard		: 	BOOL ;   //EL2904 Outputs Board Too Cold (Internal temp - not an ambient temp)
+	g_xHMI_EL2904_TempErr_DiffOnBoard		: 	BOOL ;   //EL2904 Temp-Differences on Either MicroController (Internal temp - not an ambient temp)
+	g_xHMI_EL2904_TempErr_DiffBetweenMc1Mc2	: 	BOOL ;   //EL2904 Temp-Differences Between MicroControllers (Internal temp - not an ambient temp)
+	g_xHMI_EL2904_ErrClearPB				: 	BOOL ;   //EL2904 HMI Screen Errors Clear Pushbutton
+	
+	//EL2904 Safety Terminal FEATURES
+	g_xHMI_EL2904_StandardOuts				: 	BOOL ;	//EL2904 FEATURE - Standard Outputs Active
+	g_xHMI_EL2904_CurrentMeas				: 	BOOL ;	//EL2904 FEATURE - Current Measurement Active
+	g_xHMI_EL2904_TestPulses				: 	BOOL ;	//EL2904 FEATURE - Test Pulses Active
+	g_xHMI_EL2904_ErrAck					: 	BOOL ;	//EL2904 FEATURE - Error Acknowledge Active
+
+	//EP1908-0002 Safety Terminal CoE Objects of Interest(via ADS Reads)
+	g_dwHMI_EP1908Sn						: 	DWORD ;  //EP1908 Serial Number
+	g_wHMI_EP1908DSw						: 	WORD ;   //EP1908 DIP Switch Setting
+	g_sHMI_EP1908_HWvers					: 	STRING(2) ;//EP1908 Hardware Version
+	g_sHMI_EP1908_FWvers					: 	STRING(2) ;//EP1908 Software Version
+	g_wHMI_EP1908PriMCTemp					: 	WORD ;   //EP1908 MC1 Actual Termperature In DegC
+	g_wHMI_EP1908SecMCTemp					: 	WORD ;   //EP1908 MC2 Actual Termperature In DegC
+	g_wHMI_EP1908PriMC_Volts				: 	LREAL ;  //EP1908 MC1 Actual Voltage (3.3v is nominal)
+	g_wHMI_EP1908SecMC_Volts				: 	LREAL ;  //EP1908 MC2 Actual Voltage (3.3v is nominal)
+	g_xHMI_EP1908SenT1						: 	BOOL ;   //EP1908 Sensor Test Error on CH1
+	g_xHMI_EP1908SenT2						: 	BOOL ;   //EP1908 Sensor Test Error on CH2
+	g_xHMI_EP1908SenT3						: 	BOOL ;   //EP1908 Sensor Test Error on CH3
+	g_xHMI_EP1908SenT4						: 	BOOL ;   //EP1908 Sensor Test Error on CH4
+	g_xHMI_EP1908SenT5						: 	BOOL ;   //EP1908 Sensor Test Error on CH5
+	g_xHMI_EP1908SenT6						: 	BOOL ;   //EP1908 Sensor Test Error on CH6
+	g_xHMI_EP1908SenT7						: 	BOOL ;   //EP1908 Sensor Test Error on CH7
+	g_xHMI_EP1908SenT8						: 	BOOL ;   //EP1908 Sensor Test Error on CH8
+	g_xHMI_EP1908_2CHEval_Pair1				: 	BOOL ;   //EP1908 2CH-Eval Error Pair1 (CH1 and CH2 not same value)
+	g_xHMI_EP1908_2CHEval_Pair2				: 	BOOL ;   //EP1908 2CH-Eval Error Pair2 (CH3 and CH4 not same value)
+	g_xHMI_EP1908_2CHEval_Pair3				: 	BOOL ;   //EP1908 2CH-Eval Error Pair3 (CH5 and CH6 not same value)
+	g_xHMI_EP1908_2CHEval_Pair4				: 	BOOL ;   //EP1908 2CH-Eval Error Pair4 (CH7 and CH8 not same value)
+	g_xHMI_EP1908_SMiPair_Pair1				: 	BOOL ;   //EP1908 Safety Mat Error Pair1 (CH1 and CH2 not same value)
+	g_xHMI_EP1908_SMiPair_Pair2				: 	BOOL ;   //EP1908 Safety Mat Error Pair2 (CH3 and CH4 not same value)
+	g_xHMI_EP1908_SMiPair_Pair3				: 	BOOL ;   //EP1908 Safety Mat Error Pair3 (CH5 and CH6 not same value)
+	g_xHMI_EP1908_SMiPair_Pair4				: 	BOOL ;   //EP1908 Safety Mat Error Pair4 (CH7 and CH8 not same value)
+	g_xHMI_EP1908_SMExtSupply_CH1			: 	BOOL ;   //EP1908 Safety Mat Error - External Supply CH1 (CH1 test pulses missing)
+	g_xHMI_EP1908_SMExtSupply_CH2			: 	BOOL ;   //EP1908 Safety Mat Error - External Supply CH2 (CH2 test pulses missing)
+	g_xHMI_EP1908_SMExtSupply_CH3			: 	BOOL ;   //EP1908 Safety Mat Error - External Supply CH3 (CH3 test pulses missing)
+	g_xHMI_EP1908_SMExtSupply_CH4			: 	BOOL ;   //EP1908 Safety Mat Error - External Supply CH4 (CH4 test pulses missing)
+	g_xHMI_EP1908_SMExtSupply_CH5			: 	BOOL ;   //EP1908 Safety Mat Error - External Supply CH5 (CH5 test pulses missing)
+	g_xHMI_EP1908_SMExtSupply_CH6			: 	BOOL ;   //EP1908 Safety Mat Error - External Supply CH6 (CH6 test pulses missing)
+	g_xHMI_EP1908_SMExtSupply_CH7			: 	BOOL ;   //EP1908 Safety Mat Error - External Supply CH7 (CH7 test pulses missing)
+	g_xHMI_EP1908_SMExtSupply_CH8			: 	BOOL ;   //EP1908 Safety Mat Error - External Supply CH8 (CH8 test pulses missing)
+	g_xHMI_EP1908_FreqGT500_CH1				: 	BOOL ;   //EP1908 Speed Monitoring Error - CH1 Frequency Greater Than 500Hz
+	g_xHMI_EP1908_FreqGT500_CH2				: 	BOOL ;   //EP1908 Speed Monitoring Error - CH2 Frequency Greater Than 500Hz
+	g_xHMI_EP1908_FreqGT500_CH3				: 	BOOL ;   //EP1908 Speed Monitoring Error - CH3 Frequency Greater Than 500Hz
+	g_xHMI_EP1908_FreqGT500_CH4				: 	BOOL ;   //EP1908 Speed Monitoring Error - CH4 Frequency Greater Than 500Hz
+	g_xHMI_EP1908_FreqGT500_CH5				: 	BOOL ;   //EP1908 Speed Monitoring Error - CH5 Frequency Greater Than 500Hz
+	g_xHMI_EP1908_FreqGT500_CH6				: 	BOOL ;   //EP1908 Speed Monitoring Error - CH6 Frequency Greater Than 500Hz
+	g_xHMI_EP1908_FreqGT500_CH7				: 	BOOL ;   //EP1908 Speed Monitoring Error - CH7 Frequency Greater Than 500Hz
+	g_xHMI_EP1908_FreqGT500_CH8				: 	BOOL ;   //EP1908 Speed Monitoring Error - CH8 Frequency Greater Than 500Hz
+	g_xHMI_EP1908_BothInact_Pair1			: 	BOOL ;   //Error In Operating Mode: 2CH Sync Vel Control - Ch1/Ch2 cannot be inactive in this mode
+	g_xHMI_EP1908_BothInact_Pair2			: 	BOOL ;   //Error In Operating Mode: 2CH Sync Vel Control - Ch3/Ch4 cannot be inactive in this mode
+	g_xHMI_EP1908_BothInact_Pair3			: 	BOOL ;   //Error In Operating Mode: 2CH Sync Vel Control - Ch5/Ch6 cannot be inactive in this mode
+	g_xHMI_EP1908_BothInact_Pair4			: 	BOOL ;   //Error In Operating Mode: 2CH Sync Vel Control - Ch7/Ch8 cannot be inactive in this mode
+	g_xHMI_EP1908_UnequalFreg_Pair1			: 	BOOL ;   //For Ch1/Ch2 pair, two different motor speeds detected
+	g_xHMI_EP1908_UnequalFreg_Pair2			: 	BOOL ;   //For Ch3/Ch4 pair, two different motor speeds detected
+	g_xHMI_EP1908_UnequalFreg_Pair3			: 	BOOL ;   //For Ch5/Ch6 pair, two different motor speeds detected
+	g_xHMI_EP1908_UnequalFreg_Pair4			: 	BOOL ;   //For Ch7/Ch8 pair, two different motor speeds detected
+	g_xHMI_EP1908_ErrClearPB				: 	BOOL ;   //EP1908 HMI Screen Errors Clear Pushbutton
+
+	//EP1908-0002 Safety module FEATURES	
+	g_sHMI_EP1908_OperatingMode				: 	STRING ; // EP1908-0002 FEATURES: Operating Mode
+	g_xHMI_EP1908_SensTestActive1			: 	BOOL ;   // EP1908-0002 FEATURES: Sensor Test Channel 1 Active/Inactive
+	g_xHMI_EP1908_SensTestActive2			: 	BOOL ;   // EP1908-0002 FEATURES: Sensor Test Channel 2 Active/Inactive
+	g_xHMI_EP1908_SensTestActive3			: 	BOOL ;   // EP1908-0002 FEATURES: Sensor Test Channel 3 Active/Inactive
+	g_xHMI_EP1908_SensTestActive4			: 	BOOL ;   // EP1908-0002 FEATURES: Sensor Test Channel 4 Active/Inactive
+	g_xHMI_EP1908_SensTestActive5			: 	BOOL ;   // EP1908-0002 FEATURES: Sensor Test Channel 5 Active/Inactive
+	g_xHMI_EP1908_SensTestActive6			: 	BOOL ;   // EP1908-0002 FEATURES: Sensor Test Channel 6 Active/Inactive
+	g_xHMI_EP1908_SensTestActive7			: 	BOOL ;   // EP1908-0002 FEATURES: Sensor Test Channel 7 Active/Inactive
+	g_xHMI_EP1908_SensTestActive8			: 	BOOL ;   // EP1908-0002 FEATURES: Sensor Test Channel 8 Active/Inactive
+	g_sHMI_EP1908_LogicCh1andCh2			: 	STRING ; // EP1908-0002 FEATURES: Logic of Channels 1 and 2
+	g_sHMI_EP1908_LogicCh3andCh4			: 	STRING ; // EP1908-0002 FEATURES: Logic of Channels 3 and 4
+	g_sHMI_EP1908_LogicCh5andCh6			: 	STRING ; // EP1908-0002 FEATURES: Logic of Channels 5 and 6
+	g_sHMI_EP1908_LogicCh7andCh8			: 	STRING ; // EP1908-0002 FEATURES: Logic of Channels 7 and 8
+	g_wHMI_EP1908_VelLimit1					: 	WORD ;   // EP1908-0002 FEATURES: Velocity Limit Value for Channel 1
+	g_wHMI_EP1908_VelLimit2					: 	WORD ;   // EP1908-0002 FEATURES: Velocity Limit Value for Channel 2
+	g_wHMI_EP1908_VelLimit3					: 	WORD ;   // EP1908-0002 FEATURES: Velocity Limit Value for Channel 3
+	g_wHMI_EP1908_VelLimit4					: 	WORD ;   // EP1908-0002 FEATURES: Velocity Limit Value for Channel 4
+	g_wHMI_EP1908_VelLimit5					: 	WORD ;   // EP1908-0002 FEATURES: Velocity Limit Value for Channel 5
+	g_wHMI_EP1908_VelLimit6					: 	WORD ;   // EP1908-0002 FEATURES: Velocity Limit Value for Channel 6
+	g_wHMI_EP1908_VelLimit7					: 	WORD ;   // EP1908-0002 FEATURES: Velocity Limit Value for Channel 7
+	g_wHMI_EP1908_VelLimit8					: 	WORD ;   // EP1908-0002 FEATURES: Velocity Limit Value for Channel 8
+
+	//General-Overall Safety I/O State (OK or ERROR)
+	g_xHMI_EL6900_General_Error				:	BOOL ;   // EL6900 Logic Terminal Has Errors
+	g_xHMI_EL6930_General_Error				:	BOOL ;	 // EL6930 Logic Terminal Has Errors
+	g_xHMI_EL1904_General_Error				:	BOOL ;   // EL1904 Safety Input Terminal Has Errors
+	g_xHMI_EP1908_General_Error				:	BOOL ;   // EP1908 Safety Input Module Has Errors
+	g_xHMI_EL2904_General_Error				:	BOOL ;   // EL2904 Safety Output Terminal Has Errors
+	g_xHMI_AX5805_General_Error				:	BOOL ;   // AX5805 Drive Safety Module Has Errors
+
+	//EL6930 Safety Logic Terminal CoE Objects of Interest(via ADS Reads mostly)
+	g_dwHMI_EL6930Sn						: 	DWORD ;      //EL6930 Serial Number
+	g_wHMI_EL6930DSw						: 	WORD ;       //EL6930 DIP Switch Setting
+	g_sHMI_EL6930_HWvers					: 	STRING(2) ;  //EL6930 Hardware Version
+	g_sHMI_EL6930_FWvers					: 	STRING(2) ;  //EL6930 Software Version
+	g_bHMI_EL6930_NoOfConnections			: 	BYTE ;       //EL6930 Safety Project: Number of Safety Connections
+	g_bHMI_EL6930_NoOfSafetyGrps			: 	BYTE ;       //EL6930 Safety Project: Number of Safety Groups
+	g_bHMI_EL6930_NoOfSafetyFBs				: 	BYTE ;       //EL6930 Safety Project: Number of Safety Function Blocks
+	g_wHMI_EL6930PriMCTemp					: 	WORD ;       //EL6930 MC1 Actual Termperature In DegC
+	g_wHMI_EL6930SecMCTemp					: 	WORD ;       //EL6930 MC2 Actual Termperature In DegC
+	g_wHMI_EL6930PriMC_Volts				: 	LREAL ;      //EL6930 MC1 Actual Voltage (3.3v is nominal)
+	g_wHMI_EL6930SecMC_Volts				: 	LREAL ;      //EL6930 MC2 Actual Voltage (3.3v is nominal)
+	g_xHMI_EL6930_MaxTemp					: 	BOOL ;       //EL6930 Maximum Temperature Exceeded Error
+	g_xHMI_EL6930_MinTemp					: 	BOOL ;       //EL6930 Temperature Fell Below Minimum Error
+	g_xHMI_EL6930_TempDiffExceeded			: 	BOOL ;       //EL6930 Temperature Difference Between Measuring Points Exceeded Error
+	g_xHMI_EL6930_MaxVccMC1					: 	BOOL ;       //EL6930 Maximum Supply Voltage for MC1 Exceeded Error
+	g_xHMI_EL6930_MaxVccMC2					: 	BOOL ;       //EL6930 Maximum Supply Voltage for MC2 Exceeded Error
+	g_xHMI_EL6930_MinVccMC1					: 	BOOL ;       //EL6930 Voltage Fell Below Minimum Supply Voltage for MC1 Error
+	g_xHMI_EL6930_MinVccMC2					: 	BOOL ;       //EL6930 Voltage Fell Below Minimum Supply Voltage for MC2 Error
+	g_xHMI_EL6930_ErrClearPB				: 	BOOL ;   	 //EL6930 HMI Screen Errors Clear Pushbutton
+
+	//EL6900 Safety Logic Terminal CoE Objects of Interest(via ADS Reads mostly)
+	g_dwHMI_EL6900Sn						: 	DWORD ;      //EL6900 Serial Number
+	g_wHMI_EL6900DSw						: 	WORD ;       //EL6900 DIP Switch Setting
+	g_sHMI_EL6900_HWvers					: 	STRING(2) ;  //EL6900 Hardware Version
+	g_sHMI_EL6900_FWvers					: 	STRING(2) ;  //EL6900 Software Version
+	g_bHMI_EL6900_NoOfConnections			: 	BYTE ;       //EL6900 Safety Project: Number of Safety Connections
+	g_bHMI_EL6900_NoOfSafetyGrps			: 	BYTE ;       //EL6900 Safety Project: Number of Safety Groups
+	g_bHMI_EL6900_NoOfSafetyFBs				: 	BYTE ;       //EL6900 Safety Project: Number of Safety Function Blocks
+	g_wHMI_EL6900PriMCTemp					: 	WORD ;       //EL6900 MC1 Actual Termperature In DegC
+	g_wHMI_EL6900SecMCTemp					: 	WORD ;       //EL6900 MC2 Actual Termperature In DegC
+	g_wHMI_EL6900PriMC_Volts				: 	LREAL ;      //EL6900 MC1 Actual Voltage (3.3v is nominal)
+	g_wHMI_EL6900SecMC_Volts				: 	LREAL ;      //EL6900 MC2 Actual Voltage (3.3v is nominal)
+	g_xHMI_EL6900_MaxTemp					: 	BOOL ;       //EL6900 Maximum Temperature Exceeded Error
+	g_xHMI_EL6900_MinTemp					: 	BOOL ;       //EL6900 Temperature Fell Below Minimum Error
+	g_xHMI_EL6900_TempDiffExceeded			: 	BOOL ;       //EL6900 Temperature Difference Between Measuring Points Exceeded Error
+	g_xHMI_EL6900_MaxVccMC1					: 	BOOL ;       //EL6900 Maximum Supply Voltage for MC1 Exceeded Error
+	g_xHMI_EL6900_MaxVccMC2					: 	BOOL ;       //EL6900 Maximum Supply Voltage for MC2 Exceeded Error
+	g_xHMI_EL6900_MinVccMC1					: 	BOOL ;       //EL6900 Voltage Fell Below Minimum Supply Voltage for MC1 Error
+	g_xHMI_EL6900_MinVccMC2					: 	BOOL ;       //EL6900 Voltage Fell Below Minimum Supply Voltage for MC2 Error
+	g_xHMI_EL6900_ErrClearPB				: 	BOOL ;   	 //EL6900 HMI Screen Errors Clear Pushbutton
+
+(*	0  = TwinSAFE
+	10 = EL1904_Specific_Diagnostics
+	20 = EL1908_Specific_Diagnostics
+	30 = EL2904_Specific_Diagnostics
+	40 = EL6900_Specific_Diagnostics
+	50 = EL6930_Specific_Diagnostics
+	60 = AX5805_Specific_Diagnostics
+	70 = EtherCAT_Diag1
+	80 = EtherCAT_Diag2
+	90 = TwinCAT_INFO  *)	
+	g_bHMI_ScreenBeingDisplayed				:	BYTE ;		 //Current screen being displayed
+	
+	//AX5805 Safe Motion CoE Objects of Interest(via ADS Reads mostly)
+	g_dwHMI_AX5805Sn						: 	DWORD ;     //AX5805 Serial Number
+	g_wHMI_AX5805DSw						: 	WORD ;      //AX5805 DIP Switch Setting
+	g_sHMI_AX5805_HWvers					: 	STRING(2) ; //AX5805 Hardware Version
+	g_sHMI_AX5805_FWvers					: 	STRING(2) ; //AX5805 Software Version
+	g_wHMI_AX5805PriMCTemp					: 	WORD ;      //AX5805 MC1 Actual Termperature In DegC
+	g_wHMI_AX5805SecMCTemp					: 	WORD ;      //AX5805 MC2 Actual Termperature In DegC
+	g_wHMI_AX5805PriMC_3p3Volts				: 	LREAL ;     //AX5805 MC1 Actual Voltage of 3.3v Nominal Supply
+	g_wHMI_AX5805SecMC_3p3Volts				: 	LREAL ;     //AX5805 MC2 Actual Voltage of 3.3v Nominal Supply
+	g_wHMI_AX5805PriMC_5Volts				: 	LREAL ;     //AX5805 MC1 Actual Voltage of 5.0v Nominal Supply
+	g_wHMI_AX5805SecMC_5Volts				: 	LREAL ;     //AX5805 MC2 Actual Voltage of 5.0v Nominal Supply
+	g_sHMI_AX5000_SafetyOption				: 	STRING ;    //AX5000 Safety Option (None, AX5801, AX5805)
+	g_sHMI_AX5000_ConfigMotorCHA			: 	STRING ;    //AX5000 ChA Motor String
+	g_sHMI_AX5000_ConfigMotorCHB			: 	STRING ;    //AX5000 ChB Motor String
+
+	//EtherCAT Master Diagnostics
+	g_sHMI_StateMaster						: 	STRING ;
+	g_udiHMI_LostFrames						: 	UDINT ;
+	g_lrHMI_FramesPerSecond					: 	LREAL ;
+	g_udiHMI_LostQueuedFrames				: 	UDINT ;
+	g_lrHMI_QueuedFramesPerSecond			: 	LREAL ;
+	g_xHMI_CearMFStatCRCs					: 	BOOL ;
+	g_xHMI_ClearMFStatFrames				: 	BOOL ;
+	g_xHMI_ClearMFStatTxRxErr				:	BOOL ;
+	g_dwHMI_TotalCrcErrors					: 	DWORD ;
+	g_uiHMI_ConfSlaves						: 	UINT ;
+	g_uiHMI_ScannedSlaves					: 	UINT ;
+
+	//Check EtherCAT Slave EL2004
+	g_sHMI_StateEL2004						:	STRING ;
+	g_stHMI_EL2004EcSlaveStateBits			:	ST_EcSlaveStateBits ;
+	g_iHMI_ProdCodeEL2004					: 	INT ;
+	g_stHMI_EL2004CrcErrorEx				:	ST_EcCrcErrorEx ;
+
+	//Check EtherCAT Slave EL1904
+	g_sHMI_StateEL1904						:	STRING ;
+	g_stHMI_EL1904EcSlaveStateBits			:	ST_EcSlaveStateBits ;
+	g_iHMI_ProdCodeEL1904					: 	INT ;
+	g_stHMI_EL1904CrcErrorEx				:	ST_EcCrcErrorEx ;
+
+	//Check EtherCAT Slave EL2904
+	g_sHMI_StateEL2904						:	STRING ;
+	g_stHMI_EL2904EcSlaveStateBits			:	ST_EcSlaveStateBits ;
+	g_iHMI_ProdCodeEL2904					: 	INT ;
+	g_stHMI_EL2904CrcErrorEx				:	ST_EcCrcErrorEx ;
+	
+	//Check EtherCAT Slave EL6900
+	g_sHMI_StateEL6900						:	STRING ;
+	g_stHMI_EL6900EcSlaveStateBits			:	ST_EcSlaveStateBits ;
+	g_iHMI_ProdCodeEL6900					: 	INT ;
+	g_stHMI_EL6900CrcErrorEx				:	ST_EcCrcErrorEx ;
+	
+	//Check EtherCAT Slave EL1008
+	g_sHMI_StateEL1008						:	STRING ;
+	g_stHMI_EL1008EcSlaveStateBits			:	ST_EcSlaveStateBits ;
+	g_iHMI_ProdCodeEL1008					: 	INT ;
+	g_stHMI_EL1008CrcErrorEx				:	ST_EcCrcErrorEx ;
+
+	//Check EtherCAT Slave EL2008
+	g_sHMI_StateEL2008						:	STRING ;
+	g_stHMI_EL2008EcSlaveStateBits			:	ST_EcSlaveStateBits ;
+	g_iHMI_ProdCodeEL2008					: 	INT ;
+	g_stHMI_EL2008CrcErrorEx				:	ST_EcCrcErrorEx ;
+	
+	//Check EtherCAT Slave EL3002
+	g_sHMI_StateEL3002						:	STRING ;
+	g_stHMI_EL3002EcSlaveStateBits			:	ST_EcSlaveStateBits ;
+	g_iHMI_ProdCodeEL3002					: 	INT ;
+	g_stHMI_EL3002CrcErrorEx				:	ST_EcCrcErrorEx ;
+
+	//Check EtherCAT Slave EL4034
+	g_sHMI_StateEL4032						:	STRING ;
+	g_stHMI_EL4032EcSlaveStateBits			:	ST_EcSlaveStateBits ;
+	g_iHMI_ProdCodeEL4032					: 	INT ;
+	g_stHMI_EL4032CrcErrorEx				:	ST_EcCrcErrorEx ;	
+
+	//Check EtherCAT Slave EL7201 #1
+	g_sHMI_StateEL7201_1					:	STRING ;
+	g_stHMI_EL7201_1EcSlaveStateBits		:	ST_EcSlaveStateBits ;
+	g_iHMI_ProdCodeEL7201_1					: 	INT ;
+	g_stHMI_EL7201_1CrcErrorEx				:	ST_EcCrcErrorEx ;	
+
+	//Check EtherCAT Slave EL7201 #2
+	g_sHMI_StateEL7201_2					:	STRING ;
+	g_stHMI_EL7201_2EcSlaveStateBits		:	ST_EcSlaveStateBits ;
+	g_iHMI_ProdCodeEL7201_2					: 	INT ;
+	g_stHMI_EL7201_2CrcErrorEx				:	ST_EcCrcErrorEx ;	
+
+	//Check EtherCAT Slave EK1122
+	g_sHMI_StateEK1122						:	STRING ;
+	g_stHMI_EK1122_EcSlaveStateBits			:	ST_EcSlaveStateBits ;
+	g_iHMI_ProdCodeEK1122					: 	INT ;
+	g_stHMI_EK1122_CrcErrorEx				:	ST_EcCrcErrorEx ;	
+
+(*
+	//Check EtherCAT Slave EL6930
+	g_sHMI_StateEL6930						:	STRING ;
+	g_stHMI_EL6930EcSlaveStateBits			:	ST_EcSlaveStateBits ;
+	g_iHMI_ProdCodeEL6930					: 	INT ;
+	g_stHMI_EL6930CrcErrorEx				:	ST_EcCrcErrorEx ;
+
+	//Check EtherCAT Slave EK1110
+	g_sHMI_StateEK1110						:	STRING ;
+	g_stHMI_EK1110EcSlaveStateBits			:	ST_EcSlaveStateBits ;
+	g_iHMI_ProdCodeEK1110					: 	INT ;
+	g_stHMI_EK1110CrcErrorEx				:	ST_EcCrcErrorEx ;
+	
+	//Check EtherCAT Slave AX5000
+	g_sHMI_StateAX5000						:	STRING ;
+	g_stHMI_AX5000EcSlaveStateBits			:	ST_EcSlaveStateBits ;
+	g_iHMI_ProdCodeAX5000					: 	INT ;
+	g_stHMI_AX5000CrcErrorEx				:	ST_EcCrcErrorEx ;
+
+	//Check EtherCAT Slave AX5805
+	g_sHMI_StateAX5805						:	STRING ;
+	g_stHMI_AX5805EcSlaveStateBits			:	ST_EcSlaveStateBits ;
+	g_iHMI_ProdCodeAX5805					: 	INT ;
+	g_stHMI_AX5805CrcErrorEx				:	ST_EcCrcErrorEx ;
+	
+	//Check EtherCAT Slave EP1908-0002
+	g_sHMI_StateEP1908						:	STRING ;
+	g_stHMI_EP1908EcSlaveStateBits			:	ST_EcSlaveStateBits ;
+	g_iHMI_ProdCodeEP1908					: 	INT ;
+	g_stHMI_EP1908CrcErrorEx				:	ST_EcCrcErrorEx ;	
+*)
+
+	//TwinCAT Computer and PLC INFO
+	g_stHMI_DevIdent						: 	ST_DeviceIdentificationEx ;
+
+(*
+		TYPE ST_TcRouterStatusInfo
+
+maxMem				Max. router memory byte size
+maxMemAvail			Available router memory byte size
+regPorts			Number of registered ports
+regDrivers			Number of registered TwinCAT server ports
+amsDebugLog			TRUE = Ams logging/debugging enabled, FALSE = Ams logging/debugging disabled *)
+	g_stHMI_RouterStatusInfo				:	ST_TcRouterStatusInfo ;
+
+(*
+	TYPE PlcAppSystemInfo
+
+TaskCnt 			The number of tasks in the actual runtime system. 
+OnlineChangeCnt 	The number of online changes made since the last complete download. 
+Flags 				Reserved for future use 
+AdsPort   
+BootDataLoaded   
+OldBootData   
+AppTimestamp   
+KeepOutputsOnBP   
+TComSrvPtr   
+AppName   
+ProjectName 		The name of the PLC project. *)
+	g_stHMI_AppInfo: PlcAppSystemInfo;	
+	
+(*
+	TYPE PlcTaskSystemInfo
+ 
+CycleTime  			Cycletime set in the taskconfiguration in parts of 100ns. 
+Priority 			Priority set in the task configuration. 
+AdsPort   
+CycleCount 			Cyclecounter. 
+DcTaskTime   
+LastExecTime 		Needed cycletime for the last cycle in parts of 100ns. 
+FirstCycle 			The variable is TRUE in the first cycle of the task. 
+CycleTimeExceeded 	The variable is TRUE if the runtime of the task exceeds the cycletime set in taskconfiguration. 
+TaskName Contains 	the name of the task.  *)
+	g_stHMI_PlcTaskSystemInfo				: 	PlcTaskSystemInfo ;
+	g_lrHMI_PlcTaskSystemInfo_LastExecTime	: 	LREAL ;
+
+	g_lrHMI_CPUfrequency					: 	LREAL;
+	g_iHMI_CPUusage							: 	INT ;
+	g_iHMI_CPUtemperature					: 	INT ;
+
+	g_sHMI_MainboardType					: 	STRING(255) ;
+	g_sHMI_MainboardSN						: 	STRING(255) ;
+	g_sHMI_MainboardProdDate				: 	STRING(255) ;
+	g_udiHMI_MainboardBootCount				: 	UDINT ;
+	g_diHMI_MainboardMinTemp				: 	DINT ;
+	g_diHMI_MainboardMaxTemp				: 	DINT ;
+	g_iHMI_MainboardActualTemp				: 	INT ;
+	g_bHMI_MainboardRevision				: 	BYTE ;
+	g_bHMI_MainboardBiosMajVers				: 	BYTE ;
+	g_bHMI_MainboardBiosMinVers				: 	BYTE ;
+	g_sHMI_Mainboard1p05v					: 	STRING ;
+	g_sHMI_MainboardVccCore					: 	STRING ;
+	g_sHMI_Mainboard5v						: 	STRING ;
+	g_sHMI_Mainboard12v						: 	STRING ;
+	g_sHMI_MainboardVBatt					: 	STRING ;
+	g_sHMI_MainboardPwrCtrlVcc				: 	STRING ;
+	g_sHMI_MainboardCX2100_5v				: 	STRING ;
+	g_sHMI_MainboardCX2100_12v				: 	STRING ;
+	g_sHMI_MainboardCX2100_24v				: 	STRING ;
+	g_lrHMI_MainboardMinVolt				: 	LREAL ;
+	g_lrHMI_MainboardMaxVolt				: 	LREAL ;
+	g_lrHMI_MainboardOperTimeHrs			: 	LREAL ;
+	g_udiHMI_MainboardOperTimeDays			: 	UDINT ;
+	g_lrHMI_Mainboard1p05v					: 	LREAL ;
+	g_lrHMI_MainboardVccCore				: 	LREAL ;
+	g_lrHMI_Mainboard5v						: 	LREAL ;
+	g_lrHMI_Mainboard12v					: 	LREAL ;
+	g_lrHMI_MainboardVBatt					: 	LREAL ;
+	g_lrHMI_MainboardPwrCtrlVcc				: 	LREAL ;
+	g_lrHMI_MainboardCX2100_5v				: 	LREAL ;
+	g_lrHMI_MainboardCX2100_12v				: 	LREAL ;
+	g_lrHMI_MainboardCX2100_24v				:	LREAL ;
+	g_lrHMI_PlcTaskSystemInfo_CycleTime		: 	LREAL;
+	
+	g_sHMI_CurrentTimeZone					: 	STRING ;
+	g_sHMI_SNTP_Server						: 	STRING(255) ;
+	g_udiHMI_SNTP_Refresh					: 	UDINT ;
+	g_lrHMI_SNTP_Refresh_Minutes			: 	LREAL ;
+	g_lrHMI_Time_Since_1_1_1970				: 	LREAL ;
+	g_lrHMI_Years_Since_1_1_1970			: 	LREAL ;
+	g_sHMI_DateTime_Presentation			: 	STRING(255) ;
+	g_uiHMI_Timezone						: 	UINT ;
+	
+	g_udiHMI_ProgMemAllocated				: 	UDINT ;
+	g_udiHMI_ProgMemAvailable				: 	UDINT ;
+	g_udiHMI_ProgMemUsed					: 	UDINT ;
+	g_lrHMI_ProgMemAllocated_InGB: LREAL;
+	g_lrHMI_ProgMemAvailable_InGB: LREAL;
+	g_lrHMI_ProgMemUsed_InGB: LREAL;
+	g_lrHMI_ProgStorAllocated_InGB: LREAL;
+	g_lrHMI_ProgStorAvailable_InGB: LREAL;
+	g_lrHMI_ProgStorUsed_InGB: LREAL;
+	g_lrHMI_ProgStorMemDivision_InGB: LREAL;
+END_VAR]]></Declaration>
+    <ObjectProperties />
+  </GVL>
+</TcPlcObject>

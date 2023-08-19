@@ -1,0 +1,14 @@
+﻿<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.0.18">
+  <DUT Name="DUT_ST_InfoDataConnectionIn" Id="{d736f3a3-0c4d-4023-9b16-f78ac6be7b0c}">
+    <Declaration><![CDATA[TYPE DUT_ST_InfoDataConnectionIn :
+STRUCT
+	// Safety input connections use this structure
+	usiMapState 				: 	USINT ;
+	usiMapDiag  				: 	USINT ;
+	byInputSignals 				: 	BYTE ;	
+END_STRUCT
+END_TYPE
+]]></Declaration>
+    <ObjectProperties />
+  </DUT>
+</TcPlcObject>

@@ -1,0 +1,146 @@
+﻿<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.0.18">
+  <GVL Name="GVL_IO" Id="{36068108-451d-4637-8fa0-0edefd4a9f3b}">
+    <Declaration><![CDATA[VAR_GLOBAL
+//		8-2-2012
+// 		This Program has been supplied by Beckhoff Automation As-Is and is intended only as an example 
+//		implementation. Functionality is not guaranteed. 
+//
+	//Some regular I/O just to have the EtherCAT bus running for TwinSAFE development
+	g_xOutput1 AT %Q* 						: 	BOOL ;  // EL2004 CH1
+	g_xOutput2 AT %Q* 						: 	BOOL ;	// EL2004 CH2
+	g_xOutput3 AT %Q* 						: 	BOOL ;  // EL2004 CH3
+	g_xOutput4 AT %Q* 						: 	BOOL ;  // EL2004 CH4
+	
+	// TwinSAFE project CRC	
+	g_uiTS_ProjectCRC AT %I* 				:	UINT ;
+	g_udiTS_SerialNumber AT %I* 			: 	UDINT ;
+	
+	// Commands to TwinSAFE controller's safety  group	
+	g_xTS_ErrAck AT %Q* 					: 	BOOL ;
+	g_xTS_EStop_Reset AT %Q*				: 	BOOL ;
+
+	// Feedback from TwinSAFE controller's safety group
+	g_xTS_SafetyGroup1_FBerror AT %I* 		:	BOOL ;
+	g_xTS_SafetyGroup1_COMerror AT %I*		: 	BOOL ;
+	
+	// Feedback from TwinSAFE controller's Function Blocks
+	g_xTS_EDM_Error AT %I* 					: 	BOOL ;
+	g_xTS_EStop_Complete AT %I* 			: 	BOOL ;	
+	g_xTS_EStop_Error AT %I* 				: 	BOOL ;
+	g_xTS_EStop_OFF_Delay_Complete AT %I* 	: 	BOOL ;
+	g_xTS_EStop_ON_Delay_Complete AT %I* 	: 	BOOL ;
+	
+	// Safety Group1 Info 
+	g_stTS_InfoGroup1 AT %I* 				: 	DUT_ST_InfoData ;
+	
+	// Safety Connection1 Info
+	g_stTS_InfoConnection1 AT %I* 			: 	DUT_ST_InfoDataConnectionIn ;
+
+	// Safety Connection2 Info
+	g_stTS_InfoConnection2 AT %I* 			: 	DUT_ST_InfoDataConnectionOut ;
+
+	// Safety AND#1 FB Info
+	g_stTS_InfoAND1 AT %I* 					: 	DUT_ST_InfoDataFB ;
+
+	// Safety EStop#1 FB Info
+	g_stTS_InfoEStop1 AT %I* 				: 	DUT_ST_InfoDataFB ;
+
+	// Safety AND#2 FB Info
+	g_stTS_InfoAND2 AT %I* 					: 	DUT_ST_InfoDataFB ;
+
+	// Safety TON FB Info
+	g_stTS_InfoTON AT %I* 					: 	DUT_ST_InfoDataFB ;
+
+	// Safety TOF FB Info
+	g_stTS_InfoTOF AT %I* 					: 	DUT_ST_InfoDataFB ;
+
+	// Safety EDM FB Info
+	g_stTS_InfoEDM AT %I* 					: 	DUT_ST_InfoDataFB ;
+
+	//EtherCAT Master Diagnostics
+	g_wStateMaster AT %I*					: 	WORD ;
+
+	//Check EtherCAT Slave EL2004
+	g_wStateEL2004 AT %I*					: 	WORD ;
+	g_stEL2004EcSlaveState AT %I*			: 	ST_EcSlaveState ;
+	g_xEL2004_Wc AT %I*						: 	BOOL ;
+
+	//Check EtherCAT Slave EL1904
+	g_wStateEL1904 AT %I*					: 	WORD ;
+	g_stEL1904EcSlaveState AT %I*			: 	ST_EcSlaveState ;
+	g_xEL1904_Wc AT %I*						: 	BOOL ;
+
+	//Check EtherCAT Slave EL2904
+	g_wStateEL2904 AT %I*					: 	WORD ;
+	g_stEL2904EcSlaveState AT %I*			: 	ST_EcSlaveState ;
+	g_xEL2904_Wc AT %I*						: 	BOOL ;
+	
+	//Check EtherCAT Slave EL6900
+	g_wStateEL6900 AT %I*					: 	WORD ;
+	g_stEL6900EcSlaveState AT %I*			: 	ST_EcSlaveState ;
+	g_xEL6900_Wc AT %I*						: 	BOOL ;
+	
+	//Check EtherCAT Slave EL1008
+	g_wStateEL1008 AT %I*					: 	WORD ;
+	g_stEL1008EcSlaveState AT %I*			: 	ST_EcSlaveState ;
+	g_xEL1008_Wc AT %I*						: 	BOOL ;
+
+	//Check EtherCAT Slave EL2008
+	g_wStateEL2008 AT %I*					: 	WORD ;
+	g_stEL2008EcSlaveState AT %I*			: 	ST_EcSlaveState ;
+	g_xEL2008_Wc AT %I*						: 	BOOL ;	
+	
+	//Check EtherCAT Slave EL3002
+	g_wStateEL3002 AT %I*					: 	WORD ;
+	g_stEL3002EcSlaveState AT %I*			: 	ST_EcSlaveState ;
+	g_xEL3002_Wc AT %I*						: 	BOOL ;	
+	
+	//Check EtherCAT Slave EL4032
+	g_wStateEL4032 AT %I*					: 	WORD ;
+	g_stEL4032EcSlaveState AT %I*			: 	ST_EcSlaveState ;
+	g_xEL4032_Wc AT %I*						: 	BOOL ;	
+
+	//Check EtherCAT Slave EL7201 #1
+	g_wStateEL7201_1 AT %I*					: 	WORD ;
+	g_stEL7201_1EcSlaveState AT %I*			: 	ST_EcSlaveState ;
+	g_xEL7201_1_Wc AT %I*					: 	BOOL ;
+
+	//Check EtherCAT Slave EL7201 #2
+	g_wStateEL7201_2 AT %I*					: 	WORD ;
+	g_stEL7201_2EcSlaveState AT %I*			: 	ST_EcSlaveState ;
+	g_xEL7201_2_Wc AT %I*					: 	BOOL ;
+
+	//Check EtherCAT Slave EK1122
+	g_wStateEK1122 AT %I*					: 	WORD ;
+	g_stEK1122_EcSlaveState AT %I*			: 	ST_EcSlaveState ;
+	g_xEK1122_Wc AT %I*						: 	BOOL ;
+	
+(*	//Check EtherCAT Slave EL6930
+	g_wStateEL6930 AT %I*					: 	WORD ;
+	g_stEL6930EcSlaveState AT %I*			: 	ST_EcSlaveState ;
+	g_xEL6930_Wc AT %I*						: 	BOOL ;
+
+	//Check EtherCAT Slave EK1110
+	g_wStateEK1110 AT %I*					: 	WORD ;
+	g_stEK1110EcSlaveState AT %I*			: 	ST_EcSlaveState ;
+	g_xEK1110_Wc AT %I*						: 	BOOL ;
+	
+	//Check EtherCAT Slave AX5000
+	g_wStateAX5000 AT %I*					: 	WORD ;
+	g_stAX5000EcSlaveState AT %I*			: 	ST_EcSlaveState ;
+	g_xAX5000_Wc AT %I*						: 	BOOL ;
+
+	//Check EtherCAT Slave AX5805
+	g_wStateAX5805 AT %I*					: 	WORD ;
+	g_stAX5805EcSlaveState AT %I*			: 	ST_EcSlaveState ;
+	g_xAX5805_Wc AT %I*						: 	BOOL ;
+	
+	//Check EtherCAT Slave EP1908-0002
+	g_wStateEP1908 AT %I*					: 	WORD ;
+	g_stEP1908EcSlaveState AT %I*			: 	ST_EcSlaveState ;
+	g_xEP1908_Wc AT %I*						: 	BOOL ;  *)
+END_VAR
+]]></Declaration>
+    <ObjectProperties />
+  </GVL>
+</TcPlcObject>

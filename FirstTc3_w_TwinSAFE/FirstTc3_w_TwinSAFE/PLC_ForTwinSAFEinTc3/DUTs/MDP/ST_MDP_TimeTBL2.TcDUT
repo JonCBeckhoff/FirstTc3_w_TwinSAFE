@@ -1,0 +1,112 @@
+﻿<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.0.18">
+  <DUT Name="ST_MDP_TimeTBL2" Id="{0da48ddf-42a7-4656-a700-76eee61f32e2}">
+    <Declaration><![CDATA[TYPE ST_MDP_TimeTBL2 :
+STRUCT
+	uiLen					:UINT;			// Length
+	sTimezone1				:T_MaxSTRING;	// Timezone1
+	sTimezone2				:T_MaxSTRING;	// Timezone2
+	sTimezone3				:T_MaxSTRING;	// Timezone3
+	sTimezone4				:T_MaxSTRING;	// Timezone4
+	sTimezone5				:T_MaxSTRING;	// Timezone5
+	sTimezone6				:T_MaxSTRING;	// Timezone6
+	sTimezone7				:T_MaxSTRING;	// Timezone7
+	sTimezone8				:T_MaxSTRING;	// Timezone8
+	sTimezone9				:T_MaxSTRING;	// Timezone9
+	sTimezone10				:T_MaxSTRING;	// Timezone10
+	sTimezone11				:T_MaxSTRING;	// Timezone11
+	sTimezone12				:T_MaxSTRING;	// Timezone12
+	sTimezone13				:T_MaxSTRING;	// Timezone13
+	sTimezone14				:T_MaxSTRING;	// Timezone14
+	sTimezone15				:T_MaxSTRING;	// Timezone15
+	sTimezone16				:T_MaxSTRING;	// Timezone16
+	sTimezone17				:T_MaxSTRING;	// Timezone17
+	sTimezone18				:T_MaxSTRING;	// Timezone18
+	sTimezone19				:T_MaxSTRING;	// Timezone19
+	sTimezone20				:T_MaxSTRING;	// Timezone20
+	sTimezone21				:T_MaxSTRING;	// Timezone21
+	sTimezone22				:T_MaxSTRING;	// Timezone22
+	sTimezone23				:T_MaxSTRING;	// Timezone23
+	sTimezone24				:T_MaxSTRING;	// Timezone24
+	sTimezone25				:T_MaxSTRING;	// Timezone25
+	sTimezone26				:T_MaxSTRING;	// Timezone26
+	sTimezone27				:T_MaxSTRING;	// Timezone27
+	sTimezone28				:T_MaxSTRING;	// Timezone28
+	sTimezone29				:T_MaxSTRING;	// Timezone29
+	sTimezone30				:T_MaxSTRING;	// Timezone30
+	sTimezone31				:T_MaxSTRING;	// Timezone31
+	sTimezone32				:T_MaxSTRING;	// Timezone32
+	sTimezone33				:T_MaxSTRING;	// Timezone33
+	sTimezone34				:T_MaxSTRING;	// Timezone34
+	sTimezone35				:T_MaxSTRING;	// Timezone35
+	sTimezone36				:T_MaxSTRING;	// Timezone36
+	sTimezone37				:T_MaxSTRING;	// Timezone37
+	sTimezone38				:T_MaxSTRING;	// Timezone38
+	sTimezone39				:T_MaxSTRING;	// Timezone39
+	sTimezone40				:T_MaxSTRING;	// Timezone40
+	sTimezone41				:T_MaxSTRING;	// Timezone41
+	sTimezone42				:T_MaxSTRING;	// Timezone42
+	sTimezone43				:T_MaxSTRING;	// Timezone43
+	sTimezone44				:T_MaxSTRING;	// Timezone44
+	sTimezone45				:T_MaxSTRING;	// Timezone45
+	sTimezone46				:T_MaxSTRING;	// Timezone46
+	sTimezone47				:T_MaxSTRING;	// Timezone47
+	sTimezone48				:T_MaxSTRING;	// Timezone48
+	sTimezone49				:T_MaxSTRING;	// Timezone49
+	sTimezone50				:T_MaxSTRING;	// Timezone50
+	sTimezone51				:T_MaxSTRING;	// Timezone51
+	sTimezone52				:T_MaxSTRING;	// Timezone52
+	sTimezone53				:T_MaxSTRING;	// Timezone53
+	sTimezone54				:T_MaxSTRING;	// Timezone54
+	sTimezone55				:T_MaxSTRING;	// Timezone55
+	sTimezone56				:T_MaxSTRING;	// Timezone56
+	sTimezone57				:T_MaxSTRING;	// Timezone57
+	sTimezone58				:T_MaxSTRING;	// Timezone58
+	sTimezone59				:T_MaxSTRING;	// Timezone59
+	sTimezone60				:T_MaxSTRING;	// Timezone60
+	sTimezone61				:T_MaxSTRING;	// Timezone61
+	sTimezone62				:T_MaxSTRING;	// Timezone62
+	sTimezone63				:T_MaxSTRING;	// Timezone63
+	sTimezone64				:T_MaxSTRING;	// Timezone64
+	sTimezone65				:T_MaxSTRING;	// Timezone65
+	sTimezone66				:T_MaxSTRING;	// Timezone66
+	sTimezone67				:T_MaxSTRING;	// Timezone67
+	sTimezone68				:T_MaxSTRING;	// Timezone68
+	sTimezone69				:T_MaxSTRING;	// Timezone69
+	sTimezone70				:T_MaxSTRING;	// Timezone70
+	sTimezone71				:T_MaxSTRING;	// Timezone71
+	sTimezone72				:T_MaxSTRING;	// Timezone72
+	sTimezone73				:T_MaxSTRING;	// Timezone73
+	sTimezone74				:T_MaxSTRING;	// Timezone74
+	sTimezone75				:T_MaxSTRING;	// Timezone75
+	sTimezone76				:T_MaxSTRING;	// Timezone76
+	sTimezone77				:T_MaxSTRING;	// Timezone77
+	sTimezone78				:T_MaxSTRING;	// Timezone78
+	sTimezone79				:T_MaxSTRING;	// Timezone79
+	sTimezone80				:T_MaxSTRING;	// Timezone80
+	sTimezone81				:T_MaxSTRING;	// Timezone81
+	sTimezone82				:T_MaxSTRING;	// Timezone82
+	sTimezone83				:T_MaxSTRING;	// Timezone83
+	sTimezone84				:T_MaxSTRING;	// Timezone84
+	sTimezone85				:T_MaxSTRING;	// Timezone85
+	sTimezone86				:T_MaxSTRING;	// Timezone86
+	sTimezone87				:T_MaxSTRING;	// Timezone87
+	sTimezone88				:T_MaxSTRING;	// Timezone88
+	sTimezone89				:T_MaxSTRING;	// Timezone89
+	sTimezone90				:T_MaxSTRING;	// Timezone90
+	sTimezone91				:T_MaxSTRING;	// Timezone91
+	sTimezone92				:T_MaxSTRING;	// Timezone92
+	sTimezone93				:T_MaxSTRING;	// Timezone93
+	sTimezone94				:T_MaxSTRING;	// Timezone94
+	sTimezone95				:T_MaxSTRING;	// Timezone95
+	sTimezone96				:T_MaxSTRING;	// Timezone96
+	sTimezone97				:T_MaxSTRING;	// Timezone97
+	sTimezone98				:T_MaxSTRING;	// Timezone98
+	sTimezone99				:T_MaxSTRING;	// Timezone99
+	sTimezone100			:T_MaxSTRING;	// Timezone100
+	sTimezone101			:T_MaxSTRING;	// Timezone101
+END_STRUCT
+END_TYPE
+]]></Declaration>
+    <ObjectProperties />
+  </DUT>
+</TcPlcObject>

@@ -1,0 +1,20 @@
+﻿<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.0.18">
+  <DUT Name="ST_MDP_MainboardTBL3" Id="{92a50b14-e3fa-47ee-aa1b-6f4465f088df}">
+    <Declaration><![CDATA[TYPE ST_MDP_MainboardTBL3 :
+STRUCT
+	uiLen					:UINT;				// Length *)
+	sMainboard1p05v			:STRING;			// Nominal voltage of 1.05 volt in power supply - mV
+	sMainboardVccCore		:STRING;			// Nominal voltage of Vcc Core in processor - mV
+	sMainboard5v			:STRING;			// Nominal voltage of 5 volt in power supply - mV
+	sMainboard12v			:STRING;			// Nominal voltage of 12 volt in power supply - mV
+	sMainboardVBatt			:STRING;			// Nominal voltage of 3 volt Battery - mV
+	sMainboardPwrCtrlVcc	:STRING;			// Nominal voltage of 5 volt in UNKNOWN - mV
+	sMainboardCX2100_5v		:STRING;			// Nominal voltage of 5 volt supply in CX2100 - mV
+	sMainboardCX2100_12v	:STRING;			// Nominal voltage of 12 volt supply in CX2100 - mV
+	sMainboardCX2100_24v	:STRING;			// Nominal voltage of 24 volt supply in CX2100 - mV
+END_STRUCT
+END_TYPE
+]]></Declaration>
+    <ObjectProperties />
+  </DUT>
+</TcPlcObject>

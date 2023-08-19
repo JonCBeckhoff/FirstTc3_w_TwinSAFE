@@ -1,0 +1,643 @@
+﻿<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.0.18">
+  <POU Name="EL1904_ADS_Reads" Id="{86a6f1d6-b2b6-478d-993b-7c6fdf788f58}">
+    <Declaration><![CDATA[PROGRAM EL1904_ADS_Reads
+VAR
+//		8-2-2012
+// 		This Program has been supplied by Beckhoff Automation As-Is and is intended only as an example 
+//		implementation. Functionality is not guaranteed. 
+//
+	//Time to check CoE values (Every 2 seconds in this case)
+	T1							: 		TON ;
+	xExecute					: 		BOOL ;
+	tTime1						: 		TIME ;
+
+	//Counter for just some very simple sequencing
+	C1							: 		CTU ;
+	xReset						: 		BOOL ;
+	wPreset						: 		WORD := 10 ;
+	xDone						: 		BOOL ;
+	wCount						: 		WORD ;
+	
+	//Get EL1904 terminal's serial number
+	fbEL1904Sn_ADSRead			: 		ADSREAD ;
+	dwEL1904_Sn					: 		DWORD ;
+	xEL1904Sn_busy				: 		BOOL ;
+	xEL1904Sn_Err				: 		BOOL ;
+	xEL1904Sn_ErrID				: 		UDINT ;
+
+	//Get EL1904 terminal's DIP switch setting
+	fbEL1904DSw_ADSRead			: 		ADSREAD ;
+	wEL1904_DSw					: 		WORD ;
+	xEL1904DSw_busy				: 		BOOL ;
+	xEL1904DSw_Err				: 		BOOL ;
+	udiEL1904DSw_ErrID			: 		UDINT ;
+
+	//Read the Hardware Version of the EL1904 Terminal
+	fbEL1904_HWvers_EcCoESdoRead: 		FB_EcCoESdoRead ;
+	sEL1904_HWvers				: 		STRING(2) ;
+	xEL1904_HWvers_Busy			: 		BOOL ;
+	xEL1904_HWvers_Err			: 		BOOL ;
+	udiEL1904_HWvers_ErrID		: 		UDINT ;
+
+	//Read the Software Version of the EL1904 Terminal (It's f/w)
+	fbEL1904_FWvers_EcCoESdoRead: 		FB_EcCoESdoRead ;
+	sEL1904_FWvers				: 		STRING(2) ;
+	xEL1904_FWvers_Busy			: 		BOOL ;
+	xEL1904_FWvers_Err			: 		BOOL ;
+	udiEL1904_FWvers_ErrID		: 		UDINT ;
+
+	//EL1904 FEATURES: Operating Mode
+	fbEL1904_OperatingMode_ADSRead	: 	ADSREAD ;
+	wEL1904_OperMode				: 	WORD ;
+	xEL1904_OperMode_busy			: 	BOOL ;
+	xEL1904_OperMode_Err			: 	BOOL ;
+	udiEL1904_OperModeID			: 	UDINT ;
+
+	//Sequence through 0x8001 FS Sensor Test
+	iFS_Sensor_Test					: 	INT ;
+
+	//EL1904 FEATURES: Sensor Test Channel 1 Active/Inactive
+	fbEL1904_STActive1_EcCoESdoRead	: 	FB_EcCoESdoRead ;
+	bEL1904_STActive1				: 	BYTE ;
+	xEL1904_STActive1_busy			: 	BOOL ;
+	xEL1904_STActive1_Err			: 	BOOL ;
+	udiEL1904_STActive1ID			: 	UDINT ;
+	iCaseZeroScans					: 	INT ;
+	
+	// EL1904 FEATURES: Sensor Test Channel 2 Active/Inactive
+	fbEL1904_STActive2_EcCoESdoRead	: 	FB_EcCoESdoRead ;
+	bEL1904_STActive2				: 	BYTE ;
+	xEL1904_STActive2				: 	BOOL ;
+	xEL1904_STActive2_busy			: 	BOOL ;
+	xEL1904_STActive2_Err			: 	BOOL ;
+	udiEL1904_STActive2ID			: 	UDINT ;
+	iCaseOneScans					: 	INT ;
+
+	// EL1904 FEATURES: Sensor Test Channel 3 Active/Inactive	
+	fbEL1904_STActive3_EcCoESdoRead	: 	FB_EcCoESdoRead ;
+	bEL1904_STActive3				: 	BYTE ;
+	xEL1904_STActive3_busy			: 	BOOL ;
+	xEL1904_STActive3_Err			: 	BOOL ;
+	udiEL1904_STActive3ID			: 	UDINT ;
+	iCaseTwoScans					: 	INT ;
+
+	// EL1904 FEATURES: Sensor Test Channel 4 Active/Inactive	
+	fbEL1904_STActive4_EcCoESdoRead	: 	FB_EcCoESdoRead ;
+	bEL1904_STActive4				: 	BYTE ;
+	xEL1904_STActive4_busy			: 	BOOL ;
+	xEL1904_STActive4_Err			: 	BOOL ;
+	udiEL1904_STActive4ID			: 	UDINT ;
+	iCaseThreeScans					: 	INT ;
+
+	//Sequence through 0x8002 FS Logic Of Input Pairs
+	iFS_LogicOfInputPairs			: 	INT ;
+
+	// EL1904 FEATURES: Logic of Channels 1 and 2	
+	fbEL1904_Logic1_2_EcCoESdoRead	: 	FB_EcCoESdoRead ;
+	bEL1904_Logic1_2				: 	BYTE ;
+	xEL1904_Logic1_2_busy			: 	BOOL ;
+	xEL1904_Logic1_2_Err			: 	BOOL ;
+	udiEL1904_Logic1_2ID			: 	UDINT ;
+	iCaseLogicZeroScans				: 	INT ;
+
+	// EL1904 FEATURES: Logic of Channels 3 and 4	
+	fbEL1904_Logic3_4_EcCoESdoRead	: 	FB_EcCoESdoRead ;
+	bEL1904_Logic3_4				: 	BYTE ;
+	xEL1904_Logic3_4_busy			: 	BOOL ;
+	xEL1904_Logic3_4_Err			: 	BOOL ;
+	udiEL1904_Logic3_4ID			: 	UDINT ;
+	iCaseLogicOneScans				: 	INT ;
+	
+	//Get EL1904 terminal's MC1 temperature (in Deg C)
+	fbEL1904PriMCTemp_ADSRead	: 		ADSREAD ;
+	wEL1904_PriMCTemp			: 		WORD ;
+	xEL1904PriMCTemp_busy		: 		BOOL ;
+	xEL1904PriMCTemp_Err		: 		BOOL ;
+	udiEL1904PriMCTemp_ErrID	: 		UDINT ;
+	
+	//Get EL1904 terminal's MC2 termperature (in Deg C)
+	fbEL1904SecMCTemp_ADSRead	: 		ADSREAD ;
+	wEL1904_SecMCTemp			: 		WORD ;
+	xEL1904SecMCTemp_busy		: 		BOOL ;
+	xEL1904SecMCTemp_Err		: 		BOOL ;
+	udiEL1904SecMCTemp_ErrID	: 		UDINT ;
+
+	//Get EL1904 terminal's MC1 voltage (in mV)
+	fbEL1904PriMCmV_ADSRead		: 		ADSREAD ;
+	wEL1904_PriMCmV				: 		WORD ;
+	xEL1904PriMCmV_busy			: 		BOOL ;
+	xEL1904PriMCmV_Err			: 		BOOL ;
+	udiEL1904PriMCmV_ErrID		: 		UDINT ;
+	q_wHMI_EL1904PriMCmV		: 		LREAL ;
+
+	//Get EL1904 terminal's MC2 voltage (in mV)
+	fbEL1904SecMCmV_ADSRead		: 		ADSREAD ;
+	wEL1904_SecMCmV				: 		WORD ;
+	xEL1904SecMCmV_busy			: 		BOOL ;
+	xEL1904SecMCmV_Err			: 		BOOL ;
+	udiEL1904SecMCmV_ErrID		: 		UDINT ;
+	//
+	// EL1904 ALARMS
+	//
+		//Get EL1904 Diagnostic object 800E:0A - Sensor Test Errors
+	fbEL1904SensT_ADSRead		: 		ADSREAD ;
+	wEL1904SenT					: 		WORD ;
+	wEL1904_SenT				: 		WORD ;
+	xEL1904SenT_busy			: 		BOOL ;
+	xEL1904SenT_Err				: 		BOOL ;
+	udiEL1904SenT_ErrID			: 		UDINT ;
+
+	//Get EL1904 Diagnostic object 800E:0B - Error During Two-Channel Evaluation
+	fbEL1904_2CHEval_ADSRead	: 		ADSREAD ;
+	wEL1904_2CHEval				: 		WORD ;
+	xEL1904_2CHEval_busy		: 		BOOL ;
+	xEL1904_2CHEval_Err			: 		BOOL ;
+	udiEL1904_2CHEval_ErrID		: 		UDINT ;
+
+	//Get EL1904 Diagnostic object 800E:0C - Error In Safety Mat Operating Mode: Input Pair Disagree
+	fbEL1904_SMiPair_ADSRead	: 		ADSREAD ;
+	wEL1904_SMiPair				: 		WORD ;
+	xEL1904_SMiPair_busy		: 		BOOL ;
+	xEL1904_SMiPair_Err			: 		BOOL ;
+	udiEL1904_SMiPair_ErrID		: 		UDINT ;
+
+	//Get EL1904 Diagnostic object 800E:0D - Error In Safety Mat Operating Mode: External Supply (No test pulses)
+	fbEL1904_SMExtSupply_ADSRead: 		ADSREAD ;
+	wEL1904_SMExtSupply			: 		WORD ;
+	xEL1904_SMExtSupply_busy	: 		BOOL ;
+	xEL1904_SMExtSupply_Err		: 		BOOL ;
+	udiEL1904_SMExtSupply_ErrID	: 		UDINT ;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[//		8-2-2012
+// 		This Program has been supplied by Beckhoff Automation As-Is and is intended only as an example 
+//		implementation. Functionality is not guaranteed. 
+//
+//IF g_bHMI_ScreenBeingDisplayed = 10 THEN
+// Interval timer for CoE Reads
+T1(
+						IN				:= 		NOT xExecute, 
+						PT				:=		T#500MS, 
+						Q				=>		xExecute, 
+						ET				=>		tTime1 ) ;
+
+C1(
+						CU				:= 		xExecute, 
+						RESET			:= 		xReset, 
+						PV				:= 		wPreset, 
+						Q				=> 		xDone, 
+						CV				=> 		wCount) ;
+
+IF C1.CV > 6 	THEN xReset := 1 ;
+				ELSE xReset := 0 ; 
+END_IF ;
+						
+// Read the serial number out of the EL1904
+fbEL1904Sn_ADSRead(
+						NETID			:= 		gc_sADSNetID, 
+						PORT			:= 		gc_uiEL1904_EtherCATAdr, 
+						IDXGRP			:= 		16#F302, 
+						IDXOFFS			:= 		16#F9800002, 
+						LEN				:= 		4, 
+						DESTADDR		:= 		ADR(dwEL1904_Sn), 
+						READ			:= 		xExecute, 
+						TMOUT			:= 		T#2S, 
+						BUSY			=> 		xEL1904Sn_busy, 
+						ERR				=> 		xEL1904Sn_Err, 
+						ERRID			=> 		xEL1904Sn_ErrID );
+
+g_dwHMI_EL1904Sn 						:= 		dwEL1904_Sn ;
+
+// Read the DIP Switch Setting out of the EL1904
+IF C1.CV = 1 THEN
+fbEL1904DSw_ADSRead(
+						NETID			:= 		gc_sADSNetID, 
+						PORT			:= 		gc_uiEL1904_EtherCATAdr, 
+						IDXGRP			:= 		16#F302, 
+						IDXOFFS			:= 		16#F9800001, 
+						LEN				:= 		2, 
+						DESTADDR		:= 		ADR(wEL1904_DSw), 
+						READ			:= 		xExecute, 
+						TMOUT			:= 		T#2S, 
+						BUSY			=> 		xEL1904DSw_busy, 
+						ERR				=> 		xEL1904DSw_Err, 
+						ERRID			=> 		udiEL1904DSw_ErrID );
+
+g_wHMI_EL1904DSw 						:= 		wEL1904_DSw ;
+END_IF ;
+
+//Read the Hardware Version of the EL1904 Terminal
+fbEL1904_HWvers_EcCoESdoRead(
+						sNetId			:= 		gc_sADSNetID, 
+						nSlaveAddr		:= 		gc_uiEL1904_EtherCATAdr, 
+						nSubIndex		:= 		0, 
+						nIndex			:= 		16#1009, 
+						pDstBuf			:=  	ADR(sEL1904_HWvers),
+						cbBufLen		:= 		SIZEOF(sEL1904_HWvers), 
+						bExecute		:= 		xExecute, 
+						tTimeout		:= 		T#2S, 
+						bBusy			=> 		xEL1904_HWvers_Busy, 
+						bError			=> 		xEL1904_HWvers_Err, 
+						nErrId			=> 		udiEL1904_HWvers_ErrID ) ;
+
+g_sHMI_EL1904_HWvers					:= 		sEL1904_HWvers ;
+
+//Read the Software Version of the EL1904 Logic Terminal (It's f/w)
+fbEL1904_FWvers_EcCoESdoRead(
+						sNetId			:= 		gc_sADSNetID, 
+						nSlaveAddr		:= 		gc_uiEL1904_EtherCATAdr, 
+						nSubIndex		:= 		0, 
+						nIndex			:= 		16#100A, 
+						pDstBuf			:=  	ADR(sEL1904_FWvers),
+						cbBufLen		:= 		SIZEOF(sEL1904_FWvers), 
+						bExecute		:= 		xExecute, 
+						tTimeout		:= 		T#2S, 
+						bBusy			=> 		xEL1904_FWvers_Busy, 
+						bError			=> 		xEL1904_FWvers_Err, 
+						nErrId			=> 		udiEL1904_FWvers_ErrID ) ;
+
+g_sHMI_EL1904_FWvers					:= 		sEL1904_FWvers ;
+
+// EL1904 FEATURES: Operating Mode
+fbEL1904_OperatingMode_ADSRead(
+						NETID			:= 		gc_sADSNetID, 
+						PORT			:= 		gc_uiEL1904_EtherCATAdr, 
+						IDXGRP			:= 		16#F302, 
+						IDXOFFS			:= 		16#80000001, 
+						LEN				:= 		2, 
+						DESTADDR		:=		ADR(wEL1904_OperMode), 
+						READ			:= 		xExecute, 
+						TMOUT			:= 		T#2S, 
+						BUSY			=> 		xEL1904_OperMode_busy, 
+						ERR				=> 		xEL1904_OperMode_Err, 
+						ERRID			=> 		udiEL1904_OperModeID );
+		
+IF wEL1904_OperMode 					= 		0 THEN
+	g_sHMI_EL1904_OperatingMode 		:= 		'Digital' ;
+	ELSIF wEL1904_OperMode 				= 		1 THEN
+	g_sHMI_EL1904_OperatingMode 		:= 		'Standstill Monitoring 1' ;
+	ELSIF wEL1904_OperMode 				= 		2 THEN
+	g_sHMI_EL1904_OperatingMode 		:= 		'Standstill Monitoring 2' ;
+ELSE
+	g_sHMI_EL1904_OperatingMode 		:= 		'Invalid Mode' ;
+END_IF ;
+
+CASE iFS_Sensor_Test OF
+
+0:
+// EL1904 FEATURES: Sensor Test Channel 1 Active/Inactive
+iCaseThreeScans 						:= 		0 ;
+fbEL1904_STActive1_EcCoESdoRead(
+						sNetId			:= 		gc_sADSNetID, 
+						nSlaveAddr		:= 		gc_uiEL1904_EtherCATAdr, 
+						nSubIndex		:= 		1, 
+						nIndex			:= 		16#8001, 
+						pDstBuf			:= 		ADR(bEL1904_STActive1), 
+						cbBufLen		:= 		SIZEOF(bEL1904_STActive1), 
+						bExecute		:= 		xExecute, 
+						tTimeout		:= 		T#2S, 
+						bBusy			=> 		xEL1904_STActive1_busy, 
+						bError			=> 		xEL1904_STActive1_Err, 
+						nErrId			=> 		udiEL1904_STActive1ID );
+
+g_xHMI_EL1904_SensTestActive1			:= 		bEL1904_STActive1.0 ;
+
+iCaseZeroScans := iCaseZeroScans + 1 ; //Prevent code from passing through in only one pass
+
+IF NOT xEL1904_STActive1_busy AND NOT xEL1904_STActive1_Err AND iCaseZeroScans <> 0 THEN
+	iFS_Sensor_Test := 1 ;
+END_IF ;
+
+1:
+// EL1904 FEATURES: Sensor Test Channel 2 Active/Inactive
+iCaseZeroScans 							:= 		0 ;
+fbEL1904_STActive2_EcCoESdoRead(
+						sNetId			:= 		gc_sADSNetID, 
+						nSlaveAddr		:= 		gc_uiEL1904_EtherCATAdr, 
+						nSubIndex		:= 		2, 
+						nIndex			:= 		16#8001, 
+						pDstBuf			:= 		ADR(bEL1904_STActive2), 
+						cbBufLen		:= 		SIZEOF(bEL1904_STActive2), 
+						bExecute		:= 		xExecute, 
+						tTimeout		:= 		T#2S, 
+						bBusy			=> 		xEL1904_STActive2_busy, 
+						bError			=> 		xEL1904_STActive2_Err, 
+						nErrId			=> 		udiEL1904_STActive2ID );
+
+g_xHMI_EL1904_SensTestActive2			:= 		bEL1904_STActive2.0 ;
+
+iCaseOneScans := iCaseOneScans + 1 ; //Prevent code from passing through in only one pass
+
+IF NOT xEL1904_STActive2_busy AND NOT xEL1904_STActive2_Err AND iCaseOneScans <> 0 THEN
+	iFS_Sensor_Test := 2 ;
+END_IF ;
+
+2:
+// EL1904 FEATURES: Sensor Test Channel 3 Active/Inactive
+iCaseOneScans 							:= 		0 ;
+fbEL1904_STActive3_EcCoESdoRead(
+						sNetId			:= 		gc_sADSNetID, 
+						nSlaveAddr		:= 		gc_uiEL1904_EtherCATAdr, 
+						nSubIndex		:= 		3, 
+						nIndex			:= 		16#8001, 
+						pDstBuf			:= 		ADR(bEL1904_STActive3), 
+						cbBufLen		:= 		SIZEOF(bEL1904_STActive3), 
+						bExecute		:= 		xExecute, 
+						tTimeout		:= 		T#2S, 
+						bBusy			=> 		xEL1904_STActive3_busy, 
+						bError			=> 		xEL1904_STActive3_Err, 
+						nErrId			=> 		udiEL1904_STActive3ID );
+
+g_xHMI_EL1904_SensTestActive3			:= 		bEL1904_STActive3.0 ;
+
+iCaseTwoScans := iCaseTwoScans + 1 ; //Prevent code from passing through in only one pass
+
+IF NOT xEL1904_STActive3_busy AND NOT xEL1904_STActive3_Err AND iCaseTwoScans <> 0 THEN
+	iFS_Sensor_Test := 3 ;
+END_IF ;
+
+3:
+// EL1904 FEATURES: Sensor Test Channel 4 Active/Inactive
+iCaseTwoScans 							:= 		0 ;
+fbEL1904_STActive4_EcCoESdoRead(
+						sNetId			:= 		gc_sADSNetID, 
+						nSlaveAddr		:= 		gc_uiEL1904_EtherCATAdr, 
+						nSubIndex		:= 		4, 
+						nIndex			:= 		16#8001, 
+						pDstBuf			:= 		ADR(bEL1904_STActive4), 
+						cbBufLen		:= 		SIZEOF(bEL1904_STActive4), 
+						bExecute		:= 		xExecute, 
+						tTimeout		:= 		T#2S, 
+						bBusy			=> 		xEL1904_STActive4_busy, 
+						bError			=> 		xEL1904_STActive4_Err, 
+						nErrId			=> 		udiEL1904_STActive4ID );
+
+g_xHMI_EL1904_SensTestActive4			:= 		bEL1904_STActive4.0 ;
+
+iCaseThreeScans := iCaseThreeScans + 1 ; //Prevent code from passing through in only one pass
+
+IF NOT xEL1904_STActive4_busy AND NOT xEL1904_STActive4_Err AND iCaseThreeScans <> 0 THEN
+	iFS_Sensor_Test := 0 ;
+END_IF ;
+	END_CASE ;
+
+//Sequence through 0x8002 FS Logic Of Input Pairs
+CASE iFS_LogicOfInputPairs OF
+
+0:
+// EL1904 FEATURES: Logic of Channels 1 and 2
+iCaseLogicOneScans 						:= 		0 ;
+fbEL1904_Logic1_2_EcCoESdoRead(
+						sNetId			:= 		gc_sADSNetID, 
+						nSlaveAddr		:= 		gc_uiEL1904_EtherCATAdr, 
+						nSubIndex		:= 		1, 
+						nIndex			:= 		16#8002, 
+						pDstBuf			:= 		ADR(bEL1904_Logic1_2), 
+						cbBufLen		:= 		SIZEOF(bEL1904_Logic1_2), 
+						bExecute		:= 		xExecute, 
+						tTimeout		:= 		T#2S, 
+						bBusy			=> 		xEL1904_Logic1_2_busy, 
+						bError			=> 		xEL1904_Logic1_2_Err, 
+						nErrId			=> 		udiEL1904_Logic1_2ID );
+
+IF bEL1904_Logic1_2 					= 		0 THEN
+	g_sHMI_EL1904_LogicCh1andCh2 		:= 		'Single Channel Logic' ;
+	ELSIF bEL1904_Logic1_2 				= 		1 THEN
+	g_sHMI_EL1904_LogicCh1andCh2 		:= 		'Asynchronous Repetitive OSSD, Sensor Test Must Be Disabled!' ;
+	ELSIF bEL1904_Logic1_2 				= 		2 THEN
+	g_sHMI_EL1904_LogicCh1andCh2 		:= 		'Any Pulse Repetitive OSSD, Sensor Test Must Be Disabled!' ;
+	ELSIF bEL1904_Logic1_2 				= 		3 THEN
+	g_sHMI_EL1904_LogicCh1andCh2 		:= 		'Short Cut, No Module Fault' ;
+ELSE
+	g_sHMI_EL1904_LogicCh1andCh2 		:= 		'Invalid Logic CH1 and CH2' ;
+END_IF ;						
+
+iCaseLogicZeroScans := iCaseLogicZeroScans + 1 ; //Prevent code from passing through in only one pass
+
+IF NOT xEL1904_Logic1_2_busy AND NOT xEL1904_Logic1_2_Err AND iCaseLogicZeroScans <> 0 THEN
+	iFS_LogicOfInputPairs := 1 ;
+END_IF ;
+
+1:						
+// EL1904 FEATURES: Logic of Channels 3 and 4
+iCaseLogicZeroScans 					:= 		0 ;
+fbEL1904_Logic3_4_EcCoESdoRead(
+						sNetId			:= 		gc_sADSNetID, 
+						nSlaveAddr		:= 		gc_uiEL1904_EtherCATAdr, 
+						nSubIndex		:= 		3, 
+						nIndex			:= 		16#8002, 
+						pDstBuf			:= 		ADR(bEL1904_Logic3_4), 
+						cbBufLen		:= 		SIZEOF(bEL1904_Logic3_4), 
+						bExecute		:= 		xExecute, 
+						tTimeout		:= 		T#2S, 
+						bBusy			=> 		xEL1904_Logic3_4_busy, 
+						bError			=> 		xEL1904_Logic3_4_Err, 
+						nErrId			=> 		udiEL1904_Logic3_4ID );
+
+IF bEL1904_Logic3_4 					= 		0 THEN
+	g_sHMI_EL1904_LogicCh3andCh4 		:= 		'Single Channel Logic' ;
+	ELSIF bEL1904_Logic3_4  			= 		1 THEN
+	g_sHMI_EL1904_LogicCh3andCh4 		:= 		'Asynchronous Repetitive OSSD, Sensor Test Must Be Disabled!' ;
+	ELSIF bEL1904_Logic3_4 				= 		2 THEN
+	g_sHMI_EL1904_LogicCh3andCh4 		:= 		'Any Pulse Repetitive OSSD, Sensor Test Must Be Disabled!' ;
+	ELSIF bEL1904_Logic3_4  			= 		3 THEN
+	g_sHMI_EL1904_LogicCh3andCh4 		:= 		'Short Cut, No Module Fault' ;
+ELSE
+	g_sHMI_EL1904_LogicCh3andCh4 		:= 		'Invalid Logic CH3 and CH4' ;
+	END_IF ;						
+
+iCaseLogicOneScans := iCaseLogicOneScans + 1 ; //Prevent code from passing through in only one pass
+
+IF NOT xEL1904_Logic3_4_busy AND NOT xEL1904_Logic3_4_Err AND iCaseLogicOneScans <> 0 THEN
+	iFS_LogicOfInputPairs := 0 ;
+END_IF ;
+	END_CASE ;
+
+// Read the Primary Micro Controller (MC1) Temperature in DegC out of the EL1904
+IF C1.CV = 2 THEN
+fbEL1904PriMCTemp_ADSRead(
+						NETID			:= 		gc_sADSNetID, 
+						PORT			:= 		gc_uiEL1904_EtherCATAdr, 
+						IDXGRP			:= 		16#F302, 
+						IDXOFFS			:= 		16#FA800001, 
+						LEN				:= 		2, 
+						DESTADDR		:= 		ADR(wEL1904_PriMCTemp), 
+						READ			:= 		xExecute, 
+						TMOUT			:= 		T#2S, 
+						BUSY			=> 		xEL1904PriMCTemp_busy, 
+						ERR				=> 		xEL1904PriMCTemp_Err, 
+						ERRID			=> 		udiEL1904PriMCTemp_ErrID );
+
+g_wHMI_EL1904PriMCTemp 						:= 		wEL1904_PriMCTemp ;
+END_IF ;
+
+// Read the Secondary Micro Controller (MC2) Temperature in DegC out of the EL1904
+IF C1.CV = 3 THEN
+fbEL1904SecMCTemp_ADSRead(
+						NETID			:= 		gc_sADSNetID, 
+						PORT			:= 		gc_uiEL1904_EtherCATAdr, 
+						IDXGRP			:= 		16#F302, 
+						IDXOFFS			:= 		16#FA800002, 
+						LEN				:= 		2, 
+						DESTADDR		:= 		ADR(wEL1904_SecMCTemp), 
+						READ			:= 		xExecute, 
+						TMOUT			:= 		T#2S, 
+						BUSY			=> 		xEL1904SecMCTemp_busy, 
+						ERR				=> 		xEL1904SecMCTemp_Err, 
+						ERRID			=> 		udiEL1904SecMCTemp_ErrID );
+
+g_wHMI_EL1904SecMCTemp 						:= 		wEL1904_SecMCTemp ;
+END_IF ;
+
+// Read the Primary Micro Controller (MC1) Voltage in mV out of the EL1904
+IF C1.CV = 4 THEN
+fbEL1904PriMCmV_ADSRead(
+						NETID			:= 		gc_sADSNetID, 
+						PORT			:= 		gc_uiEL1904_EtherCATAdr, 
+						IDXGRP			:= 		16#F302, 
+						IDXOFFS			:= 		16#FA810001, 
+						LEN				:= 		2, 
+						DESTADDR		:= 		ADR(wEL1904_PriMCmV), 
+						READ			:= 		xExecute, 
+						TMOUT			:= 		T#2S, 
+						BUSY			=> 		xEL1904PriMCmV_busy, 
+						ERR				=> 		xEL1904PriMCmV_Err, 
+						ERRID			=> 		udiEL1904PriMCmV_ErrID );
+
+						
+g_wHMI_EL1904PriMC_Volts				:= 		WORD_TO_LREAL(wEL1904_PriMCmV) / 1000.0 ;
+END_IF ;
+
+// Read the Secondary Micro Controller (MC2) Voltage in mV out of the EL1904
+IF C1.CV = 5 THEN
+fbEL1904SecMCmV_ADSRead(
+						NETID			:= 		gc_sADSNetID, 
+						PORT			:= 		gc_uiEL1904_EtherCATAdr, 
+						IDXGRP			:= 		16#F302, 
+						IDXOFFS			:= 		16#FA810002, 
+						LEN				:= 		2, 
+						DESTADDR		:= 		ADR(wEL1904_SecMCmV), 
+						READ			:= 		xExecute, 
+						TMOUT			:= 		T#2S, 
+						BUSY			=> 		xEL1904SecMCmV_busy, 
+						ERR				=> 		xEL1904SecMCmV_Err, 
+						ERRID			=> 		udiEL1904SecMCmV_ErrID );
+			
+g_wHMI_EL1904SecMC_Volts 				:= 		WORD_TO_LREAL(wEL1904_SecMCmV) / 1000.0 ;
+	END_IF ;
+//		ELSE xReset := 1 ;
+//		END_IF ;
+
+//		
+//		EL1904 ALARMS	
+//	
+// EL1904: Sensor Test Error
+fbEL1904SensT_ADSRead(
+						NETID			:= 		gc_sADSNetID, 
+						PORT			:= 		gc_uiEL1904_EtherCATAdr, 
+						IDXGRP			:= 		16#F302, 
+						IDXOFFS			:= 		16#800E000A, 
+						LEN				:= 		2, 
+						DESTADDR		:= 		ADR(wEL1904_SenT), 
+						READ			:= 		xExecute, 
+						TMOUT			:= 		T#2S, 
+						BUSY			=> 		xEL1904SenT_busy, 
+						ERR				=> 		xEL1904SenT_Err, 
+						ERRID			=> 		udiEL1904SenT_ErrID );
+
+//These errors may only be present temporarily so they need to be latched and then cleared
+//to be properly noted by the operator
+g_xHMI_EL1904SenT1 						:= 		wEL1904_SenT.0 OR (g_xHMI_EL1904SenT1 AND NOT g_xHMI_EL1904_ErrClearPB) ;
+g_xHMI_EL1904SenT2 						:= 		wEL1904_SenT.1 OR (g_xHMI_EL1904SenT2 AND NOT g_xHMI_EL1904_ErrClearPB) ;
+g_xHMI_EL1904SenT3 						:= 		wEL1904_SenT.2 OR (g_xHMI_EL1904SenT3 AND NOT g_xHMI_EL1904_ErrClearPB) ;
+g_xHMI_EL1904SenT4 						:= 		wEL1904_SenT.3 OR (g_xHMI_EL1904SenT4 AND NOT g_xHMI_EL1904_ErrClearPB) ;
+
+
+// EL1904: 2-Channel Evaluation Error
+// The two channels contradict each other (not same value)
+fbEL1904_2CHEval_ADSRead(
+						NETID			:= 		gc_sADSNetID, 
+						PORT			:= 		gc_uiEL1904_EtherCATAdr, 
+						IDXGRP			:= 		16#F302, 
+						IDXOFFS			:= 		16#800E000B, 
+						LEN				:= 		2, 
+						DESTADDR		:= 		ADR(wEL1904_2CHEval), 
+						READ			:= 		xExecute, 
+						TMOUT			:= 		T#2S, 
+						BUSY			=> 		xEL1904_2CHEval_busy, 
+						ERR				=> 		xEL1904_2CHEval_Err, 
+						ERRID			=> 		udiEL1904_2CHEval_ErrID );
+
+//These errors may only be present temporarily so they need to be latched and then cleared
+//to be properly noted by the operator
+g_xHMI_EL1904_2CHEval_Pair1				:= 		wEL1904_2CHEval.0 OR (g_xHMI_EL1904_2CHEval_Pair1 AND NOT g_xHMI_EL1904_ErrClearPB) ;
+g_xHMI_EL1904_2CHEval_Pair2				:= 		wEL1904_2CHEval.1 OR (g_xHMI_EL1904_2CHEval_Pair2 AND NOT g_xHMI_EL1904_ErrClearPB) ;
+
+
+// EL1904: Error In Safety Mat Operating Mode
+// Input pairs not in the same state (not same value)
+fbEL1904_SMiPair_ADSRead(
+						NETID			:= 		gc_sADSNetID, 
+						PORT			:= 		gc_uiEL1904_EtherCATAdr, 
+						IDXGRP			:= 		16#F302, 
+						IDXOFFS			:= 		16#800E000C, 
+						LEN				:= 		2, 
+						DESTADDR		:= 		ADR(wEL1904_SMiPair), 
+						READ			:= 		xExecute, 
+						TMOUT			:= 		T#2S, 
+						BUSY			=> 		xEL1904_SMiPair_busy, 
+						ERR				=> 		xEL1904_SMiPair_Err, 
+						ERRID			=> 		udiEL1904_SMiPair_ErrID );
+
+//These errors may only be present temporarily so they need to be latched and then cleared
+//to be properly noted by the operator
+g_xHMI_EL1904_SMiPair_Pair1				:= 		(wEL1904_SMiPair.0 AND wEL1904_SMiPair.1) OR (g_xHMI_EL1904_SMiPair_Pair1 AND NOT g_xHMI_EL1904_ErrClearPB) ;
+g_xHMI_EL1904_SMiPair_Pair2				:= 		(wEL1904_SMiPair.2 AND wEL1904_SMiPair.3) OR (g_xHMI_EL1904_SMiPair_Pair2 AND NOT g_xHMI_EL1904_ErrClearPB) ;
+
+
+// EL1904: Error in Safety Mat Operating Supply
+// External supply detected (Input channel not getting test pulses)
+fbEL1904_SMExtSupply_ADSRead(
+						NETID			:= 		gc_sADSNetID, 
+						PORT			:= 		gc_uiEL1904_EtherCATAdr, 
+						IDXGRP			:= 		16#F302, 
+						IDXOFFS			:= 		16#800E000D, 
+						LEN				:= 		2, 
+						DESTADDR		:= 		ADR(wEL1904_SMExtSupply), 
+						READ			:= 		xExecute, 
+						TMOUT			:= 		T#2S, 
+						BUSY			=> 		xEL1904_SMExtSupply_busy, 
+						ERR				=> 		xEL1904_SMExtSupply_Err, 
+						ERRID			=> 		udiEL1904_SMExtSupply_ErrID );
+
+//These errors may only be present temporarily so they need to be latched and then cleared
+//to be properly noted by the operator
+g_xHMI_EL1904_SMExtSupply_CH1			:= 		wEL1904_SMExtSupply.0 OR (g_xHMI_EL1904_SMExtSupply_CH1 AND NOT g_xHMI_EL1904_ErrClearPB) ;
+g_xHMI_EL1904_SMExtSupply_CH2			:= 		wEL1904_SMExtSupply.2 OR (g_xHMI_EL1904_SMExtSupply_CH2 AND NOT g_xHMI_EL1904_ErrClearPB) ;
+g_xHMI_EL1904_SMExtSupply_CH3			:= 		wEL1904_SMExtSupply.3 OR (g_xHMI_EL1904_SMExtSupply_CH3 AND NOT g_xHMI_EL1904_ErrClearPB) ;
+g_xHMI_EL1904_SMExtSupply_CH4			:= 		wEL1904_SMExtSupply.4 OR (g_xHMI_EL1904_SMExtSupply_CH4 AND NOT g_xHMI_EL1904_ErrClearPB) ;
+
+
+//Sum of all errors we know of in the EL1904 terminal
+IF 		g_xHMI_EL1904SenT1 
+	OR 	g_xHMI_EL1904SenT2 
+	OR 	g_xHMI_EL1904SenT3 
+	OR 	g_xHMI_EL1904SenT4
+	OR 	g_xHMI_EL1904_2CHEval_Pair1
+	OR 	g_xHMI_EL1904_2CHEval_Pair2
+	OR 	g_xHMI_EL1904_SMiPair_Pair1
+	OR 	g_xHMI_EL1904_SMiPair_Pair2
+	OR 	g_xHMI_EL1904_SMExtSupply_CH1
+	OR 	g_xHMI_EL1904_SMExtSupply_CH2
+	OR 	g_xHMI_EL1904_SMExtSupply_CH3
+	OR 	g_xHMI_EL1904_SMExtSupply_CH4
+		THEN g_xHMI_EL1904_General_Error := TRUE ;
+		ELSE g_xHMI_EL1904_General_Error := FALSE ;
+	END_IF ;
+	
+]]></ST>
+    </Implementation>
+    <ObjectProperties />
+  </POU>
+</TcPlcObject>

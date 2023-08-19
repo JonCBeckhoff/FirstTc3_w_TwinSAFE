@@ -1,0 +1,45 @@
+﻿<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.0.14">
+  <POU Name="FB_InfoOperationMode" Id="{91f34563-89cb-4436-873b-e8b2e3650585}">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_InfoOperationMode
+VAR_INPUT
+	stInfoData 			:		DUT_ST_InfoDataFB ;
+END_VAR
+VAR_OUTPUT
+	sState 				: 		STRING ;
+	sDiag 				: 		STRING ;
+	END_VAR
+VAR
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[// Operating Mode FB's State
+IF stInfoData.usiMapState 			= 	0 THEN
+				sState 				:= 	'Undefined' ;
+	ELSIF stInfoData.usiMapState 	= 	1 THEN
+				sState 				:= 	'RUN' ;
+	ELSIF stInfoData.usiMapState 	= 	2 THEN
+				sState 				:= 	'STOP' ;
+	ELSIF stInfoData.usiMapState 	= 	3 THEN
+				sState 				:= 	'SAFE' ;
+	ELSIF stInfoData.usiMapState 	= 	4 THEN
+				sState 				:= 	'ERROR' ;
+	ELSIF stInfoData.usiMapState 	= 	5 THEN
+				sState 				:= 	'RESET' ;
+	ELSIF stInfoData.usiMapState 	= 	6 THEN
+				sState 				:= 	'START' ;
+	ELSE
+				sState 				:= 	'Unknown' ;
+END_IF
+
+// Operating Mode FB's Diagnostics
+IF stInfoData.uiMapDiag 			= 	0 THEN
+				sDiag 				:= 	'No Error' ;
+ELSIF  stInfoData.uiMapDiag 		= 	1 THEN
+				sDiag 				:= 	'Discrepancy Monitoring Error' ;
+ELSE
+				sDiag 				:= 	'Unknown' ;
+END_IF]]></ST>
+    </Implementation>
+    <ObjectProperties />
+  </POU>
+</TcPlcObject>

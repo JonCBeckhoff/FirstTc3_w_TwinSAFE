@@ -1,0 +1,360 @@
+﻿<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.0.18">
+  <POU Name="EL6900_ADS_Reads" Id="{80d5e2bd-8b1f-4810-9bf1-90fd5758dfbf}">
+    <Declaration><![CDATA[PROGRAM EL6900_ADS_Reads
+//		8-2-2012
+// 		This Program has been supplied by Beckhoff Automation As-Is and is intended only as an example 
+//		implementation. Functionality is not guaranteed. 
+//
+VAR
+	//Time to check CoE values
+	T1							: 		TON ;
+	xExecute					: 		BOOL ;
+	tTime1						: 		TIME ;
+
+	//Counter for just some very simple sequencing
+	C1							: 		CTU ;
+	xReset						: 		BOOL ;
+	wPreset						: 		WORD := 10 ;
+	xDone						: 		BOOL ;
+	wCount						: 		WORD ;
+
+	//Read the serial number out of the EL6900
+	fbEL6900Sn_ADSRead			: 		ADSREAD ;
+	dwEL6900_Sn					: 		DWORD ;
+	xEL6900Sn_busy				: 		BOOL ;
+	xEL6900Sn_Err				: 		BOOL ;
+	xEL6900Sn_ErrID				: 		UDINT ;
+
+	//Read the DIP Switch Setting out of the EL6900
+	fbEL6900DSw_ADSRead			: 		ADSREAD ;
+	wEL6900_DSw					: 		WORD ;
+	xEL6900DSw_busy				: 		BOOL ;
+	xEL6900DSw_Err				: 		BOOL ;
+	udiEL6900DSw_ErrID			: 		UDINT ;
+
+	//Read the Hardware Version of the EL6900 Logic Terminal
+	fbEL6900_HWvers_EcCoESdoRead: 		FB_EcCoESdoRead ;
+	sEL6900_HWvers				: 		STRING(2) ;
+	xEL6900_HWvers_Busy			: 		BOOL ;
+	xEL6900_HWvers_Err			: 		BOOL ;
+	udiEL6900_HWvers_ErrID		: 		UDINT ;
+
+	//Read the Software Version of the EL6900 Logic Terminal (It's f/w)
+	fbEL6900_FWvers_EcCoESdoRead: 		FB_EcCoESdoRead ;
+	sEL6900_FWvers				: 		STRING(2) ;
+	xEL6900_FWvers_Busy			: 		BOOL ;
+	xEL6900_FWvers_Err			: 		BOOL ;
+	udiEL6900_FWvers_ErrID		: 		UDINT ;
+
+	//Read the Number Of Connections Configured In The EL6900 Logic Terminal
+	fbEL6900_StatConn_EcCoESdoRead: 	FB_EcCoESdoRead ;
+	bEL6900_NoOfConnections		: 		BYTE ;
+	xEL6900_NoOfConnections_Busy: 		BOOL ;
+	xEL6900_NoOfConnections_Err	: 		BOOL ;
+	udiEL6900_NoOfConnections_ErrID: 	UDINT ;
+
+	//Read the Number Of Safety Groups Configured In The EL6900 Logic Terminal
+	fbEL6900_SafetyGrps_EcCoESdoRead: 	FB_EcCoESdoRead ;
+	bEL6900_NoOfSafetyGrps		: 		BYTE ;
+	xEL6900_NoOfSafetyGrps_Busy	: 		BOOL ;
+	xEL6900_NoOfSafetyGrps_Err	: 		BOOL ;
+	udiEL6900_NoOfSafetyGrps_ErrID: 	UDINT ;
+
+	//Read the Number Of Safety Function Blocks Configured In The EL6900 Logic Terminal
+	fbEL6900_SafetyFBs_EcCoESdoRead: 	FB_EcCoESdoRead ;
+	bEL6900_NoOfSafetyFBs		: 		BYTE ;
+	xEL6900_NoOfSafetyFBs_Busy	: 		BOOL ;
+	xEL6900_NoOfSafetyFBs_Err	: 		BOOL ;
+	udiEL6900_NoOfSafetyFBs_ErrID: 		UDINT ;
+	
+	//Read the Primary Micro Controller (MC1) Temperature in DegC out of the EL6900
+	fbEL6900PriMCTemp_ADSRead	: 		ADSREAD ;
+	wEL6900_PriMCTemp			: 		WORD ;
+	xEL6900PriMCTemp_busy		: 		BOOL ;
+	xEL6900PriMCTemp_Err		: 		BOOL ;
+	udiEL6900PriMCTemp_ErrID	: 		UDINT ;
+
+	//Read the Secondary Micro Controller (MC2) Temperature in DegC out of the EL6900
+	fbEL6900SecMCTemp_ADSRead	: 		ADSREAD ;
+	wEL6900_SecMCTemp			: 		WORD ;
+	xEL6900SecMCTemp_busy		: 		BOOL ;
+	xEL6900SecMCTemp_Err		: 		BOOL ;
+	udiEL6900SecMCTemp_ErrID	: 		UDINT ;
+
+	//Read the Primary Micro Controller (MC1) Voltage in mV out of the EL6900
+	fbEL6900PriMCmV_ADSRead		: 		ADSREAD ;
+	wEL6900_PriMCmV				: 		WORD ;
+	xEL6900PriMCmV_busy			: 		BOOL ;
+	xEL6900PriMCmV_Err			: 		BOOL ;
+	udiEL6900PriMCmV_ErrID		: 		UDINT ;
+
+	//Read the Secondary Micro Controller (MC2) Voltage in mV out of the EL6900
+	fbEL6900SecMCmV_ADSRead		: 		ADSREAD ;
+	wEL6900_SecMCmV				: 		WORD ;
+	xEL6900SecMCmV_busy			: 		BOOL ;
+	xEL6900SecMCmV_Err			: 		BOOL ;
+	udiEL6900SecMCmV_ErrID		: 		UDINT ;
+
+	// EL6900: Temperature and Voltage Errors
+	//There are two temperature sensors inside each Microcontroller
+	fbEL6900_Error_ADSRead		: 		ADSREAD ;
+	wEL6900_Error				: 		WORD ;
+	xEL6900Error_busy			: 		BOOL ;
+	xEL6900Error_Err			: 		BOOL ;
+	udiEL6900Error_ErrID		: 		UDINT ;
+END_VAR
+VAR_INPUT
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[//		8-2-2012
+// 		This Program has been supplied by Beckhoff Automation As-Is and is intended only as an example 
+//		implementation. Functionality is not guaranteed. 
+//
+//IF g_bHMI_ScreenBeingDisplayed = 40 THEN
+// Interval timer for CoE Reads
+T1(
+						IN				:= 		NOT xExecute, 
+						PT				:=		T#500MS, 
+						Q				=>		xExecute, 
+						ET				=>		tTime1 ) ;
+
+C1(
+						CU				:= 		xExecute, 
+						RESET			:= 		xReset, 
+						PV				:= 		wPreset, 
+						Q				=> 		xDone, 
+						CV				=> 		wCount) ;
+
+IF C1.CV > 6 	THEN xReset := 1 ;
+				ELSE xReset := 0 ; 
+END_IF ;
+
+// Read the serial number out of the EL6900
+fbEL6900Sn_ADSRead(
+						NETID			:= 		gc_sADSNetID, 
+						PORT			:= 		gc_uiEL6900_EtherCATAdr, 
+						IDXGRP			:= 		16#F302, 
+						IDXOFFS			:= 		16#F9800002, 
+						LEN				:= 		4, 
+						DESTADDR		:= 		ADR(dwEL6900_Sn), 
+						READ			:= 		xExecute, 
+						TMOUT			:= 		T#2S, 
+						BUSY			=> 		xEL6900Sn_busy, 
+						ERR				=> 		xEL6900Sn_Err, 
+						ERRID			=> 		xEL6900Sn_ErrID );
+
+g_dwHMI_EL6900Sn 						:= 		dwEL6900_Sn ;
+
+// Read the DIP Switch Setting out of the EL6900
+IF C1.CV = 1 THEN
+fbEL6900DSw_ADSRead(
+						NETID			:= 		gc_sADSNetID, 
+						PORT			:= 		gc_uiEL6900_EtherCATAdr, 
+						IDXGRP			:= 		16#F302, 
+						IDXOFFS			:= 		16#F9800001, 
+						LEN				:= 		2, 
+						DESTADDR		:= 		ADR(wEL6900_DSw), 
+						READ			:= 		xExecute, 
+						TMOUT			:= 		T#2S, 
+						BUSY			=> 		xEL6900DSw_busy, 
+						ERR				=> 		xEL6900DSw_Err, 
+						ERRID			=> 		udiEL6900DSw_ErrID );
+
+g_wHMI_EL6900DSw 						:= 		wEL6900_DSw ;
+END_IF ;						
+
+//Read the Hardware Version of the EL6900 Logic Terminal
+fbEL6900_HWvers_EcCoESdoRead(
+						sNetId			:= 		gc_sADSNetID, 
+						nSlaveAddr		:= 		gc_uiEL6900_EtherCATAdr, 
+						nSubIndex		:= 		0, 
+						nIndex			:= 		16#1009, 
+						pDstBuf			:=  	ADR(sEL6900_HWvers),
+						cbBufLen		:= 		SIZEOF(sEL6900_HWvers), 
+						bExecute		:= 		xExecute, 
+						tTimeout		:= 		T#2S, 
+						bBusy			=> 		xEL6900_HWvers_Busy, 
+						bError			=> 		xEL6900_HWvers_Err, 
+						nErrId			=> 		udiEL6900_HWvers_ErrID ) ;
+
+g_sHMI_EL6900_HWvers					:= 		sEL6900_HWvers ;
+
+//Read the Software Version of the EL6900 Logic Terminal (It's f/w)
+fbEL6900_FWvers_EcCoESdoRead(
+						sNetId			:= 		gc_sADSNetID, 
+						nSlaveAddr		:= 		gc_uiEL6900_EtherCATAdr, 
+						nSubIndex		:= 		0, 
+						nIndex			:= 		16#100A, 
+						pDstBuf			:=  	ADR(sEL6900_FWvers),
+						cbBufLen		:= 		SIZEOF(sEL6900_FWvers), 
+						bExecute		:= 		xExecute, 
+						tTimeout		:= 		T#2S, 
+						bBusy			=> 		xEL6900_FWvers_Busy, 
+						bError			=> 		xEL6900_FWvers_Err, 
+						nErrId			=> 		udiEL6900_FWvers_ErrID ) ;
+
+g_sHMI_EL6900_FWvers					:= 		sEL6900_FWvers ;
+
+//Read the Number Of Connections Configured In The EL6900 Logic Terminal
+fbEL6900_StatConn_EcCoESdoRead(
+						sNetId			:= 		gc_sADSNetID, 
+						nSlaveAddr		:= 		gc_uiEL6900_EtherCATAdr, 
+						nSubIndex		:= 		0, 
+						nIndex			:= 		16#2110, 
+						pDstBuf			:=  	ADR(bEL6900_NoOfConnections),
+						cbBufLen		:= 		SIZEOF(bEL6900_NoOfConnections), 
+						bExecute		:= 		xExecute, 
+						tTimeout		:= 		T#2S, 
+						bBusy			=> 		xEL6900_NoOfConnections_Busy, 
+						bError			=> 		xEL6900_NoOfConnections_Err, 
+						nErrId			=> 		udiEL6900_NoOfConnections_ErrID ) ;
+
+g_bHMI_EL6900_NoOfConnections			:= 		bEL6900_NoOfConnections ;					
+
+//Read the Number Of Safety Groups Configured In The EL6900 Logic Terminal
+fbEL6900_SafetyGrps_EcCoESdoRead(
+						sNetId			:= 		gc_sADSNetID, 
+						nSlaveAddr		:= 		gc_uiEL6900_EtherCATAdr, 
+						nSubIndex		:= 		0, 
+						nIndex			:= 		16#2120, 
+						pDstBuf			:=  	ADR(bEL6900_NoOfSafetyGrps),
+						cbBufLen		:= 		SIZEOF(bEL6900_NoOfSafetyGrps), 
+						bExecute		:= 		xExecute, 
+						tTimeout		:= 		T#2S, 
+						bBusy			=> 		xEL6900_NoOfSafetyGrps_Busy, 
+						bError			=> 		xEL6900_NoOfSafetyGrps_Err, 
+						nErrId			=> 		udiEL6900_NoOfSafetyGrps_ErrID ) ;
+
+g_bHMI_EL6900_NoOfSafetyGrps			:= 		bEL6900_NoOfSafetyGrps ;
+
+//Read the Number Of Safety Function Blocks Configured In The EL6900 Logic Terminal
+fbEL6900_SafetyFBs_EcCoESdoRead(
+						sNetId			:= 		gc_sADSNetID, 
+						nSlaveAddr		:= 		gc_uiEL6900_EtherCATAdr, 
+						nSubIndex		:= 		0, 
+						nIndex			:= 		16#2130, 
+						pDstBuf			:=  	ADR(bEL6900_NoOfSafetyFBs),
+						cbBufLen		:= 		SIZEOF(bEL6900_NoOfSafetyFBs), 
+						bExecute		:= 		xExecute, 
+						tTimeout		:= 		T#2S, 
+						bBusy			=> 		xEL6900_NoOfSafetyFBs_Busy, 
+						bError			=> 		xEL6900_NoOfSafetyFBs_Err, 
+						nErrId			=> 		udiEL6900_NoOfSafetyFBs_ErrID ) ;
+
+g_bHMI_EL6900_NoOfSafetyFBs			:= 		bEL6900_NoOfSafetyFBs ;
+
+// Read the Primary Micro Controller (MC1) Temperature in DegC out of the EL6900
+IF C1.CV = 2 THEN
+fbEL6900PriMCTemp_ADSRead(
+						NETID			:= 		gc_sADSNetID, 
+						PORT			:= 		gc_uiEL6900_EtherCATAdr, 
+						IDXGRP			:= 		16#F302, 
+						IDXOFFS			:= 		16#FA800001, 
+						LEN				:= 		2, 
+						DESTADDR		:= 		ADR(wEL6900_PriMCTemp), 
+						READ			:= 		xExecute, 
+						TMOUT			:= 		T#2S, 
+						BUSY			=> 		xEL6900PriMCTemp_busy, 
+						ERR				=> 		xEL6900PriMCTemp_Err, 
+						ERRID			=> 		udiEL6900PriMCTemp_ErrID );
+
+g_wHMI_EL6900PriMCTemp 						:= 		wEL6900_PriMCTemp ;
+END_IF ;
+
+// Read the Secondary Micro Controller (MC2) Temperature in DegC out of the EL6900
+IF C1.CV = 3 THEN
+fbEL6900SecMCTemp_ADSRead(
+						NETID			:= 		gc_sADSNetID, 
+						PORT			:= 		gc_uiEL6900_EtherCATAdr, 
+						IDXGRP			:= 		16#F302, 
+						IDXOFFS			:= 		16#FA800002, 
+						LEN				:= 		2, 
+						DESTADDR		:= 		ADR(wEL6900_SecMCTemp), 
+						READ			:= 		xExecute, 
+						TMOUT			:= 		T#2S, 
+						BUSY			=> 		xEL6900SecMCTemp_busy, 
+						ERR				=> 		xEL6900SecMCTemp_Err, 
+						ERRID			=> 		udiEL6900SecMCTemp_ErrID );
+
+g_wHMI_EL6900SecMCTemp 						:= 		wEL6900_SecMCTemp ;
+END_IF ;
+
+// Read the Primary Micro Controller (MC1) Voltage in mV out of the EL6900
+IF C1.CV = 4 THEN
+fbEL6900PriMCmV_ADSRead(
+						NETID			:= 		gc_sADSNetID, 
+						PORT			:= 		gc_uiEL6900_EtherCATAdr, 
+						IDXGRP			:= 		16#F302, 
+						IDXOFFS			:= 		16#FA800003, 
+						LEN				:= 		2, 
+						DESTADDR		:= 		ADR(wEL6900_PriMCmV), 
+						READ			:= 		xExecute, 
+						TMOUT			:= 		T#2S, 
+						BUSY			=> 		xEL6900PriMCmV_busy, 
+						ERR				=> 		xEL6900PriMCmV_Err, 
+						ERRID			=> 		udiEL6900PriMCmV_ErrID );
+
+g_wHMI_EL6900PriMC_Volts				:= 		WORD_TO_LREAL(wEL6900_PriMCmV) / 1000.0 ;
+END_IF ;
+
+// Read the Secondary Micro Controller (MC2) Voltage in mV out of the EL6900
+IF C1.CV = 5 THEN
+fbEL6900SecMCmV_ADSRead(
+						NETID			:= 		gc_sADSNetID, 
+						PORT			:= 		gc_uiEL6900_EtherCATAdr, 
+						IDXGRP			:= 		16#F302, 
+						IDXOFFS			:= 		16#FA800004, 
+						LEN				:= 		2, 
+						DESTADDR		:= 		ADR(wEL6900_SecMCmV), 
+						READ			:= 		xExecute, 
+						TMOUT			:= 		T#2S, 
+						BUSY			=> 		xEL6900SecMCmV_busy, 
+						ERR				=> 		xEL6900SecMCmV_Err, 
+						ERRID			=> 		udiEL6900SecMCmV_ErrID );
+			
+g_wHMI_EL6900SecMC_Volts 				:= 		WORD_TO_LREAL(wEL6900_SecMCmV) / 1000.0 ;
+END_IF ;
+//	ELSE xReset := 1 ;
+//	END_IF ;
+
+//EL6900: Temperature and Voltage Errors
+//There are two temperature sensors inside each Microcontroller
+fbEL6900_Error_ADSRead(
+						NETID			:= 		gc_sADSNetID, 
+						PORT			:= 		gc_uiEL6900_EtherCATAdr, 
+						IDXGRP			:= 		16#F302, 
+						IDXOFFS			:= 		16#FA000003, 
+						LEN				:= 		2, 
+						DESTADDR		:= 		ADR(wEL6900_Error), 
+						READ			:= 		xExecute, 
+						TMOUT			:= 		T#2S, 
+						BUSY			=> 		xEL6900Error_busy, 
+						ERR				=> 		xEL6900Error_Err, 
+						ERRID			=> 		udiEL6900Error_ErrID );
+			
+//These errors may only be present temporarily so they need to be latched and then cleared
+//to be properly noted by the operator
+g_xHMI_EL6900_MaxTemp				:= 		(wEL6900_Error = 5) OR (g_xHMI_EL6900_MaxTemp AND NOT g_xHMI_EL6900_ErrClearPB) ;
+g_xHMI_EL6900_MinTemp				:= 		(wEL6900_Error = 6) OR (g_xHMI_EL6900_MinTemp AND NOT g_xHMI_EL6900_ErrClearPB) ;
+g_xHMI_EL6900_TempDiffExceeded		:= 		(wEL6900_Error = 7) OR (g_xHMI_EL6900_TempDiffExceeded AND NOT g_xHMI_EL6900_ErrClearPB) ;
+g_xHMI_EL6900_MaxVccMC1				:= 		(wEL6900_Error = 257) OR (g_xHMI_EL6900_MaxVccMC1 AND NOT g_xHMI_EL6900_ErrClearPB) ;
+g_xHMI_EL6900_MaxVccMC2				:= 		(wEL6900_Error = 258) OR (g_xHMI_EL6900_MaxVccMC2 AND NOT g_xHMI_EL6900_ErrClearPB) ;
+g_xHMI_EL6900_MinVccMC1				:= 		(wEL6900_Error = 259) OR (g_xHMI_EL6900_MinVccMC1 AND NOT g_xHMI_EL6900_ErrClearPB) ;
+g_xHMI_EL6900_MinVccMC2				:= 		(wEL6900_Error = 260) OR (g_xHMI_EL6900_MinVccMC2 AND NOT g_xHMI_EL6900_ErrClearPB) ;
+
+//Sum of all errors we know of in the EL6930 terminal
+IF 		g_xHMI_EL6900_MaxTemp 
+	OR 	g_xHMI_EL6900_MinTemp
+	OR 	g_xHMI_EL6900_TempDiffExceeded 
+	OR 	g_xHMI_EL6900_MaxVccMC1
+	OR 	g_xHMI_EL6900_MaxVccMC2
+	OR 	g_xHMI_EL6900_MinVccMC1
+	OR 	g_xHMI_EL6900_MinVccMC2
+		THEN g_xHMI_EL6900_General_Error := TRUE ;
+		ELSE g_xHMI_EL6900_General_Error := FALSE ;
+END_IF ;
+]]></ST>
+    </Implementation>
+    <ObjectProperties />
+  </POU>
+</TcPlcObject>

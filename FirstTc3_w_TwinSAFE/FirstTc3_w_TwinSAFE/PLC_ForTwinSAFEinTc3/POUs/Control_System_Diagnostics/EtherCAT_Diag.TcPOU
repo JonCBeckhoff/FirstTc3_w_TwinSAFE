@@ -1,0 +1,1037 @@
+﻿<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.0.18">
+  <POU Name="EtherCAT_Diag" Id="{f6817d24-5ac6-4383-b1d2-87fd62e7f4a5}">
+    <Declaration><![CDATA[PROGRAM EtherCAT_Diag
+//		8-2-2012
+// 		This Program has been supplied by Beckhoff Automation As-Is and is intended only as an example 
+//		implementation. Functionality is not guaranteed. 
+//
+VAR
+	T1									: 		Ton ;
+	xExecute							: 		BOOL ;
+	tTime1								: 		TIME ;
+	
+	//Get EtherCAT network performance statistics
+	fbEcMasterFrameStatistic			: 		FB_EcMasterFrameStatistic ;
+	xMasterFrameStatistic_Busy			: 		BOOL ;
+	xMasterFrameStatistic_Error			: 		BOOL ;
+	udiMasterFrameStatistic_ErrId		: 		UDINT ;
+	
+	//Clear EtherCAT network CRC Errors
+	fbEcMasterFrameStatisticClearCRC	:		FB_EcMasterFrameStatisticClearCRC ;
+	xEcMFStatClearCRC_Busy				: 		BOOL ;
+	xEcMFStatClearCRC_Error				: 		BOOL ;
+	udiEcMFStatClearCRC_ErrId			: 		UDINT ;
+
+	//Clear EtherCAT network Frame Errors
+	fbEcMasterFrameStatisticClearFrames	:		FB_EcMasterFrameStatisticClearFrames ;
+	xEcMFStatClearFrames_Busy			: 		BOOL ;
+	xEcMFStatClearFrames_Error			: 		BOOL ;
+	udiEcMFStatClearFrames_ErrId		: 		UDINT ;
+
+	//Clear EtherCAT network Tx/Rx Errors
+	fbEcMasterFrameStatisticClearTxRxErr:		FB_EcMasterFrameStatisticClearTxRxErr ;
+	xEcMFStatClearTxRxErr_Busy			: 		BOOL ;
+	xEcMFStatClearTxRxErr_Error			: 		BOOL ;
+	udiEcMFStatClearTxRxErr_ErrId		: 		UDINT ;
+
+	//Check for slave CRCs
+	fbGetAllSlaveCrcErrors				: 		FB_EcGetAllSlaveCrcErrors ;
+	ArrCrcErrors						:		ARRAY[1..12] OF DWORD ;
+	xGetAllSlaveCrcErrors_Busy			: 		BOOL ;
+	xGetAllSlaveCrcErrors_Error			: 		BOOL ;
+	udiGetAllSlaveCrcErrors_ErrId		: 		UDINT ;
+	uiGetAllSlavecrc					:		UINT ;
+	udiTotalCrcErrors					: 		UDINT ;
+
+	//Number of slaves configured
+	fbEcGetConfSlaves					: 		FB_EcGetConfSlaves ;
+	pArrEcConfSlaveInfo 				: 		ARRAY[0..10] OF ST_EcSlaveConfigData ;
+	xGetConfSlaves_Busy					: 		BOOL ;
+	xGetConfSlaves_Error				: 		BOOL ;
+	udiGetConfSlaves_ErrId				: 		UDINT ;
+
+	//Number of slaves found
+	fbEcGetScannedSlaves				: 		FB_EcGetScannedSlaves ;
+	xGetScannedSlaves_Busy				: 		BOOL ;
+	xGetScannedSlaves_Error				: 		BOOL ;
+	udiGetScannedSlaves_ErrId			: 		UDINT ;
+	uiScannedSlaves						: 		UINT ;
+	pArrEcScannedSlaveInfo				: 		ARRAY[0..10] OF ST_EcSlaveScannedData ;
+	nScannedSlaves						: 		UINT ;
+
+	//Get vendor product identification of EL2004 slave
+	fbEL2004_EcGetSlaveIdentity			:		FB_EcGetSlaveIdentity ;
+	xEL2004SlaveIdentity_Busy			:		BOOL ;
+	xEL2004SlaveIdentity_Error			:		BOOL ;
+	udiEL2004SlaveIdentity_ErrId		:		UDINT ;
+	stSlaveIdentityEL2004				:		ST_EcSlaveIdentity ;
+	sProdCodeEL2004						:		STRING ;
+	sProdCodeEL2004_End4				:		STRING ;
+	nProdCodeEL2004						:		INT ;
+
+	//Check for specific CRC errors on the EL2004
+	fbEL2004_EcGetSlaveCrcErrorEx		: 		FB_EcGetSlaveCrcErrorEx;
+	xEL2004GetSlaveCrc_Busy				:		BOOL;
+	xEL2004GetSlaveCrc_Error			:		BOOL;
+	udiEL2004GetSlaveCrc_ErrId			:		UDINT;
+
+	//Get vendor product identification of EL1904 slave
+	fbEL1904_EcGetSlaveIdentity			:		FB_EcGetSlaveIdentity ;
+	xEL1904SlaveIdentity_Busy			:		BOOL ;
+	xEL1904SlaveIdentity_Error			:		BOOL ;
+	udiEL1904SlaveIdentity_ErrId		:		UDINT ;
+	stSlaveIdentityEL1904				:		ST_EcSlaveIdentity ;
+	sProdCodeEL1904						:		STRING ;
+	sProdCodeEL1904_End4				:		STRING ;
+	nProdCodeEL1904						:		INT ;
+
+	//Check for specific CRC errors on the EL1904
+	fbEL1904_EcGetSlaveCrcErrorEx		: 		FB_EcGetSlaveCrcErrorEx;
+	xEL1904GetSlaveCrc_Busy				:		BOOL;
+	xEL1904GetSlaveCrc_Error			:		BOOL;
+	udiEL1904GetSlaveCrc_ErrId			:		UDINT;
+
+	//Get vendor product identification of EL2904 slave
+	fbEL2904_EcGetSlaveIdentity			:		FB_EcGetSlaveIdentity ;
+	xEL2904SlaveIdentity_Busy			:		BOOL ;
+	xEL2904SlaveIdentity_Error			:		BOOL ;
+	udiEL2904SlaveIdentity_ErrId		:		UDINT ;
+	stSlaveIdentityEL2904				:		ST_EcSlaveIdentity ;
+	sProdCodeEL2904						:		STRING ;
+	sProdCodeEL2904_End4				:		STRING ;
+	nProdCodeEL2904						:		INT ;
+
+	//Check for specific CRC errors on the EL2904
+	fbEL2904_EcGetSlaveCrcErrorEx		: 		FB_EcGetSlaveCrcErrorEx;
+	xEL2904GetSlaveCrc_Busy				:		BOOL;
+	xEL2904GetSlaveCrc_Error			:		BOOL;
+	udiEL2904GetSlaveCrc_ErrId			:		UDINT;
+	
+	//Get vendor product identification of EL6900 slave
+	fbEL6900_EcGetSlaveIdentity			:		FB_EcGetSlaveIdentity ;
+	xEL6900SlaveIdentity_Busy			:		BOOL ;
+	xEL6900SlaveIdentity_Error			:		BOOL ;
+	udiEL6900SlaveIdentity_ErrId		:		UDINT ;
+	stSlaveIdentityEL6900				:		ST_EcSlaveIdentity ;
+	sProdCodeEL6900						:		STRING ;
+	sProdCodeEL6900_End4				:		STRING ;
+	nProdCodeEL6900						:		INT ;
+
+	//Check for specific CRC errors on the EL6900
+	fbEL6900_EcGetSlaveCrcErrorEx		: 		FB_EcGetSlaveCrcErrorEx;
+	xEL6900GetSlaveCrc_Busy				:		BOOL;
+	xEL6900GetSlaveCrc_Error			:		BOOL;
+	udiEL6900GetSlaveCrc_ErrId			:		UDINT;
+	
+	//Get vendor product identification of EL1008 slave
+	fbEL1008_EcGetSlaveIdentity			:		FB_EcGetSlaveIdentity ;
+	xEL1008SlaveIdentity_Busy			:		BOOL ;
+	xEL1008SlaveIdentity_Error			:		BOOL ;
+	udiEL1008SlaveIdentity_ErrId		:		UDINT ;
+	stSlaveIdentityEL1008				:		ST_EcSlaveIdentity ;
+	sProdCodeEL1008						:		STRING ;
+	sProdCodeEL1008_End4				:		STRING ;
+	nProdCodeEL1008						:		INT ;
+
+	//Check for specific CRC errors on the EL1008
+	fbEL1008_EcGetSlaveCrcErrorEx		: 		FB_EcGetSlaveCrcErrorEx;
+	xEL1008GetSlaveCrc_Busy				:		BOOL;
+	xEL1008GetSlaveCrc_Error			:		BOOL;
+	udiEL1008GetSlaveCrc_ErrId			:		UDINT;
+	
+	//Get vendor product identification of EL2008 slave
+	fbEL2008_EcGetSlaveIdentity			:		FB_EcGetSlaveIdentity ;
+	xEL2008SlaveIdentity_Busy			:		BOOL ;
+	xEL2008SlaveIdentity_Error			:		BOOL ;
+	udiEL2008SlaveIdentity_ErrId		:		UDINT ;
+	stSlaveIdentityEL2008				:		ST_EcSlaveIdentity ;
+	sProdCodeEL2008						:		STRING ;
+	sProdCodeEL2008_End4				:		STRING ;
+	nProdCodeEL2008						:		INT ;
+
+	//Check for specific CRC errors on the EL2008
+	fbEL2008_EcGetSlaveCrcErrorEx		: 		FB_EcGetSlaveCrcErrorEx;
+	xEL2008GetSlaveCrc_Busy				:		BOOL;
+	xEL2008GetSlaveCrc_Error			:		BOOL;
+	udiEL2008GetSlaveCrc_ErrId			:		UDINT;
+	
+	//Get vendor product identification of EL3002 slave
+	fbEL3002_EcGetSlaveIdentity			:		FB_EcGetSlaveIdentity ;
+	xEL3002SlaveIdentity_Busy			:		BOOL ;
+	xEL3002SlaveIdentity_Error			:		BOOL ;
+	udiEL3002SlaveIdentity_ErrId		:		UDINT ;
+	stSlaveIdentityEL3002				:		ST_EcSlaveIdentity ;
+	sProdCodeEL3002						:		STRING ;
+	sProdCodeEL3002_End4				:		STRING ;
+	nProdCodeEL3002						:		INT ;
+
+	//Check for specific CRC errors on the EL3002
+	fbEL3002_EcGetSlaveCrcErrorEx		: 		FB_EcGetSlaveCrcErrorEx;
+	xEL3002GetSlaveCrc_Busy				:		BOOL;
+	xEL3002GetSlaveCrc_Error			:		BOOL;
+	udiEL3002GetSlaveCrc_ErrId			:		UDINT;	
+	
+	//Get vendor product identification of EL4032 slave
+	fbEL4032_EcGetSlaveIdentity			:		FB_EcGetSlaveIdentity ;
+	xEL4032SlaveIdentity_Busy			:		BOOL ;
+	xEL4032SlaveIdentity_Error			:		BOOL ;
+	udiEL4032SlaveIdentity_ErrId		:		UDINT ;
+	stSlaveIdentityEL4032 				: 		ST_EcSlaveIdentity ;
+	sProdCodeEL4032						:		STRING ;
+	sProdCodeEL4032_End4				:		STRING ;
+	nProdCodeEL4032						:		INT ;
+
+	//Check for specific CRC errors on the EL4032
+	fbEL4032_EcGetSlaveCrcErrorEx		: 		FB_EcGetSlaveCrcErrorEx;
+	xEL4032GetSlaveCrc_Busy				:		BOOL;
+	xEL4032GetSlaveCrc_Error			:		BOOL;
+	udiEL4032GetSlaveCrc_ErrId			:		UDINT;	
+
+	//Get vendor product identification of EL7201 #1 slave
+	fbEL7201_1_EcGetSlaveIdentity		:		FB_EcGetSlaveIdentity ;
+	xEL7201_1SlaveIdentity_Busy			:		BOOL ;
+	xEL7201_1SlaveIdentity_Error		:		BOOL ;
+	udiEL7201_1SlaveIdentity_ErrId		:		UDINT ;
+	stSlaveIdentityEL7201_1 			: 		ST_EcSlaveIdentity ;
+	sProdCodeEL7201_1					:		STRING ;
+	sProdCodeEL7201_1_End4				:		STRING ;
+	nProdCodeEL7201_1					:		INT ;
+
+	//Check for specific CRC errors on the EL7201 #1
+	fbEL7201_1_EcGetSlaveCrcErrorEx		: 		FB_EcGetSlaveCrcErrorEx;
+	xEL7201_1GetSlaveCrc_Busy			:		BOOL;
+	xEL7201_1GetSlaveCrc_Error			:		BOOL;
+	udiEL7201_1GetSlaveCrc_ErrId		:		UDINT;
+
+
+	//Get vendor product identification of EL7201 #2 slave
+	fbEL7201_2_EcGetSlaveIdentity		:		FB_EcGetSlaveIdentity ;
+	xEL7201_2SlaveIdentity_Busy			:		BOOL ;
+	xEL7201_2SlaveIdentity_Error		:		BOOL ;
+	udiEL7201_2SlaveIdentity_ErrId		:		UDINT ;
+	stSlaveIdentityEL7201_2 			: 		ST_EcSlaveIdentity ;
+	sProdCodeEL7201_2					:		STRING ;
+	sProdCodeEL7201_2_End4				:		STRING ;
+	nProdCodeEL7201_2					:		INT ;
+
+	//Check for specific CRC errors on the EL7201 #2
+	fbEL7201_2_EcGetSlaveCrcErrorEx		: 		FB_EcGetSlaveCrcErrorEx;
+	xEL7201_2GetSlaveCrc_Busy			:		BOOL;
+	xEL7201_2GetSlaveCrc_Error			:		BOOL;
+	udiEL7201_2GetSlaveCrc_ErrId		:		UDINT;
+
+	//Get vendor product identification of EK1122 slave
+	fbEK1122_EcGetSlaveIdentity			:		FB_EcGetSlaveIdentity ;
+	xEK1122_SlaveIdentity_Busy			:		BOOL ;
+	xEK1122_SlaveIdentity_Error			:		BOOL ;
+	udiEK1122_SlaveIdentity_ErrId		:		UDINT ;
+	stSlaveIdentityEK1122 				: 		ST_EcSlaveIdentity ;
+	sProdCodeEK1122						:		STRING ;
+	sProdCodeEK1122_End4				:		STRING ;
+	nProdCodeEK1122						:		INT ;	
+
+	//Check for specific CRC errors on the EK1122
+	fbEK1122_EcGetSlaveCrcErrorEx		: 		FB_EcGetSlaveCrcErrorEx;
+	xEK1122_GetSlaveCrc_Busy			:		BOOL;
+	xEK1122_GetSlaveCrc_Error			:		BOOL;
+	udiEK1122_GetSlaveCrc_ErrId			:		UDINT;
+
+(*	
+	//Get vendor product identification of EL6930 slave
+	fbEL6930_EcGetSlaveIdentity			:		FB_EcGetSlaveIdentity ;
+	xEL6930SlaveIdentity_Busy			:		BOOL ;
+	xEL6930SlaveIdentity_Error			:		BOOL ;
+	udiEL6930SlaveIdentity_ErrId		:		UDINT ;
+	stSlaveIdentityEL6930				:		ST_EcSlaveIdentity ;
+	sProdCodeEL6930						:		STRING ;
+	sProdCodeEL6930_End4				:		STRING ;
+	nProdCodeEL6930						:		INT ;
+
+	//Check for specific CRC errors on the EL6930
+	fbEL6930_EcGetSlaveCrcErrorEx		: 		FB_EcGetSlaveCrcErrorEx;
+	xEL6930GetSlaveCrc_Busy				:		BOOL;
+	xEL6930GetSlaveCrc_Error			:		BOOL;
+	udiEL6930GetSlaveCrc_ErrId			:		UDINT;
+	
+	//Get vendor product identification of EK1110 slave
+	fbEK1110_EcGetSlaveIdentity			:		FB_EcGetSlaveIdentity ;
+	xEK1110SlaveIdentity_Busy			:		BOOL ;
+	xEK1110SlaveIdentity_Error			:		BOOL ;
+	udiEK1110SlaveIdentity_ErrId		:		UDINT ;
+	stSlaveIdentityEK1110				:		ST_EcSlaveIdentity ;
+	sProdCodeEK1110						:		STRING ;
+	sProdCodeEK1110_End4				:		STRING ;
+	nProdCodeEK1110						:		INT ;
+
+	//Check for specific CRC errors on the EK1110
+	fbEK1110_EcGetSlaveCrcErrorEx		: 		FB_EcGetSlaveCrcErrorEx;
+	xEK1110GetSlaveCrc_Busy				:		BOOL;
+	xEK1110GetSlaveCrc_Error			:		BOOL;
+	udiEK1110GetSlaveCrc_ErrId			:		UDINT;
+	
+	//Get vendor product identification of AX5000 slave
+	fbAX5000_EcGetSlaveIdentity			:		FB_EcGetSlaveIdentity ;
+	xAX5000SlaveIdentity_Busy			:		BOOL ;
+	xAX5000SlaveIdentity_Error			:		BOOL ;
+	udiAX5000SlaveIdentity_ErrId		:		UDINT ;
+	stSlaveIdentityAX5000				:		ST_EcSlaveIdentity ;
+	sProdCodeAX5000						:		STRING ;
+	sProdCodeAX5000_End4				:		STRING ;
+	nProdCodeAX5000						:		INT ;
+
+	//Check for specific CRC errors on the AX5000
+	fbAX5000_EcGetSlaveCrcErrorEx		: 		FB_EcGetSlaveCrcErrorEx;
+	xAX5000GetSlaveCrc_Busy				:		BOOL;
+	xAX5000GetSlaveCrc_Error			:		BOOL;
+	udiAX5000GetSlaveCrc_ErrId			:		UDINT;
+	
+	//Get vendor product identification of AX5805 slave
+	fbAX5805_EcGetSlaveIdentity			:		FB_EcGetSlaveIdentity ;
+	xAX5805SlaveIdentity_Busy			:		BOOL ;
+	xAX5805SlaveIdentity_Error			:		BOOL ;
+	udiAX5805SlaveIdentity_ErrId		:		UDINT ;
+	stSlaveIdentityAX5805				:		ST_EcSlaveIdentity ;
+	sProdCodeAX5805						:		STRING ;
+	sProdCodeAX5805_End4				:		STRING ;
+	nProdCodeAX5805						:		INT ;
+
+	//Check for specific CRC errors on the AX5805
+	fbAX5805_EcGetSlaveCrcErrorEx		: 		FB_EcGetSlaveCrcErrorEx;
+	xAX5805GetSlaveCrc_Busy				:		BOOL;
+	xAX5805GetSlaveCrc_Error			:		BOOL;
+	udiAX5805GetSlaveCrc_ErrId			:		UDINT;
+	
+	//Get vendor product identification of EP1908-0002 slave
+	fbEP1908_EcGetSlaveIdentity			:		FB_EcGetSlaveIdentity ;
+	xEP1908SlaveIdentity_Busy			:		BOOL ;
+	xEP1908SlaveIdentity_Error			:		BOOL ;
+	udiEP1908SlaveIdentity_ErrId		:		UDINT ;
+	stSlaveIdentityEP1908				:		ST_EcSlaveIdentity ;
+	sProdCodeEP1908						:		STRING ;
+	sProdCodeEP1908_End4				:		STRING ;
+	nProdCodeEP1908						:		INT ;
+
+	//Check for specific CRC errors on the EP1908-0002
+	fbEP1908_EcGetSlaveCrcErrorEx		: 		FB_EcGetSlaveCrcErrorEx;
+	xEP1908GetSlaveCrc_Busy				:		BOOL;
+	xEP1908GetSlaveCrc_Error			:		BOOL;
+	udiEP1908GetSlaveCrc_ErrId			:		UDINT;
+*)
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[//		5-6-2013
+// 		This Program has been supplied by Beckhoff Automation As-Is and is intended only as an example 
+//		implementation. Functionality is not guaranteed. 
+//
+
+//EtherCAT Diagnostics
+
+//IF (g_bHMI_ScreenBeingDisplayed = 70) OR (g_bHMI_ScreenBeingDisplayed = 80) THEN
+
+//Get the state of the EtherCAT master and return status as a string - suppose to be for
+//drives but works fine for any Beckhoff EtherCAT master
+g_sHMI_StateMaster := F_ConvMasterDevStateToString(g_wStateMaster);
+
+//Create the xExecute bit for continuous timed interval FB calls
+T1(IN:= NOT xExecute, PT:= T#2S, Q=> xExecute, ET=>tTime1 );
+
+//Get the EtherCAT Network Statistics
+fbEcMasterFrameStatistic(		
+							sNetId					:= 		gc_sADSNetID,
+							bExecute				:= 		xExecute,
+							tTimeout				:= 		T#2S,
+							bBusy					=> 		xMasterFrameStatistic_Busy,
+							bError					=> 		xMasterFrameStatistic_Error,
+							nErrId					=> 		udiMasterFrameStatistic_ErrId,
+							nLostFrames				=> 		g_udiHMI_LostFrames,
+							fFramesPerSecond		=> 		g_lrHMI_FramesPerSecond,
+							nLostQueuedFrames		=> 		g_udiHMI_LostQueuedFrames,
+							fQueuedFramesPerSecond	=> 		g_lrHMI_QueuedFramesPerSecond );
+
+//This FB sends the command to clear EtherCAT Network CRC errors
+fbEcMasterFrameStatisticClearCRC(	
+							sNetId					:= 		gc_sADSNetID,
+							bExecute				:= 		g_xHMI_CearMFStatCRCs,
+							tTimeout				:=  	T#2S,
+							bBusy					=> 		xEcMFStatClearCRC_Busy,
+							bError					=> 		xEcMFStatClearCRC_Error,
+							nErrId					=> 		udiEcMFStatClearCRC_ErrId);
+
+//This FB sends the command to clear EtherCAT Network Frame errors
+fbEcMasterFrameStatisticClearFrames(	
+							sNetId					:= 		gc_sADSNetID,
+							bExecute				:= 		g_xHMI_ClearMFStatFrames,
+							tTimeout				:= 		T#2S,
+							bBusy					=> 		xEcMFStatClearFrames_Busy,
+							bError					=> 		xEcMFStatClearFrames_Error,
+							nErrId					=> 		udiEcMFStatClearFrames_ErrId);
+
+//This FB sends the command to clear EtherCAT Network Tx/Rx errors
+fbEcMasterFrameStatisticClearTxRxErr(	
+							sNetId					:= 		gc_sADSNetID,
+							nEcMasterDevID			:= 		1000,
+							bExecute				:= 		g_xHMI_ClearMFStatTxRxErr,
+							tTimeout				:= 		T#2S,
+							bBusy					=> 		xEcMFStatClearTxRxErr_Busy,
+							bError					=> 		xEcMFStatClearTxRxErr_Error,
+							nErrId					=> 		udiEcMFStatClearTxRxErr_ErrId);
+							
+(* 
+EtherCAT Network: Check for any CRC errors in ALL the slaves
+This fuction is good for an overview but not to find the exact port (A, B, C, or D)
+where the error is coming from on the terminal.  What this function does is get all
+CRC errors for a terminal and simply sum them up as a single number for that slave. 
+nSlaves returns how many slaves there are.  ArrCrcErrors is an array of numbers with
+each number in the array representing each slave's crc summation.  For example crcError[1]
+represents the sum of any crc errors for the first EtherCAT slave device in the network
+and so on *)
+fbGetAllSlaveCrcErrors(	
+							sNetId					:= 		gc_sADSNetID,
+							pCrcErrorBuf 			:= 		ADR(ArrCrcErrors),
+							cbBufLen				:= 		SIZEOF(ArrCrcErrors),
+							bExecute				:=		xExecute,
+							tTimeout				:= 		T#2S,
+							bBusy					=> 		xGetAllSlaveCrcErrors_Busy,
+							bError					=> 		xGetAllSlaveCrcErrors_Error,
+							nErrId					=> 		udiGetAllSlaveCrcErrors_ErrId,
+							nSlaves					=> 		uiGetAllSlavecrc);
+
+//You could be tricky here since the FB gives the number of slaves present and use that to loop through
+//and sum up the total CRCs.  We didn't choose to do that for this example.
+g_dwHMI_TotalCrcErrors := 	ArrCrcErrors[1] + ArrCrcErrors[2] + ArrCrcErrors[3] + ArrCrcErrors[4] + ArrCrcErrors[5] + ArrCrcErrors[6] +
+							ArrCrcErrors[7] + ArrCrcErrors[8] ;
+
+//How many slaves have been configured
+fbEcGetConfSlaves(	
+							sNetId					:= 		gc_sADSNetID,
+							pArrEcConfSlaveInfo		:= 		ADR(pArrEcConfSlaveInfo),
+							cbBufLen				:= 		SIZEOF(pArrEcConfSlaveInfo),
+							bExecute				:= 		xExecute,
+							tTimeout				:= 		T#2S,
+							bBusy					=> 		xGetConfSlaves_Busy,
+							bError					=> 		xGetConfSlaves_Error,
+							nErrorId				=> 		udiGetConfSlaves_ErrId,
+							nSlaves					=> 		g_uiHMI_ConfSlaves);
+
+//How many slaves does the network see
+fbEcGetScannedSlaves(	
+							bExecute				:= 		xExecute,
+							sNetId					:=  	gc_sADSNetID,
+							pArrEcScannedSlaveInfo	:= 		ADR(pArrEcScannedSlaveInfo),
+							cbBufLen				:= 		SIZEOF(pArrEcScannedSlaveInfo),
+							tTimeout				:= 		T#2S,
+							bBusy					=> 		xGetScannedSlaves_Busy,
+							bError					=> 		xGetScannedSlaves_Error,
+							nErrorId				=> 		udiGetScannedSlaves_ErrId,
+							nSlaves					=> 		nScannedSlaves);
+							
+IF NOT xGetScannedSlaves_Busy THEN g_uiHMI_ScannedSlaves := nScannedSlaves ; END_IF ;
+
+//Get the STATE of the EL2004 terminal and display as a text string
+g_sHMI_StateEL2004 									:= 		F_ConvStateToString(g_wStateEL2004);
+
+// slave device's STATE BITS  
+g_stHMI_EL2004EcSlaveStateBits 						:=  	F_ConvSlaveStateToBits(g_stEL2004EcSlaveState);
+
+fbEL2004_EcGetSlaveIdentity(		
+							sNetId					:= 		gc_sADSNetID,
+							nSlaveAddr				:= 		gc_uiEL2004_EtherCATAdr,
+							bExecute				:= 		xExecute,
+							tTimeout				:= 		T#2S,
+							bBusy					=> 		xEL2004SlaveIdentity_Busy,
+							bError					=> 		xEL2004SlaveIdentity_Error,
+							nErrId					=> 		udiEL2004SlaveIdentity_ErrId,
+							identity				=> 		stSlaveIdentityEL2004 );
+
+sProdCodeEL2004 									:= 		F_ConvProductCodeToString(stSlaveIdentityEL2004);
+//Get last 4 characters of the string
+sProdCodeEL2004_End4 								:= 		RIGHT(sProdCodeEL2004, 4) ;
+//Convert last 4 characters to a number
+g_iHMI_ProdCodeEL2004 								:= 		STRING_TO_INT(sProdCodeEL2004_End4);
+
+//In this function block the CRC counts for the individual counts can be decoded
+fbEL2004_EcGetSlaveCrcErrorEx(	
+							sNetId					:= 		gc_sADSNetID,
+							nSlaveAddr				:= 		gc_uiEL2004_EtherCATAdr,
+							bExecute				:= 		xExecute,
+							tTimeout				:= 		T#2S,
+							bBusy					=> 		xEL2004GetSlaveCrc_Busy,
+							bError					=> 		xEL2004GetSlaveCrc_Error,
+							nErrId					=> 		udiEL2004GetSlaveCrc_ErrId,
+							crcError				=> 		g_stHMI_EL2004CrcErrorEx );
+
+//Working Counter: Should remain Zero, If value=1 then data is bad from this device
+g_xEL2004_Wc ;
+
+//Get the STATE of the EL1904 terminal and display as a text string
+g_sHMI_StateEL1904 									:= 		F_ConvStateToString(g_wStateEL1904);
+
+// slave device's STATE BITS  
+g_stHMI_EL1904EcSlaveStateBits 						:=  	F_ConvSlaveStateToBits(g_stEL1904EcSlaveState);
+
+fbEL1904_EcGetSlaveIdentity(		
+							sNetId					:= 		gc_sADSNetID,
+							nSlaveAddr				:= 		gc_uiEL1904_EtherCATAdr,
+							bExecute				:= 		xExecute,
+							tTimeout				:= 		T#2S,
+							bBusy					=> 		xEL1904SlaveIdentity_Busy,
+							bError					=> 		xEL1904SlaveIdentity_Error,
+							nErrId					=> 		udiEL1904SlaveIdentity_ErrId,
+							identity				=> 		stSlaveIdentityEL1904 );
+
+sProdCodeEL1904 									:= 		F_ConvProductCodeToString(stSlaveIdentityEL1904);
+//Get last 4 characters of the string
+sProdCodeEL1904_End4 								:= 		RIGHT(sProdCodeEL1904, 4) ;
+//Convert last 4 characters to a number
+g_iHMI_ProdCodeEL1904 								:= 		STRING_TO_INT(sProdCodeEL1904_End4);
+
+//In this function block the CRC counts for the individual counts can be decoded
+fbEL1904_EcGetSlaveCrcErrorEx(	
+							sNetId					:= 		gc_sADSNetID,
+							nSlaveAddr				:= 		gc_uiEL1904_EtherCATAdr,
+							bExecute				:= 		xExecute,
+							tTimeout				:= 		T#2S,
+							bBusy					=> 		xEL1904GetSlaveCrc_Busy,
+							bError					=> 		xEL1904GetSlaveCrc_Error,
+							nErrId					=> 		udiEL1904GetSlaveCrc_ErrId,
+							crcError				=> 		g_stHMI_EL1904CrcErrorEx );
+
+//Working Counter: Should remain Zero, If value=1 then data is bad from this device
+g_xEL1904_Wc ;
+
+
+//Get the STATE of the EL2904 terminal and display as a text string
+g_sHMI_StateEL2904 									:= 		F_ConvStateToString(g_wStateEL2904);
+
+// slave device's STATE BITS  
+g_stHMI_EL2904EcSlaveStateBits 						:=  	F_ConvSlaveStateToBits(g_stEL2904EcSlaveState);
+
+fbEL2904_EcGetSlaveIdentity(		
+							sNetId					:= 		gc_sADSNetID,
+							nSlaveAddr				:= 		gc_uiEL2904_EtherCATAdr,
+							bExecute				:= 		xExecute,
+							tTimeout				:= 		T#2S,
+							bBusy					=> 		xEL2904SlaveIdentity_Busy,
+							bError					=> 		xEL2904SlaveIdentity_Error,
+							nErrId					=> 		udiEL2904SlaveIdentity_ErrId,
+							identity				=> 		stSlaveIdentityEL2904 );
+
+sProdCodeEL2904 									:= 		F_ConvProductCodeToString(stSlaveIdentityEL2904);
+//Get last 4 characters of the string
+sProdCodeEL2904_End4 								:= 		RIGHT(sProdCodeEL2904, 4) ;
+//Convert last 4 characters to a number
+g_iHMI_ProdCodeEL2904 								:= 		STRING_TO_INT(sProdCodeEL2904_End4);
+
+//In this function block the CRC counts for the individual counts can be decoded
+fbEL2904_EcGetSlaveCrcErrorEx(	
+							sNetId					:= 		gc_sADSNetID,
+							nSlaveAddr				:= 		gc_uiEL2904_EtherCATAdr,
+							bExecute				:= 		xExecute,
+							tTimeout				:= 		T#2S,
+							bBusy					=> 		xEL2904GetSlaveCrc_Busy,
+							bError					=> 		xEL2904GetSlaveCrc_Error,
+							nErrId					=> 		udiEL2904GetSlaveCrc_ErrId,
+							crcError				=> 		g_stHMI_EL2904CrcErrorEx );
+
+//Working Counter: Should remain Zero, If value=1 then data is bad from this device
+g_xEL2904_Wc ;
+
+//Get the STATE of the EL6900 terminal and display as a text string
+g_sHMI_StateEL6900 									:= 		F_ConvStateToString(g_wStateEL6900);
+
+(* 
+Here's a really cool conversion function that decodes the STATE and presents the data
+as every possible BOOL of information that is possible from the slave device's STATE.  
+This function is very simply looking in the program but when viewed ONLINE the resulting
+"premade" structure reveals all the available data bits *)
+g_stHMI_EL6900EcSlaveStateBits 						:=  	F_ConvSlaveStateToBits(g_stEL6900EcSlaveState);
+
+//This function is great for Beckhoff internal product info but it's a shame at this time
+//the one thing it doens't support is the device's serial number!
+fbEL6900_EcGetSlaveIdentity(		
+							sNetId					:= 		gc_sADSNetID,
+							nSlaveAddr				:= 		gc_uiEL6900_EtherCATAdr,
+							bExecute				:= 		xExecute,
+							tTimeout				:= 		T#2S,
+							bBusy					=> 		xEL6900SlaveIdentity_Busy,
+							bError					=> 		xEL6900SlaveIdentity_Error,
+							nErrId					=> 		udiEL6900SlaveIdentity_ErrId,
+							identity				=> 		stSlaveIdentityEL6900 );
+
+(* 
+While the EcGetSlaveIdentity FB didn't seem to be very worthwhile it was needed
+in order to do the conversion function to convert to the product code which DOES say
+the device's XML revision.  For example: EK1100-0000-0017 means f/w rev 17 for this
+slave device *)
+sProdCodeEL6900 									:= 		F_ConvProductCodeToString(stSlaveIdentityEL6900);
+
+//Get last 4 characters of the string
+sProdCodeEL6900_End4 								:= 		RIGHT(sProdCodeEL6900, 4) ;
+
+//Convert last 4 characters to a number
+g_iHMI_ProdCodeEL6900 								:= 		STRING_TO_INT(sProdCodeEL6900_End4);
+
+//In this function block the CRC counts for the individual counts can be decoded
+fbEL6900_EcGetSlaveCrcErrorEx(	
+							sNetId					:= 		gc_sADSNetID,
+							nSlaveAddr				:= 		gc_uiEL6900_EtherCATAdr,
+							bExecute				:= 		xExecute,
+							tTimeout				:= 		T#2S,
+							bBusy					=> 		xEL6900GetSlaveCrc_Busy,
+							bError					=> 		xEL6900GetSlaveCrc_Error,
+							nErrId					=> 		udiEL6900GetSlaveCrc_ErrId,
+							crcError				=> 		g_stHMI_EL6900CrcErrorEx );
+
+//Working Counter: Should remain Zero, If value=1 then data is bad from this device
+g_xEL6900_Wc ;
+
+
+//Get the STATE of the EL1008 terminal and display as a text string
+g_sHMI_StateEL1008 									:= 		F_ConvStateToString(g_wStateEL1008);
+
+// slave device's STATE BITS  
+g_stHMI_EL1008EcSlaveStateBits 						:=  	F_ConvSlaveStateToBits(g_stEL1008EcSlaveState);
+
+fbEL1008_EcGetSlaveIdentity(		
+							sNetId					:= 		gc_sADSNetID,
+							nSlaveAddr				:= 		gc_uiEL1008_EtherCATAdr,
+							bExecute				:= 		xExecute,
+							tTimeout				:= 		T#2S,
+							bBusy					=> 		xEL1008SlaveIdentity_Busy,
+							bError					=> 		xEL1008SlaveIdentity_Error,
+							nErrId					=> 		udiEL1008SlaveIdentity_ErrId,
+							identity				=> 		stSlaveIdentityEL1008 );
+
+sProdCodeEL1008 									:= 		F_ConvProductCodeToString(stSlaveIdentityEL1008);
+//Get last 4 characters of the string
+sProdCodeEL1008_End4 								:= 		RIGHT(sProdCodeEL1008, 4) ;
+//Convert last 4 characters to a number
+g_iHMI_ProdCodeEL1008 								:= 		STRING_TO_INT(sProdCodeEL1008_End4);
+
+//In this function block the CRC counts for the individual counts can be decoded
+fbEL1008_EcGetSlaveCrcErrorEx(	
+							sNetId					:= 		gc_sADSNetID,
+							nSlaveAddr				:= 		gc_uiEL1008_EtherCATAdr,
+							bExecute				:= 		xExecute,
+							tTimeout				:= 		T#2S,
+							bBusy					=> 		xEL1008GetSlaveCrc_Busy,
+							bError					=> 		xEL1008GetSlaveCrc_Error,
+							nErrId					=> 		udiEL1008GetSlaveCrc_ErrId,
+							crcError				=> 		g_stHMI_EL1008CrcErrorEx );
+
+//Working Counter: Should remain Zero, If value=1 then data is bad from this device
+g_xEL1008_Wc ;
+
+
+//Get the STATE of the EL2008 terminal and display as a text string
+g_sHMI_StateEL2008 									:= 		F_ConvStateToString(g_wStateEL2008);
+
+// slave device's STATE BITS  
+g_stHMI_EL2008EcSlaveStateBits 						:=  	F_ConvSlaveStateToBits(g_stEL2008EcSlaveState);
+
+fbEL2008_EcGetSlaveIdentity(		
+							sNetId					:= 		gc_sADSNetID,
+							nSlaveAddr				:= 		gc_uiEL2008_EtherCATAdr,
+							bExecute				:= 		xExecute,
+							tTimeout				:= 		T#2S,
+							bBusy					=> 		xEL2008SlaveIdentity_Busy,
+							bError					=> 		xEL2008SlaveIdentity_Error,
+							nErrId					=> 		udiEL2008SlaveIdentity_ErrId,
+							identity				=> 		stSlaveIdentityEL2008 );
+
+sProdCodeEL2008 									:= 		F_ConvProductCodeToString(stSlaveIdentityEL2008);
+//Get last 4 characters of the string
+sProdCodeEL2008_End4 								:= 		RIGHT(sProdCodeEL2008, 4) ;
+//Convert last 4 characters to a number
+g_iHMI_ProdCodeEL2008 								:= 		STRING_TO_INT(sProdCodeEL2008_End4);
+
+//In this function block the CRC counts for the individual counts can be decoded
+fbEL2008_EcGetSlaveCrcErrorEx(	
+							sNetId					:= 		gc_sADSNetID,
+							nSlaveAddr				:= 		gc_uiEL2008_EtherCATAdr,
+							bExecute				:= 		xExecute,
+							tTimeout				:= 		T#2S,
+							bBusy					=> 		xEL2008GetSlaveCrc_Busy,
+							bError					=> 		xEL2008GetSlaveCrc_Error,
+							nErrId					=> 		udiEL2008GetSlaveCrc_ErrId,
+							crcError				=> 		g_stHMI_EL2008CrcErrorEx );
+
+//Working Counter: Should remain Zero, If value=1 then data is bad from this device
+g_xEL2008_Wc ;
+
+
+
+//Get the STATE of the EL3002 terminal and display as a text string
+g_sHMI_StateEL3002 									:= 		F_ConvStateToString(g_wStateEL3002);
+
+// slave device's STATE BITS  
+g_stHMI_EL3002EcSlaveStateBits 						:=  	F_ConvSlaveStateToBits(g_stEL3002EcSlaveState);
+
+fbEL3002_EcGetSlaveIdentity(		
+							sNetId					:= 		gc_sADSNetID,
+							nSlaveAddr				:= 		gc_uiEL3002_EtherCATAdr,
+							bExecute				:= 		xExecute,
+							tTimeout				:= 		T#2S,
+							bBusy					=> 		xEL3002SlaveIdentity_Busy,
+							bError					=> 		xEL3002SlaveIdentity_Error,
+							nErrId					=> 		udiEL3002SlaveIdentity_ErrId,
+							identity				=> 		stSlaveIdentityEL3002 );
+
+sProdCodeEL3002 									:= 		F_ConvProductCodeToString(stSlaveIdentityEL3002);
+//Get last 4 characters of the string
+sProdCodeEL3002_End4 								:= 		RIGHT(sProdCodeEL3002, 4) ;
+//Convert last 4 characters to a number
+g_iHMI_ProdCodeEL3002 								:= 		STRING_TO_INT(sProdCodeEL3002_End4);
+
+//In this function block the CRC counts for the individual counts can be decoded
+fbEL3002_EcGetSlaveCrcErrorEx(	
+							sNetId					:= 		gc_sADSNetID,
+							nSlaveAddr				:= 		gc_uiEL3002_EtherCATAdr,
+							bExecute				:= 		xExecute,
+							tTimeout				:= 		T#2S,
+							bBusy					=> 		xEL3002GetSlaveCrc_Busy,
+							bError					=> 		xEL3002GetSlaveCrc_Error,
+							nErrId					=> 		udiEL3002GetSlaveCrc_ErrId,
+							crcError				=> 		g_stHMI_EL3002CrcErrorEx );
+
+//Working Counter: Should remain Zero, If value=1 then data is bad from this device
+g_xEL3002_Wc ;
+
+
+//Get the STATE of the EL4032 terminal and display as a text string
+g_sHMI_StateEL4032 									:= 		F_ConvStateToString(g_wStateEL4032);
+
+// slave device's STATE BITS  
+g_stHMI_EL4032EcSlaveStateBits 						:=  	F_ConvSlaveStateToBits(g_stEL4032EcSlaveState);
+
+fbEL4032_EcGetSlaveIdentity(		
+							sNetId					:= 		gc_sADSNetID,
+							nSlaveAddr				:= 		gc_uiEL4032_EtherCATAdr,
+							bExecute				:= 		xExecute,
+							tTimeout				:= 		T#2S,
+							bBusy					=> 		xEL4032SlaveIdentity_Busy,
+							bError					=> 		xEL4032SlaveIdentity_Error,
+							nErrId					=> 		udiEL4032SlaveIdentity_ErrId,
+							identity				=> 		stSlaveIdentityEL4032 );
+
+sProdCodeEL4032 									:= 		F_ConvProductCodeToString(stSlaveIdentityEL4032);
+//Get last 4 characters of the string
+sProdCodeEL4032_End4 								:= 		RIGHT(sProdCodeEL4032, 4) ;
+//Convert last 4 characters to a number
+g_iHMI_ProdCodeEL4032 								:= 		STRING_TO_INT(sProdCodeEL4032_End4);
+
+//In this function block the CRC counts for the individual counts can be decoded
+fbEL4032_EcGetSlaveCrcErrorEx(	
+							sNetId					:= 		gc_sADSNetID,
+							nSlaveAddr				:= 		gc_uiEL4032_EtherCATAdr,
+							bExecute				:= 		xExecute,
+							tTimeout				:= 		T#2S,
+							bBusy					=> 		xEL4032GetSlaveCrc_Busy,
+							bError					=> 		xEL4032GetSlaveCrc_Error,
+							nErrId					=> 		udiEL4032GetSlaveCrc_ErrId,
+							crcError				=> 		g_stHMI_EL4032CrcErrorEx );
+
+//Working Counter: Should remain Zero, If value=1 then data is bad from this device
+g_xEL4032_Wc ;
+
+//Get the STATE of the EL7201 #1 terminal and display as a text string
+g_sHMI_StateEL7201_1								:= 		F_ConvStateToString(g_wStateEL7201_1);
+
+// slave device's STATE BITS  
+g_stHMI_EL7201_1EcSlaveStateBits 					:=  	F_ConvSlaveStateToBits(g_stEL7201_1EcSlaveState);
+
+fbEL7201_1_EcGetSlaveIdentity(		
+							sNetId					:= 		gc_sADSNetID,
+							nSlaveAddr				:= 		gc_uiEL7201_1_EtherCATAdr,
+							bExecute				:= 		xExecute,
+							tTimeout				:= 		T#2S,
+							bBusy					=> 		xEL7201_1SlaveIdentity_Busy,
+							bError					=> 		xEL7201_1SlaveIdentity_Error,
+							nErrId					=> 		udiEL7201_1SlaveIdentity_ErrId,
+							identity				=> 		stSlaveIdentityEL7201_1 );
+
+sProdCodeEL7201_1 									:= 		F_ConvProductCodeToString(stSlaveIdentityEL7201_1);
+//Get last 4 characters of the string
+sProdCodeEL7201_1_End4 								:= 		RIGHT(sProdCodeEL7201_1, 4) ;
+//Convert last 4 characters to a number
+g_iHMI_ProdCodeEL7201_1 							:= 		STRING_TO_INT(sProdCodeEL7201_1_End4);
+
+//In this function block the CRC counts for the individual counts can be decoded
+fbEL7201_1_EcGetSlaveCrcErrorEx(	
+							sNetId					:= 		gc_sADSNetID,
+							nSlaveAddr				:= 		gc_uiEL7201_1_EtherCATAdr,
+							bExecute				:= 		xExecute,
+							tTimeout				:= 		T#2S,
+							bBusy					=> 		xEL7201_1GetSlaveCrc_Busy,
+							bError					=> 		xEL7201_1GetSlaveCrc_Error,
+							nErrId					=> 		udiEL7201_1GetSlaveCrc_ErrId,
+							crcError				=> 		g_stHMI_EL7201_1CrcErrorEx );
+
+//Working Counter: Should remain Zero, If value=1 then data is bad from this device
+g_xEL7201_1_Wc ;
+
+
+//Get the STATE of the EL7201 #2 terminal and display as a text string
+g_sHMI_StateEL7201_2								:= 		F_ConvStateToString(g_wStateEL7201_2);
+
+// slave device's STATE BITS  
+g_stHMI_EL7201_2EcSlaveStateBits 					:=  	F_ConvSlaveStateToBits(g_stEL7201_2EcSlaveState);
+
+fbEL7201_2_EcGetSlaveIdentity(		
+							sNetId					:= 		gc_sADSNetID,
+							nSlaveAddr				:= 		gc_uiEL7201_2_EtherCATAdr,
+							bExecute				:= 		xExecute,
+							tTimeout				:= 		T#2S,
+							bBusy					=> 		xEL7201_2SlaveIdentity_Busy,
+							bError					=> 		xEL7201_2SlaveIdentity_Error,
+							nErrId					=> 		udiEL7201_2SlaveIdentity_ErrId,
+							identity				=> 		stSlaveIdentityEL7201_2 );
+
+sProdCodeEL7201_2 									:= 		F_ConvProductCodeToString(stSlaveIdentityEL7201_2);
+//Get last 4 characters of the string
+sProdCodeEL7201_2_End4 								:= 		RIGHT(sProdCodeEL7201_2, 4) ;
+//Convert last 4 characters to a number
+g_iHMI_ProdCodeEL7201_2 							:= 		STRING_TO_INT(sProdCodeEL7201_2_End4);
+
+//In this function block the CRC counts for the individual counts can be decoded
+fbEL7201_2_EcGetSlaveCrcErrorEx(	
+							sNetId					:= 		gc_sADSNetID,
+							nSlaveAddr				:= 		gc_uiEL7201_2_EtherCATAdr,
+							bExecute				:= 		xExecute,
+							tTimeout				:= 		T#2S,
+							bBusy					=> 		xEL7201_2GetSlaveCrc_Busy,
+							bError					=> 		xEL7201_2GetSlaveCrc_Error,
+							nErrId					=> 		udiEL7201_2GetSlaveCrc_ErrId,
+							crcError				=> 		g_stHMI_EL7201_2CrcErrorEx );
+
+//Working Counter: Should remain Zero, If value=1 then data is bad from this device
+g_xEL7201_2_Wc ;
+
+
+//Get the STATE of the EK1122 terminal and display as a text string
+g_sHMI_StateEK1122								:= 		F_ConvStateToString(g_wStateEK1122);
+
+// slave device's STATE BITS  
+g_stHMI_EK1122_EcSlaveStateBits 					:=  	F_ConvSlaveStateToBits(g_stEK1122_EcSlaveState);
+
+fbEK1122_EcGetSlaveIdentity(		
+							sNetId					:= 		gc_sADSNetID,
+							nSlaveAddr				:= 		gc_uiEK1122_EtherCATAdr,
+							bExecute				:= 		xExecute,
+							tTimeout				:= 		T#2S,
+							bBusy					=> 		xEK1122_SlaveIdentity_Busy,
+							bError					=> 		xEK1122_SlaveIdentity_Error,
+							nErrId					=> 		udiEK1122_SlaveIdentity_ErrId,
+							identity				=> 		stSlaveIdentityEK1122 );
+
+sProdCodeEK1122 									:= 		F_ConvProductCodeToString(stSlaveIdentityEK1122);
+//Get last 4 characters of the string
+sProdCodeEK1122_End4 								:= 		RIGHT(sProdCodeEK1122, 4) ;
+//Convert last 4 characters to a number
+g_iHMI_ProdCodeEK1122 							:= 		STRING_TO_INT(sProdCodeEK1122_End4);
+
+//In this function block the CRC counts for the individual counts can be decoded
+fbEK1122_EcGetSlaveCrcErrorEx(	
+							sNetId					:= 		gc_sADSNetID,
+							nSlaveAddr				:= 		gc_uiEK1122_EtherCATAdr,
+							bExecute				:= 		xExecute,
+							tTimeout				:= 		T#2S,
+							bBusy					=> 		xEK1122_GetSlaveCrc_Busy,
+							bError					=> 		xEK1122_GetSlaveCrc_Error,
+							nErrId					=> 		udiEK1122_GetSlaveCrc_ErrId,
+							crcError				=> 		g_stHMI_EK1122_CrcErrorEx );
+
+(*
+//Get the STATE of the EL6930 terminal and display as a text string
+g_sHMI_StateEL6930 									:= 		F_ConvStateToString(g_wStateEL6930);
+
+// slave device's STATE BITS  
+g_stHMI_EL6930EcSlaveStateBits 						:=  	F_ConvSlaveStateToBits(g_stEL6930EcSlaveState);
+
+fbEL6930_EcGetSlaveIdentity(		
+							sNetId					:= 		gc_sADSNetID,
+							nSlaveAddr				:= 		gc_uiEL6930_EtherCATAdr,
+							bExecute				:= 		xExecute,
+							tTimeout				:= 		T#2S,
+							bBusy					=> 		xEL6930SlaveIdentity_Busy,
+							bError					=> 		xEL6930SlaveIdentity_Error,
+							nErrId					=> 		udiEL6930SlaveIdentity_ErrId,
+							identity				=> 		stSlaveIdentityEL6930 );
+
+sProdCodeEL6930 									:= 		F_ConvProductCodeToString(stSlaveIdentityEL6930);
+//Get last 4 characters of the string
+sProdCodeEL6930_End4 								:= 		RIGHT(sProdCodeEL6930, 4) ;
+//Convert last 4 characters to a number
+g_iHMI_ProdCodeEL6930 								:= 		STRING_TO_INT(sProdCodeEL6930_End4);
+
+//In this function block the CRC counts for the individual counts can be decoded
+fbEL6930_EcGetSlaveCrcErrorEx(	
+							sNetId					:= 		gc_sADSNetID,
+							nSlaveAddr				:= 		gc_uiEL6930_EtherCATAdr,
+							bExecute				:= 		xExecute,
+							tTimeout				:= 		T#2S,
+							bBusy					=> 		xEL6930GetSlaveCrc_Busy,
+							bError					=> 		xEL6930GetSlaveCrc_Error,
+							nErrId					=> 		udiEL6930GetSlaveCrc_ErrId,
+							crcError				=> 		g_stHMI_EL6930CrcErrorEx );
+
+//Working Counter: Should remain Zero, If value=1 then data is bad from this device
+g_xEL6930_Wc;
+
+
+//Get the STATE of the EK1110 terminal and display as a text string
+g_sHMI_StateEK1110 									:= 		F_ConvStateToString(g_wStateEK1110);
+
+// slave device's STATE BITS  
+g_stHMI_EK1110EcSlaveStateBits 						:=  	F_ConvSlaveStateToBits(g_stEK1110EcSlaveState);
+
+fbEK1110_EcGetSlaveIdentity(		
+							sNetId					:= 		gc_sADSNetID,
+							nSlaveAddr				:= 		gc_uiEK1110_EtherCATAdr,
+							bExecute				:= 		xExecute,
+							tTimeout				:= 		T#2S,
+							bBusy					=> 		xEK1110SlaveIdentity_Busy,
+							bError					=> 		xEK1110SlaveIdentity_Error,
+							nErrId					=> 		udiEK1110SlaveIdentity_ErrId,
+							identity				=> 		stSlaveIdentityEK1110 );
+
+sProdCodeEK1110 									:= 		F_ConvProductCodeToString(stSlaveIdentityEL6930);
+//Get last 4 characters of the string
+sProdCodeEK1110_End4 								:= 		RIGHT(sProdCodeEK1110, 4) ;
+//Convert last 4 characters to a number
+g_iHMI_ProdCodeEK1110 								:= 		STRING_TO_INT(sProdCodeEK1110_End4);
+
+//In this function block the CRC counts for the individual counts can be decoded
+fbEK1110_EcGetSlaveCrcErrorEx(	
+							sNetId					:= 		gc_sADSNetID,
+							nSlaveAddr				:= 		gc_uiEK1110_EtherCATAdr,
+							bExecute				:= 		xExecute,
+							tTimeout				:= 		T#2S,
+							bBusy					=> 		xEK1110GetSlaveCrc_Busy,
+							bError					=> 		xEK1110GetSlaveCrc_Error,
+							nErrId					=> 		udiEK1110GetSlaveCrc_ErrId,
+							crcError				=> 		g_stHMI_EK1110CrcErrorEx );
+
+//Working Counter: Should remain Zero, If value=1 then data is bad from this device
+g_xEK1110_Wc ;
+
+
+//Get the STATE of the AX5000 terminal and display as a text string
+g_sHMI_StateAX5000 									:= 		F_ConvStateToString(g_wStateAX5000);
+
+// slave device's STATE BITS  
+g_stHMI_AX5000EcSlaveStateBits 						:=  	F_ConvSlaveStateToBits(g_stAX5000EcSlaveState);
+
+fbAX5000_EcGetSlaveIdentity(		
+							sNetId					:= 		gc_sADSNetID,
+							nSlaveAddr				:= 		gc_uiAX5206_EtherCATAdr,
+							bExecute				:= 		xExecute,
+							tTimeout				:= 		T#2S,
+							bBusy					=> 		xAX5000SlaveIdentity_Busy,
+							bError					=> 		xAX5000SlaveIdentity_Error,
+							nErrId					=> 		udiAX5000SlaveIdentity_ErrId,
+							identity				=> 		stSlaveIdentityAX5000 );
+
+sProdCodeAX5000 									:= 		F_ConvProductCodeToString(stSlaveIdentityAX5000);
+//Get last 4 characters of the string
+sProdCodeAX5000_End4 								:= 		RIGHT(sProdCodeAX5000, 4) ;
+//Convert last 4 characters to a number
+g_iHMI_ProdCodeAX5000 								:= 		STRING_TO_INT(sProdCodeAX5000_End4);
+
+//In this function block the CRC counts for the individual counts can be decoded
+fbAX5000_EcGetSlaveCrcErrorEx(	
+							sNetId					:= 		gc_sADSNetID,
+							nSlaveAddr				:= 		gc_uiAX5206_EtherCATAdr,
+							bExecute				:= 		xExecute,
+							tTimeout				:= 		T#2S,
+							bBusy					=> 		xAX5000GetSlaveCrc_Busy,
+							bError					=> 		xAX5000GetSlaveCrc_Error,
+							nErrId					=> 		udiAX5000GetSlaveCrc_ErrId,
+							crcError				=> 		g_stHMI_AX5000CrcErrorEx );
+
+//Working Counter: Should remain Zero, If value=1 then data is bad from this device
+g_xAX5000_Wc ;
+
+
+//Get the STATE of the AX5805 terminal and display as a text string
+g_sHMI_StateAX5805 									:= 		F_ConvStateToString(g_wStateAX5805);
+
+// slave device's STATE BITS  
+g_stHMI_AX5805EcSlaveStateBits 						:=  	F_ConvSlaveStateToBits(g_stAX5805EcSlaveState);
+
+fbAX5805_EcGetSlaveIdentity(		
+							sNetId					:= 		gc_sADSNetID,
+							nSlaveAddr				:= 		gc_uiAX5805_EtherCATAdr,
+							bExecute				:= 		xExecute,
+							tTimeout				:= 		T#2S,
+							bBusy					=> 		xAX5805SlaveIdentity_Busy,
+							bError					=> 		xAX5805SlaveIdentity_Error,
+							nErrId					=> 		udiAX5805SlaveIdentity_ErrId,
+							identity				=> 		stSlaveIdentityAX5805 );
+
+sProdCodeAX5805 									:= 		F_ConvProductCodeToString(stSlaveIdentityAX5805);
+//Get last 4 characters of the string
+sProdCodeAX5805_End4 								:= 		RIGHT(sProdCodeAX5805, 4) ;
+//Convert last 4 characters to a number
+g_iHMI_ProdCodeAX5805 								:= 		STRING_TO_INT(sProdCodeAX5805_End4);
+
+//In this function block the CRC counts for the individual counts can be decoded
+fbAX5805_EcGetSlaveCrcErrorEx(	
+							sNetId					:= 		gc_sADSNetID,
+							nSlaveAddr				:= 		gc_uiAX5805_EtherCATAdr,
+							bExecute				:= 		xExecute,
+							tTimeout				:= 		T#2S,
+							bBusy					=> 		xAX5805GetSlaveCrc_Busy,
+							bError					=> 		xAX5805GetSlaveCrc_Error,
+							nErrId					=> 		udiAX5805GetSlaveCrc_ErrId,
+							crcError				=> 		g_stHMI_AX5805CrcErrorEx );
+
+//Working Counter: Should remain Zero, If value=1 then data is bad from this device
+g_xAX5805_Wc ;
+
+
+//Get the STATE of the EP1908-0002 module and display as a text string
+g_sHMI_StateEP1908 									:= 		F_ConvStateToString(g_wStateEP1908);
+
+// slave device's STATE BITS  
+g_stHMI_EP1908EcSlaveStateBits 						:=  	F_ConvSlaveStateToBits(g_stEP1908EcSlaveState);
+
+fbEP1908_EcGetSlaveIdentity(		
+							sNetId					:= 		gc_sADSNetID,
+							nSlaveAddr				:= 		gc_uiEP1908_EtherCATAdr,
+							bExecute				:= 		xExecute,
+							tTimeout				:= 		T#2S,
+							bBusy					=> 		xEP1908SlaveIdentity_Busy,
+							bError					=> 		xEP1908SlaveIdentity_Error,
+							nErrId					=> 		udiEP1908SlaveIdentity_ErrId,
+							identity				=> 		stSlaveIdentityEP1908 );
+
+sProdCodeEP1908 									:= 		F_ConvProductCodeToString(stSlaveIdentityEP1908);
+//Get last 4 characters of the string
+sProdCodeEP1908_End4 								:= 		RIGHT(sProdCodeEP1908, 4) ;
+//Convert last 4 characters to a number
+g_iHMI_ProdCodeEP1908 								:= 		STRING_TO_INT(sProdCodeEP1908_End4);
+
+//In this function block the CRC counts for the individual counts can be decoded
+fbEP1908_EcGetSlaveCrcErrorEx(	
+							sNetId					:= 		gc_sADSNetID,
+							nSlaveAddr				:= 		gc_uiEP1908_EtherCATAdr,
+							bExecute				:= 		xExecute,
+							tTimeout				:= 		T#2S,
+							bBusy					=> 		xEP1908GetSlaveCrc_Busy,
+							bError					=> 		xEP1908GetSlaveCrc_Error,
+							nErrId					=> 		udiEP1908GetSlaveCrc_ErrId,
+							crcError				=> 		g_stHMI_EP1908CrcErrorEx );
+
+//Working Counter: Should remain Zero, If value=1 then data is bad from this device
+g_xEP1908_Wc ;
+
+*)
+
+//END_IF ;
+]]></ST>
+    </Implementation>
+    <ObjectProperties />
+  </POU>
+</TcPlcObject>

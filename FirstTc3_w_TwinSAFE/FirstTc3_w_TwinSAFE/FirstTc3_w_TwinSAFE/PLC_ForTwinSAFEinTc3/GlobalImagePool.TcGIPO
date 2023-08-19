@@ -1,0 +1,64 @@
+﻿<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.0.14">
+  <ImagePool Name="GlobalImagePool" Id="{463669b1-5960-4b91-a013-4fa95bef64c9}">﻿<XmlArchive>
+  <Data>
+    <o xml:space="preserve" t="GlobalImagePoolObject">
+      <v n="UniqueIdGenerator">"11"</v>
+      <l n="BitmapPool" t="ArrayList" cet="ImagePoolItem">
+        <o>
+          <v n="BitmapID">"Beckhoff_pic4"</v>
+          <v n="FileID">"5ce3da45-db07-42e7-a21c-a00fff4ed8f6|FirstTc3_w_TwinSAFE\PLC_ForTwinSAFEinTc3\VISUs\pics\Beckhoff_Pic4.jpg"</v>
+          <v n="ItemID">11</v>
+        </o>
+        <o>
+          <v n="BitmapID">"AX5805"</v>
+          <v n="FileID">"5ce3da45-db07-42e7-a21c-a00fff4ed8f6|FirstTc3_w_TwinSAFE\PLC_ForTwinSAFEinTc3\VISUs\pics\AX5805.jpg"</v>
+          <v n="ItemID">10</v>
+        </o>
+        <o>
+          <v n="BitmapID">"EL6900"</v>
+          <v n="FileID">"5ce3da45-db07-42e7-a21c-a00fff4ed8f6|FirstTc3_w_TwinSAFE\PLC_ForTwinSAFEinTc3\VISUs\pics\EL6900.jpg"</v>
+          <v n="ItemID">8</v>
+        </o>
+        <o>
+          <v n="BitmapID">"EL6930"</v>
+          <v n="FileID">"5ce3da45-db07-42e7-a21c-a00fff4ed8f6|FirstTc3_w_TwinSAFE\PLC_ForTwinSAFEinTc3\VISUs\pics\EL6930.jpg"</v>
+          <v n="ItemID">7</v>
+        </o>
+        <o>
+          <v n="BitmapID">"EP1908"</v>
+          <v n="FileID">"5ce3da45-db07-42e7-a21c-a00fff4ed8f6|FirstTc3_w_TwinSAFE\PLC_ForTwinSAFEinTc3\VISUs\pics\EP1908-0002.jpg"</v>
+          <v n="ItemID">6</v>
+        </o>
+        <o>
+          <v n="BitmapID">"EL2904"</v>
+          <v n="FileID">"5ce3da45-db07-42e7-a21c-a00fff4ed8f6|FirstTc3_w_TwinSAFE\PLC_ForTwinSAFEinTc3\VISUs\pics\EL2904.jpg"</v>
+          <v n="ItemID">5</v>
+        </o>
+        <o>
+          <v n="BitmapID">"EL1904"</v>
+          <v n="FileID">"5ce3da45-db07-42e7-a21c-a00fff4ed8f6|FirstTc3_w_TwinSAFE\PLC_ForTwinSAFEinTc3\VISUs\pics\EL1904.jpg"</v>
+          <v n="ItemID">3</v>
+        </o>
+        <o>
+          <v n="BitmapID">""</v>
+          <v n="FileID">""</v>
+          <v n="ItemID">4</v>
+        </o>
+      </l>
+      <v n="GuidInit">{2a20b3e8-85fc-4f08-ac1d-39ea2b6925eb}</v>
+      <v n="GuidReInit">{27fe4fd1-9fab-4169-a77e-8e7cc71b4cd9}</v>
+      <v n="GuidExitX">{f45c04f0-b926-42af-bd4d-273b9ddc4600}</v>
+      <v n="ValidIds">true</v>
+    </o>
+  </Data>
+  <TypeList>
+    <Type n="ArrayList">System.Collections.ArrayList</Type>
+    <Type n="Boolean">System.Boolean</Type>
+    <Type n="GlobalImagePoolObject">{795b536d-9cec-4fc3-a972-50e1e08d20e8}</Type>
+    <Type n="Guid">System.Guid</Type>
+    <Type n="ImagePoolItem">{215b2719-0347-4e4d-ba85-8bcd66946f66}</Type>
+    <Type n="Int32">System.Int32</Type>
+    <Type n="String">System.String</Type>
+  </TypeList>
+</XmlArchive><ObjectProperties /></ImagePool>
+</TcPlcObject>

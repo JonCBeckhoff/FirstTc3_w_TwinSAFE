@@ -1,0 +1,33 @@
+﻿<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.0.14">
+  <POU Name="FB_InfoTON" Id="{5c7de7e7-2871-40c6-8900-ff54e1eb6275}">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_InfoTON
+VAR_INPUT
+	stInfoData 		: 		DUT_ST_InfoDataFB ;
+END_VAR
+VAR_OUTPUT
+	sState 			: 		STRING ;
+END_VAR
+VAR
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[// Timer-ON (TON) FB's State
+IF stInfoData.usiMapState 			= 	0 THEN
+				sState 				:= 	'Undefined' ;
+	ELSIF stInfoData.usiMapState 	= 	1 THEN
+				sState 				:= 	'RUN' ;
+	ELSIF stInfoData.usiMapState 	= 	2 THEN
+				sState 				:= 	'STOP' ;
+	ELSIF stInfoData.usiMapState 	= 	3 THEN
+				sState 				:= 	'SAFE' ;
+	ELSIF stInfoData.usiMapState 	= 	9 THEN
+				sState 				:= 	'DelayIn' ;
+	ELSE
+				sState 				:= 	'Unknown' ;
+END_IF
+
+// The Timer-ON (TON) FB Has No Diagnostic Byte to Decode]]></ST>
+    </Implementation>
+    <ObjectProperties />
+  </POU>
+</TcPlcObject>

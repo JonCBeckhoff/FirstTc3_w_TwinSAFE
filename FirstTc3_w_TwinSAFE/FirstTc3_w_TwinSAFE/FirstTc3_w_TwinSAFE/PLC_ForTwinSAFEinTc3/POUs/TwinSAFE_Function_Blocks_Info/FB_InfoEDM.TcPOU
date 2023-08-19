@@ -1,0 +1,45 @@
+﻿<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.0.14">
+  <POU Name="FB_InfoEDM" Id="{e6f103c6-93dc-4ef0-9458-c368091d07f8}">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_InfoEDM
+VAR_INPUT
+	stInfoData 			:		DUT_ST_InfoDataFB ;
+END_VAR
+VAR_OUTPUT
+	sState 				: 		STRING ;
+	sDiag 				: 		STRING ;
+	END_VAR
+VAR
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[// EDM FB's State
+IF stInfoData.usiMapState 			= 	0 THEN
+				sState 				:= 	'Undefined' ;
+	ELSIF stInfoData.usiMapState 	= 	2 THEN
+				sState 				:= 	'STOP' ;
+	ELSIF stInfoData.usiMapState 	= 	4 THEN
+				sState 				:= 	'ERROR' ;
+	ELSIF stInfoData.usiMapState 	= 	5 THEN
+				sState 				:= 	'RESET' ;
+	ELSIF stInfoData.usiMapState	= 	14 THEN
+				sState 				:= 	'Monitor-OFF' ;
+	ELSIF stInfoData.usiMapState 	= 	15 THEN
+				sState 				:= 	'Monitor-ON' ;
+	ELSE
+				sState 				:= 	'Unknown' ;
+END_IF
+
+// EDM FB's Diagnostics
+IF stInfoData.uiMapDiag 			= 	0 THEN
+				sDiag 				:= 	'No Error' ;
+ELSIF  stInfoData.uiMapDiag 		= 	1 THEN
+				sDiag	 			:= 	'Switch-OFF Timer Elapsed' ;
+ELSIF  stInfoData.uiMapDiag 		= 	2 THEN
+				sDiag 				:= 	'Switch-ON Timer Elapsed' ;
+ELSE
+				sDiag 				:= 	'Unknown' ;
+END_IF]]></ST>
+    </Implementation>
+    <ObjectProperties />
+  </POU>
+</TcPlcObject>

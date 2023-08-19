@@ -1,0 +1,20 @@
+﻿<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.0.18">
+  <DUT Name="ST_MDP_MainboardTBL4" Id="{350e9f93-52d7-49d9-8a60-75b7e8b1b9e3}">
+    <Declaration><![CDATA[TYPE ST_MDP_MainboardTBL4 :
+STRUCT
+	uiLen					:UINT;			// Length
+	iMainboard1p05v			:INT;			// Actual voltage of 1.05 volt in power supply - mV
+	iMainboardVccCore		:INT;			// Actual voltage of Vcc Core in processor - mV
+	iMainboard5v			:INT;			// Actual voltage of 5 volt in power supply - mV
+	iMainboard12v			:INT;			// Actual voltage of 12 volt in power supply - mV
+	iMainboardVBatt			:INT;			// Actual voltage of 3 volt Battery - mV
+	iMainboardPwrCtrlVcc	:INT;			// Actual voltage of 5 volt in UNKNOWN - mV
+	iMainboardCX2100_5v		:INT;			// Actual voltage of 5 volt supply in CX2100 - mV
+	iMainboardCX2100_12v	:INT;			// Actual voltage of 12 volt supply in CX2100 - mV
+	iMainboardCX2100_24v	:INT;			// Actual voltage of 24 volt supply in CX2100 - mV
+END_STRUCT
+END_TYPE
+]]></Declaration>
+    <ObjectProperties />
+  </DUT>
+</TcPlcObject>

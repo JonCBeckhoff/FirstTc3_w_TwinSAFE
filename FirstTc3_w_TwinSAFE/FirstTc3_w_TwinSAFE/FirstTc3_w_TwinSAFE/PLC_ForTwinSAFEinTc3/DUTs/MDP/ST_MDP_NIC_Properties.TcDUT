@@ -1,0 +1,17 @@
+﻿<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.0.18">
+  <DUT Name="ST_MDP_NIC_Properties" Id="{befce162-9162-469f-a16d-04c9516ab89d}">
+    <Declaration><![CDATA[TYPE ST_MDP_NIC_Properties :
+STRUCT
+	uiLen			:UINT;			// Length
+	sMACAddress		:T_MaxSTRING;	// MAC Address
+	sIPAddress		:T_MaxSTRING;	// IPv4 Address
+	sSubnetMask		:T_MaxSTRING;	// IPv4 Subnet Mask
+	xDHCP			:BOOL;			// DHCP
+	iReserved		:BYTE;
+	sDefaultGateway	:T_MaxSTRING;	// IPv4 Default Gateway
+END_STRUCT
+END_TYPE
+]]></Declaration>
+    <ObjectProperties />
+  </DUT>
+</TcPlcObject>

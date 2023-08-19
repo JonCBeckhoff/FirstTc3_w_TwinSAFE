@@ -1,0 +1,643 @@
+﻿<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.0.19">
+  <POU Name="System_Functions" Id="{1ea758fa-b210-44d7-82c0-6097527974ef}">
+    <Declaration><![CDATA[PROGRAM System_Functions
+//		8-2-2012
+// 		This Program has been supplied by Beckhoff Automation As-Is and is intended only as an example 
+//		implementation. Functionality is not guaranteed. 
+//
+VAR
+	//General timer for periodic reads
+	T1									:		TON ;
+	xExecute							:		BOOL ;
+	tTime1								:		TIME ;
+
+	//Get Device Identification
+	fbGetDeviceIdentificationEx			:		FB_GetDeviceIdentificationEx ;
+	xGetDeviceId_Busy					:		BOOL ;
+	xGetDeviceId_Error					:		BOOL ;
+	udiGetDeviceId_ErrId				:		UDINT ;
+	stDevIdent							:		ST_DeviceIdentificationEx ;
+
+	//Get ADS Router Info
+	fbGetRouterStatusInfo				:		FB_GetRouterStatusInfo ;
+	xGetRouterStatusInfo_Busy			:		BOOL ;
+	xGetRouterStatusInfo_Error			:		BOOL ;
+	udiGetRouterStatusInfo_ErrId		:		UDINT ;
+	stRouterStatusInfo					:		ST_TcRouterStatusInfo ;
+
+
+(*
+(* Get CPU Usage Info  *)
+	fbTC_CpuUsage: TC_CpuUsage;
+	bCpuUsage_Busy: BOOL;
+	bCpuUsage_Error: BOOL;
+	nCpuUsage_ErrId: UDINT;
+	nCpuUsage: UDINT;
+	nCpuUsage_HMI: UDINT;
+
+(* Get System Latency Values *)
+	fbTC_SysLatency: TC_SysLatency;
+	bSysLatency_Busy: BOOL;
+	bSysLatency_Error: BOOL;
+	nSysLatency_ErrId: UDINT;
+	nSysLatency_Actual: UDINT;
+	nSysLatency_Max: UDINT;
+	nSysLatency_Actual_HMI: UDINT;
+	nSysLatency_Max_HMI: UDINT;
+
+(* SystemTaskInfoArr[1].cycleTime is in 100ns increments - needed to convert to ms for display*)
+	nCycleTime_HMI: LREAL;
+
+(* SystemTaskInfoArr[1].lastExecTime is in 100ns increments - needed to convert to ms for display*)
+	nLastExecTime_HMI: LREAL;
+	fbGetDeviceIdentificationEx: FB_GetDeviceIdentificationEx;
+*)
+	fbFB_MDP_ScanModules				: 		FB_MDP_ScanModules;
+	eMDP_ModType						: 		E_MDP_ModuleType;
+	usiModIdx							: 		USINT;
+	xMDP_ScanModules_busy				: 		BOOL;
+	xMDP_ScanModules_Error				: 		BOOL;
+	udiMDP_ScanModules_ErrID			: 		UDINT;
+	bMDP_ScanModules_DynModID			: 		BYTE;
+	usiMDP_ScanModules_ModTypCnt		: 		USINT;
+	usiMDP_ScanModules_ModCnt			: 		USINT;
+
+	fbFB_MDP_ReadModuleContent 			:		FB_MDP_ReadModuleContent ;
+	ST_MDP_Addr 						:		ST_MDP_Addr ;
+	dwMB_Buffer							: 		DWORD ;
+	xMDP_Motherboard_ReadModContent_Busy: 		BOOL ;
+	xMDP_Motherboard_ReadModContent_Error: 		BOOL ;
+	udiMDP_Motherboard_ReadModContent_ErrID: 	UDINT ;
+	usiMDP_Motherboard_ReadModContent_ErrPOS: 	USINT ;
+	arrMDP_Motherboard_StartIdx			: 		ARRAY [0..255] OF UINT ;
+
+	fbFB_MDP_SplitErrorID				: 		FB_MDP_SplitErrorID ;
+	eMDP_ErrGroup 						:		E_MDP_ErrGroup ;
+	uiMDP_Motherboard_ReadModContent_ErrCODE:	UINT ;
+
+	fbFB_MDP_ReadModuleHeader			: 		FB_MDP_ReadModuleHeader ;
+	xMDP_Motherboard_ReadModHeader_Busy	: 		BOOL ;
+	xMDP_Motherboard_ReadModHeader_Error: 		BOOL ;
+	udiMDP_Motherboard_ReadModHeader_ErrID: 	UDINT ;
+	ST_MDP_Motherboard_ReadModHeader 	:		ST_MDP_ModuleHeader ;
+
+	fbFB_MDP_CPU_Read1					: 		FB_MDP_CPU_Read;
+	ST_CPUModHdr 						:		ST_MDP_ModuleHeader ;
+	ST_CPUModContent 					: 		ST_MDP_CPU ;
+
+	fbFB_MDP_Mainboard_ReadTBL1			: 		FB_MDP_Mainboard_ReadTBL1;
+	ST_MainboardModHdrTBL1				:		ST_MDP_ModuleHeader ;
+	ST_MainboardModContentTBL1			: 		ST_MDP_MainboardTBL1 ;
+
+	fbFB_MDP_Mainboard_ReadTBL2			: 		FB_MDP_Mainboard_ReadTBL2 ;
+	ST_MainboardModHdrTBL2				:		ST_MDP_ModuleHeader ;
+	ST_MainboardModContentTBL2			: 		ST_MDP_MainboardTBL2 ;
+
+	fbFB_MDP_Mainboard_ReadTBL3			: 		FB_MDP_Mainboard_ReadTBL3 ;
+	ST_MainboardModHdrTBL3				:		ST_MDP_ModuleHeader ;
+	ST_MainboardModContentTBL3			: 		ST_MDP_MainboardTBL3 ;
+
+	fbFB_MDP_Mainboard_ReadTBL4			: 		FB_MDP_Mainboard_ReadTBL4 ;
+	ST_MainboardModHdrTBL4				:		ST_MDP_ModuleHeader ;
+	ST_MainboardModContentTBL4			: 		ST_MDP_MainboardTBL4 ;
+	
+	fbFB_MDP_NIC0_Read					: 		FB_MDP_NIC_Read ;
+	ST_NIC0_ModHdr						: 		ST_MDP_ModuleHeader ;
+	ST_NIC0_ModContent					: 		ST_MDP_NIC_Properties ;
+	
+	fbFB_MDP_NIC1_Read					: 		FB_MDP_NIC_Read ;
+	ST_NIC1_ModHdr						: 		ST_MDP_ModuleHeader ;
+	ST_NIC1_ModContent					: 		ST_MDP_NIC_Properties ;	
+	lrOperTimeHrs						: 		LREAL ;
+	lrOperTimeDays						: 		LREAL ;
+	lrOperTimeYears						: 		LREAL ;
+
+	fbFB_MDP_Time1_Read					: 		FB_MDP_Time_ReadTBL1 ;
+	ST_Time1_ModHdr						: 		ST_MDP_ModuleHeader ;
+	ST_Time1_ModContent					: 		ST_MDP_TimeTBL1 ;
+
+	fbFB_MDP_Time2_Read					: 		FB_MDP_Time_ReadTBL2 ;
+	ST_Time2_ModHdr						: 		ST_MDP_ModuleHeader ;
+	ST_Time2_ModContent					: 		ST_MDP_TimeTBL2 ;
+	
+	fbFB_MDP_Memory_Read				: 		FB_MDP_Memory_ReadTBL1 ;
+	ST_Memory_ModHdr					: 		ST_MDP_ModuleHeader ;
+	ST_Memory_ModContent				: 		ST_MDP_MemoryTBL1 ;
+	one									:		INT :=1 ;
+	
+//	fbFB_MDP_Time1_Read					: 		FB_MDP_Time_ReadTBL1 ;
+//	ST_Memory_ModHdr					: 		ST_MDP_ModuleHeader ;
+//	ST_Memory_ModContent				: 		ST_MDP_TimeTBL1 ;
+	
+	testword: INT;
+	string45: STRING;
+	fbFB_MDP_DiskMngmnt_ReadTBL1		: 		FB_MDP_DiskMngmnt_ReadTBL1 ;
+	ST_DiskMngmnt_HdrTBL1				: 		ST_MDP_ModuleHeader ;
+	ST_DiskMngmntTBL1					: 		ST_MDP_DiskMngmntTBL1 ;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[//		8-2-2012
+// 		This Program has been supplied by Beckhoff Automation As-Is and is intended only as an example 
+//		implementation. Functionality is not guaranteed. 
+//
+//   ;
+;
+testword ;
+
+
+//IF g_bHMI_ScreenBeingDisplayed = 90 THEN
+//Create the xExecute bit for continuous timed interval FB calls
+T1(IN:= NOT xExecute, PT:= T#2S, Q=> xExecute, ET=>tTime1 );
+
+(* Computer/Controller Device Info - Get CX and TwinCAT version info
+   from the resulting structure "stDevIdent" - display only when the 
+   function block is not BUSY retrieving the data else the display
+   will "blink" because while the FB is BUSY the values go to 0 or
+   "blank" text *)
+fbGetDeviceIdentificationEx(
+							bExecute					:= 		xExecute, 
+							tTimeout					:= 		T#2S, 
+							sNetId						:= 		'', 
+							bBusy						=> 		xGetDeviceId_Busy, 
+							bError						=> 		xGetDeviceId_Error, 
+							nErrorID					=> 		udiGetDeviceId_ErrId, 
+							stDevIdent					=> 		stDevIdent );
+							
+IF NOT xGetDeviceId_Busy THEN 
+							g_stHMI_DevIdent 			:= 		stDevIdent ; 
+END_IF ;
+
+g_stHMI_AppInfo 										:= _AppInfo  ;
+
+//ADS Router Status info
+fbGetRouterStatusInfo(		
+							sNetId						:= 		'',
+							bExecute					:= 		xExecute,
+							tTimeout					:= 		T#2S,
+							bBusy						=> 		xGetRouterStatusInfo_Busy,
+							bError						=> 		xGetRouterStatusInfo_Error,
+							nErrID						=> 		udiGetRouterStatusInfo_ErrId,
+							info						=> 		stRouterStatusInfo );
+							
+IF NOT xGetRouterStatusInfo_Busy THEN 
+							g_stHMI_RouterStatusInfo	:= 		stRouterStatusInfo ; 
+END_IF ;
+
+g_stHMI_PlcTaskSystemInfo 								:= 		_TaskInfo[_AppInfo.TaskCnt] ;
+g_lrHMI_PlcTaskSystemInfo_CycleTime 					:= 		g_stHMI_PlcTaskSystemInfo.CycleTime / 10.0 ;
+g_lrHMI_PlcTaskSystemInfo_LastExecTime 					:= 		g_stHMI_PlcTaskSystemInfo.LastExecTime / 10.0 ;
+
+//In order to be able to query or set an MDP parameter, the Dynamic Module ID of 
+//the module in which the parameter is located must be known.
+fbFB_MDP_ScanModules(
+							bExecute					:= 		xExecute, 
+							nModuleType					:= 		eMDP_ModType, 
+							iModIdx						:= 		usiModIdx, 
+							tTimeout					:= 		T#2S, 
+							sAmsNetId					:= 		'', 
+							bBusy						=> 		xMDP_ScanModules_busy, 
+							bError						=> 		xMDP_ScanModules_Error, 
+							nErrID						=> 		udiMDP_ScanModules_ErrID, 
+							nDynModuleId				=> 		bMDP_ScanModules_DynModID, 
+							iModuleTypeCount			=> 		usiMDP_ScanModules_ModTypCnt, 
+							iModuleCount				=> 		usiMDP_ScanModules_ModCnt );
+
+// The function block enables the header of an MDP module to be queried
+fbFB_MDP_ReadModuleHeader(
+							bExecute					:= 		xExecute, 
+							nDynModuleId				:= 		4, 
+							tTimeout					:= 		T#2S, 
+							sAmsNetId					:= 		'', 
+							bBusy						=> 		xMDP_Motherboard_ReadModHeader_Busy, 
+							bError						=> 		xMDP_Motherboard_ReadModHeader_Error, 
+							nErrID						=> 		udiMDP_Motherboard_ReadModHeader_ErrID, 
+							stMDP_ModHeader				=> 		ST_MDP_Motherboard_ReadModHeader);							
+							
+
+fbFB_MDP_CPU_Read1(
+							xExecute					:= 		xExecute, 
+							tTimeout					:= 		T#2S, 
+							usiModIdx					:= 		0, 
+							sAmsNetId					:= 		'', 
+							bBusy						=> 		, 
+							bError						=> 		, 
+							nErrID						=> 		, 
+							iErrPos						=> 		, 
+							stMDP_ModuleHeader			=> 		ST_CPUModHdr, 
+							stMDP_ModuleContent			=> 		ST_CPUModContent);							
+
+g_lrHMI_CPUfrequency 									:=		ST_CPUModContent.udiCPUfrequency / 1000.0	; // CPU Clock Frequency in GHz				
+g_iHMI_CPUusage											:=		ST_CPUModContent.uiCPUusage ;  // CPU Usage in percent
+g_iHMI_CPUtemperature 									:= 		ST_CPUModContent.iCPUtemp ; // CPU Temperature in DegC	
+
+fbFB_MDP_Mainboard_ReadTBL1(
+							xExecute					:= 		xExecute, 
+							tTimeout					:= 		T#2S, 
+							usiModIdx					:= 		0, 
+							sAmsNetId					:= 		'', 
+							bBusy						=> 		, 
+							bError						=> 		, 
+							nErrID						=> 		, 
+							iErrPos						=> 		, 
+							stMDP_ModuleHeader			=> 		ST_MainboardModHdrTBL1, 
+							stMDP_ModuleContent			=> 		ST_MainboardModContentTBL1);
+
+
+g_sHMI_MainboardType 									:= 		ST_MainboardModContentTBL1.sMainboardType ;
+g_sHMI_MainboardSN 										:= 		ST_MainboardModContentTBL1.sMainboardSN ;
+g_sHMI_MainboardProdDate								:= 		ST_MainboardModContentTBL1.sMainboardProdDate ;
+g_udiHMI_MainboardBootCount								:= 		ST_MainboardModContentTBL1.udiMainboardBootCount ;
+lrOperTimeHrs											:= 		ST_MainboardModContentTBL1.udiMainboardOperTime / 60.0 ;
+lrOperTimeDays											:= 		lrOperTimeHrs / 24.0 ;
+g_udiHMI_MainboardOperTimeDays 							:= 		TRUNC(lrOperTimeDays) ;
+g_lrHMI_MainboardOperTimeHrs							:=		24.0 * (lrOperTimeDays - UDINT_TO_LREAL(g_udiHMI_MainboardOperTimeDays)) ;
+g_diHMI_MainboardMinTemp								:= 		ST_MainboardModContentTBL1.diMainboardMinTemp ;
+g_diHMI_MainboardMaxTemp								:= 		ST_MainboardModContentTBL1.diMainboardMaxTemp ;
+g_lrHMI_MainboardMinVolt								:= 		ST_MainboardModContentTBL1.diMainboardMinVolt / 1000.0 ;
+g_lrHMI_MainboardMaxVolt								:= 		ST_MainboardModContentTBL1.diMainboardMaxVolt / 1000.0 ;
+g_iHMI_MainboardActualTemp								:= 		ST_MainboardModContentTBL1.iMainboardActualTemp ;
+
+
+fbFB_MDP_Mainboard_ReadTBL2(
+							xExecute					:= 		xExecute, 
+							tTimeout					:= 		T#2S, 
+							usiModIdx						:= 		0, 
+							sAmsNetId					:= 		'', 
+							bBusy						=> 		, 
+							bError						=> 		, 
+							nErrID						=> 		, 
+							iErrPos						=> 		, 
+							stMDP_ModuleHeader			=> 		ST_MainboardModHdrTBL2, 
+							stMDP_ModuleContent			=> 		ST_MainboardModContentTBL2);
+
+
+g_bHMI_MainboardRevision 								:= 		ST_MainboardModContentTBL2.usiMainboardRevision ;
+g_bHMI_MainboardBiosMajVers 							:= 		ST_MainboardModContentTBL2.usiMainboardBiosMajVers ;
+g_bHMI_MainboardBiosMinVers 							:= 		ST_MainboardModContentTBL2.usiMainboardBiosMinVers ;
+
+
+fbFB_MDP_Mainboard_ReadTBL3(
+							xExecute					:= 		xExecute, 
+							tTimeout					:= 		T#2S, 
+							usiModIdx						:= 		0, 
+							sAmsNetId					:= 		'', 
+							bBusy						=> 		, 
+							bError						=> 		, 
+							nErrID						=> 		, 
+							iErrPos						=> 		, 
+							stMDP_ModuleHeader			=> 		ST_MainboardModHdrTBL3, 
+							stMDP_ModuleContent			=> 		ST_MainboardModContentTBL3);							
+
+g_sHMI_Mainboard1p05v 									:= 		ST_MainboardModContentTBL3.sMainboard1p05v ;
+g_sHMI_MainboardVccCore 								:= 		ST_MainboardModContentTBL3.sMainboardVccCore ;
+g_sHMI_Mainboard5v 										:= 		ST_MainboardModContentTBL3.sMainboard5v ;
+g_sHMI_Mainboard12v 									:= 		ST_MainboardModContentTBL3.sMainboard12v ;
+g_sHMI_MainboardVBatt 									:= 		ST_MainboardModContentTBL3.sMainboardVBatt ;
+g_sHMI_MainboardPwrCtrlVcc 								:= 		ST_MainboardModContentTBL3.sMainboardPwrCtrlVcc ;
+g_sHMI_MainboardCX2100_5v 								:= 		ST_MainboardModContentTBL3.sMainboardCX2100_5v ;
+g_sHMI_MainboardCX2100_12v 								:= 		ST_MainboardModContentTBL3.sMainboardCX2100_12v ;
+g_sHMI_MainboardCX2100_24v 								:= 		ST_MainboardModContentTBL3.sMainboardCX2100_24v ;
+
+					
+fbFB_MDP_Mainboard_ReadTBL4(
+							xExecute					:= 		xExecute, 
+							tTimeout					:= 		T#2S, 
+							usiModIdx						:= 		0, 
+							sAmsNetId					:= 		'', 
+							bBusy						=> 		, 
+							bError						=> 		, 
+							nErrID						=> 		, 
+							iErrPos						=> 		, 
+							stMDP_ModuleHeader			=> 		ST_MainboardModHdrTBL4, 
+							stMDP_ModuleContent			=> 		ST_MainboardModContentTBL4);
+
+g_lrHMI_Mainboard1p05v 									:= 		ST_MainboardModContentTBL4.iMainboard1p05v / 1000.0 ;
+g_lrHMI_MainboardVccCore 								:= 		ST_MainboardModContentTBL4.iMainboardVccCore / 1000.0 ;
+g_lrHMI_Mainboard5v 									:= 		ST_MainboardModContentTBL4.iMainboard5v / 1000.0 ;
+g_lrHMI_Mainboard12v 									:= 		ST_MainboardModContentTBL4.iMainboard12v / 1000.0 ;
+g_lrHMI_MainboardVBatt 									:= 		ST_MainboardModContentTBL4.iMainboardVBatt / 1000.0 ;
+g_lrHMI_MainboardPwrCtrlVcc 							:= 		ST_MainboardModContentTBL4.iMainboardPwrCtrlVcc / 1000.0 ;
+g_lrHMI_MainboardCX2100_5v 								:= 		ST_MainboardModContentTBL4.iMainboardCX2100_5v / 1000.0 ;
+g_lrHMI_MainboardCX2100_12v 							:= 		ST_MainboardModContentTBL4.iMainboardCX2100_12v / 1000.0 ;
+g_lrHMI_MainboardCX2100_24v 							:= 		ST_MainboardModContentTBL4.iMainboardCX2100_24v / 1000.0 ; 
+
+
+fbFB_MDP_NIC0_Read(
+							xExecute					:= 		xExecute, 
+							tTimeout					:= 		T#2S, 
+							usiModIdx					:= 		0, 
+							sAmsNetId					:= 		'', 
+							bBusy						=> 		, 
+							bError						=> 		, 
+							nErrID						=> 		, 
+							iErrPos						=> 		, 
+							stMDP_ModuleHeader			=> 		ST_NIC0_ModHdr, 
+							stMDP_ModuleContent			=> 		ST_NIC0_ModContent);
+
+fbFB_MDP_NIC1_Read(
+							xExecute					:= 		xExecute, 
+							tTimeout					:= 		T#2S, 
+							usiModIdx					:= 		1, 
+							sAmsNetId					:= 		'', 
+							bBusy						=> 		, 
+							bError						=> 		, 
+							nErrID						=> 		, 
+							iErrPos						=> 		, 
+							stMDP_ModuleHeader			=> 		ST_NIC1_ModHdr, 
+							stMDP_ModuleContent			=> 		ST_NIC1_ModContent);
+
+fbFB_MDP_Time1_Read(
+							xExecute					:= 		xExecute, 
+							tTimeout					:= 		T#2S, 
+							usiModIdx					:= 		0, 
+							sAmsNetId					:= 		'', 
+							bBusy						=> 		, 
+							bError						=> 		, 
+							nErrID						=> 		, 
+							iErrPos						=> 		, 
+							stMDP_ModuleHeader			=> 		ST_Time1_ModHdr, 
+							stMDP_ModuleContent			=> 		ST_Time1_ModContent);				
+
+g_sHMI_SNTP_Server										:= 		ST_Time1_ModContent.sSNTP_Server ;
+g_lrHMI_SNTP_Refresh_Minutes							:= 		UDINT_TO_LREAL(ST_Time1_ModContent.udiSNTP_Refresh) / 60.0 ; // Seconds / 60 = Minutes
+g_lrHMI_Years_Since_1_1_1970							:= 		UDINT_TO_LREAL(ST_Time1_ModContent.udiSec_Since_1_1_1970) / (60 * 60 *24 * 365) ;
+g_sHMI_DateTime_Presentation							:= 		ST_Time1_ModContent.sDateTime_Presentation ;
+g_uiHMI_Timezone										:= 		ST_Time1_ModContent.uiTimezone ;
+
+
+fbFB_MDP_Time2_Read(
+							xExecute					:= 		xExecute, 
+							tTimeout					:= 		T#2S, 
+							usiModIdx					:= 		0, 
+							sAmsNetId					:= 		'', 
+							bBusy						=> 		, 
+							bError						=> 		, 
+							nErrID						=> 		, 
+							iErrPos						=> 		, 
+							stMDP_ModuleHeader			=> 		ST_Time2_ModHdr, 
+							stMDP_ModuleContent			=> 		ST_Time2_ModContent);
+							
+IF ST_Time1_ModContent.uiTimezone = 0 THEN
+	g_sHMI_currentTimeZone := ST_Time2_ModContent.sTimezone1 ;
+ELSIF ST_Time1_ModContent.uiTimezone = 1 THEN
+	g_sHMI_currentTimeZone := ST_Time2_ModContent.sTimezone2 ;
+ELSIF ST_Time1_ModContent.uiTimezone = 2 THEN
+	g_sHMI_currentTimeZone := ST_Time2_ModContent.sTimezone3 ;
+ELSIF ST_Time1_ModContent.uiTimezone = 3 THEN
+	g_sHMI_currentTimeZone := ST_Time2_ModContent.sTimezone4 ;
+ELSIF ST_Time1_ModContent.uiTimezone = 4 THEN
+	g_sHMI_currentTimeZone := ST_Time2_ModContent.sTimezone5 ;	
+ELSIF ST_Time1_ModContent.uiTimezone = 5 THEN
+	g_sHMI_currentTimeZone := ST_Time2_ModContent.sTimezone6 ;
+ELSIF ST_Time1_ModContent.uiTimezone = 6 THEN
+	g_sHMI_currentTimeZone := ST_Time2_ModContent.sTimezone7 ;
+ELSIF ST_Time1_ModContent.uiTimezone = 7 THEN
+	g_sHMI_currentTimeZone := ST_Time2_ModContent.sTimezone8 ;
+ELSIF ST_Time1_ModContent.uiTimezone = 8 THEN
+	g_sHMI_currentTimeZone := ST_Time2_ModContent.sTimezone9 ;		
+ELSIF ST_Time1_ModContent.uiTimezone = 9 THEN
+	g_sHMI_currentTimeZone := ST_Time2_ModContent.sTimezone10 ;
+ELSIF ST_Time1_ModContent.uiTimezone = 10 THEN
+	g_sHMI_currentTimeZone := ST_Time2_ModContent.sTimezone11 ;
+ELSIF ST_Time1_ModContent.uiTimezone = 11 THEN
+	g_sHMI_currentTimeZone := ST_Time2_ModContent.sTimezone12 ;
+ELSIF ST_Time1_ModContent.uiTimezone = 12 THEN
+	g_sHMI_currentTimeZone := ST_Time2_ModContent.sTimezone13 ;	
+ELSIF ST_Time1_ModContent.uiTimezone = 13 THEN
+	g_sHMI_currentTimeZone := ST_Time2_ModContent.sTimezone14 ;
+ELSIF ST_Time1_ModContent.uiTimezone = 14 THEN
+	g_sHMI_currentTimeZone := ST_Time2_ModContent.sTimezone15 ;
+ELSIF ST_Time1_ModContent.uiTimezone = 15 THEN
+	g_sHMI_currentTimeZone := ST_Time2_ModContent.sTimezone16 ;
+ELSIF ST_Time1_ModContent.uiTimezone = 16 THEN
+	g_sHMI_currentTimeZone := ST_Time2_ModContent.sTimezone17 ;		
+ELSIF ST_Time1_ModContent.uiTimezone = 17 THEN
+	g_sHMI_currentTimeZone := ST_Time2_ModContent.sTimezone18 ;
+ELSIF ST_Time1_ModContent.uiTimezone = 18 THEN
+	g_sHMI_currentTimeZone := ST_Time2_ModContent.sTimezone19 ;
+ELSIF ST_Time1_ModContent.uiTimezone = 19 THEN
+	g_sHMI_currentTimeZone := ST_Time2_ModContent.sTimezone20 ;
+ELSIF ST_Time1_ModContent.uiTimezone = 20 THEN
+	g_sHMI_currentTimeZone := ST_Time2_ModContent.sTimezone21 ;	
+ELSIF ST_Time1_ModContent.uiTimezone = 21 THEN
+	g_sHMI_currentTimeZone := ST_Time2_ModContent.sTimezone22 ;
+ELSIF ST_Time1_ModContent.uiTimezone = 22 THEN
+	g_sHMI_currentTimeZone := ST_Time2_ModContent.sTimezone23 ;
+ELSIF ST_Time1_ModContent.uiTimezone = 23 THEN
+	g_sHMI_currentTimeZone := ST_Time2_ModContent.sTimezone24 ;
+ELSIF ST_Time1_ModContent.uiTimezone = 24 THEN
+	g_sHMI_currentTimeZone := ST_Time2_ModContent.sTimezone25 ;		
+ELSIF ST_Time1_ModContent.uiTimezone = 25 THEN
+	g_sHMI_currentTimeZone := ST_Time2_ModContent.sTimezone26 ;
+ELSIF ST_Time1_ModContent.uiTimezone = 26 THEN
+	g_sHMI_currentTimeZone := ST_Time2_ModContent.sTimezone27 ;
+ELSIF ST_Time1_ModContent.uiTimezone = 27 THEN
+	g_sHMI_currentTimeZone := ST_Time2_ModContent.sTimezone28 ;
+ELSIF ST_Time1_ModContent.uiTimezone = 28 THEN
+	g_sHMI_currentTimeZone := ST_Time2_ModContent.sTimezone29 ;	
+ELSIF ST_Time1_ModContent.uiTimezone = 29 THEN
+	g_sHMI_currentTimeZone := ST_Time2_ModContent.sTimezone30 ;
+ELSIF ST_Time1_ModContent.uiTimezone = 30 THEN
+	g_sHMI_currentTimeZone := ST_Time2_ModContent.sTimezone31 ;
+ELSIF ST_Time1_ModContent.uiTimezone = 31 THEN
+	g_sHMI_currentTimeZone := ST_Time2_ModContent.sTimezone32 ;
+ELSIF ST_Time1_ModContent.uiTimezone = 32 THEN
+	g_sHMI_currentTimeZone := ST_Time2_ModContent.sTimezone33 ;			
+ELSIF ST_Time1_ModContent.uiTimezone = 33 THEN
+	g_sHMI_currentTimeZone := ST_Time2_ModContent.sTimezone34 ;
+ELSIF ST_Time1_ModContent.uiTimezone = 34 THEN
+	g_sHMI_currentTimeZone := ST_Time2_ModContent.sTimezone35 ;
+ELSIF ST_Time1_ModContent.uiTimezone = 35 THEN
+	g_sHMI_currentTimeZone := ST_Time2_ModContent.sTimezone36 ;
+ELSIF ST_Time1_ModContent.uiTimezone = 36 THEN
+	g_sHMI_currentTimeZone := ST_Time2_ModContent.sTimezone37 ;	
+ELSIF ST_Time1_ModContent.uiTimezone = 37 THEN
+	g_sHMI_currentTimeZone := ST_Time2_ModContent.sTimezone38 ;
+ELSIF ST_Time1_ModContent.uiTimezone = 38 THEN
+	g_sHMI_currentTimeZone := ST_Time2_ModContent.sTimezone39 ;
+ELSIF ST_Time1_ModContent.uiTimezone = 39 THEN
+	g_sHMI_currentTimeZone := ST_Time2_ModContent.sTimezone40 ;
+ELSIF ST_Time1_ModContent.uiTimezone = 40 THEN
+	g_sHMI_currentTimeZone := ST_Time2_ModContent.sTimezone41 ;		
+ELSIF ST_Time1_ModContent.uiTimezone = 41 THEN
+	g_sHMI_currentTimeZone := ST_Time2_ModContent.sTimezone42 ;
+ELSIF ST_Time1_ModContent.uiTimezone = 42 THEN
+	g_sHMI_currentTimeZone := ST_Time2_ModContent.sTimezone43 ;
+ELSIF ST_Time1_ModContent.uiTimezone = 43 THEN
+	g_sHMI_currentTimeZone := ST_Time2_ModContent.sTimezone44 ;
+ELSIF ST_Time1_ModContent.uiTimezone = 44 THEN
+	g_sHMI_currentTimeZone := ST_Time2_ModContent.sTimezone45 ;	
+ELSIF ST_Time1_ModContent.uiTimezone = 45 THEN
+	g_sHMI_currentTimeZone := ST_Time2_ModContent.sTimezone46 ;
+ELSIF ST_Time1_ModContent.uiTimezone = 46 THEN
+	g_sHMI_currentTimeZone := ST_Time2_ModContent.sTimezone47 ;
+ELSIF ST_Time1_ModContent.uiTimezone = 47 THEN
+	g_sHMI_currentTimeZone := ST_Time2_ModContent.sTimezone48 ;
+ELSIF ST_Time1_ModContent.uiTimezone = 48 THEN
+	g_sHMI_currentTimeZone := ST_Time2_ModContent.sTimezone49 ;		
+ELSIF ST_Time1_ModContent.uiTimezone = 49 THEN
+	g_sHMI_currentTimeZone := ST_Time2_ModContent.sTimezone50 ;
+ELSIF ST_Time1_ModContent.uiTimezone = 50 THEN
+	g_sHMI_currentTimeZone := ST_Time2_ModContent.sTimezone51 ;
+ELSIF ST_Time1_ModContent.uiTimezone = 51 THEN
+	g_sHMI_currentTimeZone := ST_Time2_ModContent.sTimezone52 ;
+ELSIF ST_Time1_ModContent.uiTimezone = 52 THEN
+	g_sHMI_currentTimeZone := ST_Time2_ModContent.sTimezone53 ;	
+ELSIF ST_Time1_ModContent.uiTimezone = 53 THEN
+	g_sHMI_currentTimeZone := ST_Time2_ModContent.sTimezone54 ;
+ELSIF ST_Time1_ModContent.uiTimezone = 54 THEN
+	g_sHMI_currentTimeZone := ST_Time2_ModContent.sTimezone55 ;
+ELSIF ST_Time1_ModContent.uiTimezone = 55 THEN
+	g_sHMI_currentTimeZone := ST_Time2_ModContent.sTimezone56 ;
+ELSIF ST_Time1_ModContent.uiTimezone = 56 THEN
+	g_sHMI_currentTimeZone := ST_Time2_ModContent.sTimezone57 ;		
+ELSIF ST_Time1_ModContent.uiTimezone = 57 THEN
+	g_sHMI_currentTimeZone := ST_Time2_ModContent.sTimezone58 ;
+ELSIF ST_Time1_ModContent.uiTimezone = 58 THEN
+	g_sHMI_currentTimeZone := ST_Time2_ModContent.sTimezone59 ;
+ELSIF ST_Time1_ModContent.uiTimezone = 59 THEN
+	g_sHMI_currentTimeZone := ST_Time2_ModContent.sTimezone60 ;
+ELSIF ST_Time1_ModContent.uiTimezone = 60 THEN
+	g_sHMI_currentTimeZone := ST_Time2_ModContent.sTimezone61 ;	
+ELSIF ST_Time1_ModContent.uiTimezone = 61 THEN
+	g_sHMI_currentTimeZone := ST_Time2_ModContent.sTimezone62 ;
+ELSIF ST_Time1_ModContent.uiTimezone = 62 THEN
+	g_sHMI_currentTimeZone := ST_Time2_ModContent.sTimezone63 ;
+ELSIF ST_Time1_ModContent.uiTimezone = 63 THEN
+	g_sHMI_currentTimeZone := ST_Time2_ModContent.sTimezone64 ;
+ELSIF ST_Time1_ModContent.uiTimezone = 64 THEN
+	g_sHMI_currentTimeZone := ST_Time2_ModContent.sTimezone65 ;	
+ELSIF ST_Time1_ModContent.uiTimezone = 65 THEN
+	g_sHMI_currentTimeZone := ST_Time2_ModContent.sTimezone66 ;
+ELSIF ST_Time1_ModContent.uiTimezone = 66 THEN
+	g_sHMI_currentTimeZone := ST_Time2_ModContent.sTimezone67 ;
+ELSIF ST_Time1_ModContent.uiTimezone = 67 THEN
+	g_sHMI_currentTimeZone := ST_Time2_ModContent.sTimezone68 ;
+ELSIF ST_Time1_ModContent.uiTimezone = 68 THEN
+	g_sHMI_currentTimeZone := ST_Time2_ModContent.sTimezone69 ;	
+ELSIF ST_Time1_ModContent.uiTimezone = 69 THEN
+	g_sHMI_currentTimeZone := ST_Time2_ModContent.sTimezone70 ;
+ELSIF ST_Time1_ModContent.uiTimezone = 70 THEN
+	g_sHMI_currentTimeZone := ST_Time2_ModContent.sTimezone71 ;
+ELSIF ST_Time1_ModContent.uiTimezone = 71 THEN
+	g_sHMI_currentTimeZone := ST_Time2_ModContent.sTimezone72 ;
+ELSIF ST_Time1_ModContent.uiTimezone = 72 THEN
+	g_sHMI_currentTimeZone := ST_Time2_ModContent.sTimezone73 ;		
+ELSIF ST_Time1_ModContent.uiTimezone = 73 THEN
+	g_sHMI_currentTimeZone := ST_Time2_ModContent.sTimezone74 ;
+ELSIF ST_Time1_ModContent.uiTimezone = 74 THEN
+	g_sHMI_currentTimeZone := ST_Time2_ModContent.sTimezone75 ;
+ELSIF ST_Time1_ModContent.uiTimezone = 75 THEN
+	g_sHMI_currentTimeZone := ST_Time2_ModContent.sTimezone76 ;
+ELSIF ST_Time1_ModContent.uiTimezone = 76 THEN
+	g_sHMI_currentTimeZone := ST_Time2_ModContent.sTimezone77 ;	
+ELSIF ST_Time1_ModContent.uiTimezone = 77 THEN
+	g_sHMI_currentTimeZone := ST_Time2_ModContent.sTimezone78 ;
+ELSIF ST_Time1_ModContent.uiTimezone = 78 THEN
+	g_sHMI_currentTimeZone := ST_Time2_ModContent.sTimezone79 ;
+ELSIF ST_Time1_ModContent.uiTimezone = 79 THEN
+	g_sHMI_currentTimeZone := ST_Time2_ModContent.sTimezone80 ;
+ELSIF ST_Time1_ModContent.uiTimezone = 80 THEN
+	g_sHMI_currentTimeZone := ST_Time2_ModContent.sTimezone81 ;		
+ELSIF ST_Time1_ModContent.uiTimezone = 81 THEN
+	g_sHMI_currentTimeZone := ST_Time2_ModContent.sTimezone82 ;
+ELSIF ST_Time1_ModContent.uiTimezone = 82 THEN
+	g_sHMI_currentTimeZone := ST_Time2_ModContent.sTimezone83 ;
+ELSIF ST_Time1_ModContent.uiTimezone = 83 THEN
+	g_sHMI_currentTimeZone := ST_Time2_ModContent.sTimezone84 ;
+ELSIF ST_Time1_ModContent.uiTimezone = 84 THEN
+	g_sHMI_currentTimeZone := ST_Time2_ModContent.sTimezone85 ;	
+ELSIF ST_Time1_ModContent.uiTimezone = 85 THEN
+	g_sHMI_currentTimeZone := ST_Time2_ModContent.sTimezone86 ;
+ELSIF ST_Time1_ModContent.uiTimezone = 86 THEN
+	g_sHMI_currentTimeZone := ST_Time2_ModContent.sTimezone87 ;
+ELSIF ST_Time1_ModContent.uiTimezone = 87 THEN
+	g_sHMI_currentTimeZone := ST_Time2_ModContent.sTimezone88 ;
+ELSIF ST_Time1_ModContent.uiTimezone = 88 THEN
+	g_sHMI_currentTimeZone := ST_Time2_ModContent.sTimezone89 ;		
+ELSIF ST_Time1_ModContent.uiTimezone = 89 THEN
+	g_sHMI_currentTimeZone := ST_Time2_ModContent.sTimezone90 ;
+ELSIF ST_Time1_ModContent.uiTimezone = 90 THEN
+	g_sHMI_currentTimeZone := ST_Time2_ModContent.sTimezone91 ;
+ELSIF ST_Time1_ModContent.uiTimezone = 91 THEN
+	g_sHMI_currentTimeZone := ST_Time2_ModContent.sTimezone92 ;
+ELSIF ST_Time1_ModContent.uiTimezone = 92 THEN
+	g_sHMI_currentTimeZone := ST_Time2_ModContent.sTimezone93 ;	
+ELSIF ST_Time1_ModContent.uiTimezone = 93 THEN
+	g_sHMI_currentTimeZone := ST_Time2_ModContent.sTimezone94 ;
+ELSIF ST_Time1_ModContent.uiTimezone = 94 THEN
+	g_sHMI_currentTimeZone := ST_Time2_ModContent.sTimezone95 ;
+ELSIF ST_Time1_ModContent.uiTimezone = 95 THEN
+	g_sHMI_currentTimeZone := ST_Time2_ModContent.sTimezone96 ;
+ELSIF ST_Time1_ModContent.uiTimezone = 96 THEN
+	g_sHMI_currentTimeZone := ST_Time2_ModContent.sTimezone97 ;			
+ELSIF ST_Time1_ModContent.uiTimezone = 97 THEN
+	g_sHMI_currentTimeZone := ST_Time2_ModContent.sTimezone98 ;
+ELSIF ST_Time1_ModContent.uiTimezone = 98 THEN
+	g_sHMI_currentTimeZone := ST_Time2_ModContent.sTimezone99 ;
+ELSIF ST_Time1_ModContent.uiTimezone = 99 THEN
+	g_sHMI_currentTimeZone := ST_Time2_ModContent.sTimezone100 ;
+ELSIF ST_Time1_ModContent.uiTimezone = 100 THEN
+	g_sHMI_currentTimeZone := ST_Time2_ModContent.sTimezone101 ;	
+END_IF
+							
+fbFB_MDP_Memory_Read(
+							xExecute					:= 		xExecute, 
+							tTimeout					:= 		T#2S, 
+							usiModIdx					:= 		0, 
+							sAmsNetId					:= 		'', 
+							bBusy						=> 		, 
+							bError						=> 		, 
+							nErrID						=> 		, 
+							iErrPos						=> 		, 
+							stMDP_ModuleHeader			=> 		ST_Memory_ModHdr, 
+							stMDP_ModuleContent			=> 		ST_Memory_ModContent);		
+
+	g_lrHMI_ProgMemAllocated_InGB 		:= UDINT_TO_LREAL(ST_Memory_ModContent.udiProgMemAllocated) / 1000000000.0 ;	
+	g_lrHMI_ProgMemAvailable_InGB 		:= UDINT_TO_LREAL(ST_Memory_ModContent.udiProgMemAvailable) / 1000000000.0 ;	
+	g_lrHMI_ProgMemUsed_InGB 			:= g_lrHMI_ProgMemAllocated_InGB - g_lrHMI_ProgMemAvailable_InGB ;	
+	g_lrHMI_ProgStorAllocated_InGB 		:= UDINT_TO_LREAL(ST_Memory_ModContent.udiStorageMemAllocated) / 1000000000.0 ;	
+	g_lrHMI_ProgStorAvailable_InGB 		:= UDINT_TO_LREAL(ST_Memory_ModContent.udiStorageMemAvailable) / 1000000000.0 ;	
+	g_lrHMI_ProgStorUsed_InGB 			:= g_lrHMI_ProgStorAllocated_InGB - g_lrHMI_ProgStorAvailable_InGB ;
+	g_lrHMI_ProgStorMemDivision_InGB	:= UDINT_TO_LREAL(ST_Memory_ModContent.udiMemoryDivision) / 1000000000.0 ;	
+
+
+fbFB_MDP_DiskMngmnt_ReadTBL1(
+								xExecute				:= 		xExecute, 
+								tTimeout				:= 		T#2S, 
+								usiModIdx				:= 		0, 
+								sAmsNetId				:= 		'', 
+								bBusy					=> 		, 
+								bError					=> 		, 
+								nErrID					=> 		, 
+								iErrPos					=> 		, 
+								stMDP_ModuleHeader		=> 		ST_DiskMngmnt_HdrTBL1, 
+								stMDP_ModuleContent		=> 		ST_DiskMngmntTBL1);
+
+
+
+
+
+
+
+
+							
+fbFB_MDP_Time1_Read(
+							xExecute					:= 		xExecute, 
+							tTimeout					:= 		T#2S, 
+							usiModIdx					:= 		0, 
+							sAmsNetId					:= 		'', 
+							bBusy						=> 		, 
+							bError						=> 		, 
+							nErrID						=> 		, 
+							iErrPos						=> 		, 
+							stMDP_ModuleHeader			=> 		ST_Time1_ModHdr, 
+							stMDP_ModuleContent			=> 		ST_Time1_ModContent);					
+//	END_IF ;
+	
+]]></ST>
+    </Implementation>
+    <ObjectProperties />
+  </POU>
+</TcPlcObject>

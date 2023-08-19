@@ -1,0 +1,429 @@
+﻿<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.0.18">
+  <POU Name="AX5805_ADS_Reads" Id="{ff321f23-86e8-4eb1-8143-c561d348969f}">
+    <Declaration><![CDATA[PROGRAM AX5805_ADS_Reads
+//		8-2-2012
+// 		This Program has been supplied by Beckhoff Automation As-Is and is intended only as an example 
+//		implementation. Functionality is not guaranteed. 
+//
+VAR
+	//Time to check CoE values
+	T1							: 		TON ;
+	xExecute					: 		BOOL ;
+	tTime1						: 		TIME ;
+
+	//Counter for just some very simple sequencing
+	C1							: 		CTU ;
+	xReset						: 		BOOL ;
+	wPreset						: 		WORD := 10 ;
+	xDone						: 		BOOL ;
+	wCount						: 		WORD ;
+
+	// Reading the serial number out of the AX5805
+	fbAX5805Sn_ADSRead			: 		ADSREAD ;
+	dwAX5805_Sn					: 		DWORD ;
+	xAX5805Sn_busy				: 		BOOL ;
+	xAX5805Sn_Err				: 		BOOL ;
+	xAX5805Sn_ErrID				: 		UDINT ;
+
+	// Reading the DIP Switch Setting out of the AX5805
+	fbAX5805DSw_ADSRead			: 		ADSREAD ;
+	wAX5805_DSw					: 		WORD ;
+	xAX5805DSw_busy				: 		BOOL ;
+	xAX5805DSw_Err				: 		BOOL ;
+	udiAX5805DSw_ErrID			: 		UDINT ;
+
+	//Read the Hardware Version of the AX5805 Logic Terminal
+	fbAX5805_HWvers_EcCoESdoRead: 		FB_EcCoESdoRead ;
+	sAX5805_HWvers				: 		STRING(2) ;
+	xAX5805_HWvers_Busy			: 		BOOL ;
+	xAX5805_HWvers_Err			: 		BOOL ;
+	udiAX5805_HWvers_ErrID		: 		UDINT ;
+
+	//Read the Software Version of the AX5805 Logic Terminal (It's f/w)
+	fbAX5805_FWvers_EcCoESdoRead: 		FB_EcCoESdoRead ;
+	sAX5805_FWvers				: 		STRING(2) ;
+	xAX5805_FWvers_Busy			: 		BOOL ;
+	xAX5805_FWvers_Err			: 		BOOL ;
+	udiAX5805_FWvers_ErrID		: 		UDINT ;
+
+	//Read the Number Of Connections Configured In The AX5805 Logic Terminal
+	fbAX5805_StatConn_EcCoESdoRead: 	FB_EcCoESdoRead ;
+	bAX5805_NoOfConnections		: 		BYTE ;
+	xAX5805_NoOfConnections_Busy: 		BOOL ;
+	xAX5805_NoOfConnections_Err	: 		BOOL ;
+	udiAX5805_NoOfConnections_ErrID: 	UDINT ;
+
+	//Read the Number Of Safety Groups Configured In The AX5805 Logic Terminal
+	fbAX5805_SafetyGrps_EcCoESdoRead: 	FB_EcCoESdoRead ;
+	bAX5805_NoOfSafetyGrps		: 		BYTE ;
+	xAX5805_NoOfSafetyGrps_Busy	: 		BOOL ;
+	xAX5805_NoOfSafetyGrps_Err	: 		BOOL ;
+	udiAX5805_NoOfSafetyGrps_ErrID: 	UDINT ;
+
+	//Read the Number Of Safety Function Blocks Configured In The AX5805 Logic Terminal
+	fbAX5805_SafetyFBs_EcCoESdoRead: 	FB_EcCoESdoRead ;
+	bAX5805_NoOfSafetyFBs		: 		BYTE ;
+	xAX5805_NoOfSafetyFBs_Busy	: 		BOOL ;
+	xAX5805_NoOfSafetyFBs_Err	: 		BOOL ;
+	udiAX5805_NoOfSafetyFBs_ErrID: 		UDINT ;
+	
+	// Reading the Primary Micro Controller (MC1) Temperature in DegC out of the AX5805
+	fbAX5805PriMCTemp_ADSRead	: 		ADSREAD ;
+	wAX5805_PriMCTemp			: 		WORD ;
+	xAX5805PriMCTemp_busy		: 		BOOL ;
+	xAX5805PriMCTemp_Err		: 		BOOL ;
+	udiAX5805PriMCTemp_ErrID	: 		UDINT ;
+
+	// Reading the Secondary Micro Controller (MC2) Temperature in DegC out of the AX5805
+	fbAX5805SecMCTemp_ADSRead	: 		ADSREAD ;
+	wAX5805_SecMCTemp			: 		WORD ;
+	xAX5805SecMCTemp_busy		: 		BOOL ;
+	xAX5805SecMCTemp_Err		: 		BOOL ;
+	udiAX5805SecMCTemp_ErrID	: 		UDINT ;
+
+	// Reading the Primary Micro Controller (MC1) Voltage in mV out of the AX5805
+	fbAX5805PriMC3300mV_ADSRead	: 		ADSREAD ;
+	wAX5805_PriMC3300mV			: 		WORD ;
+	xAX5805PriMC3300mV_busy		: 		BOOL ;
+	xAX5805PriMC3300mV_Err		: 		BOOL ;
+	udiAX5805PriMC3300mV_ErrID	: 		UDINT ;
+	fbAX5805PriMC5000mV_ADSRead	: 		ADSREAD ;
+	wAX5805_PriMC5000mV			: 		WORD ;
+	xAX5805PriMC5000mV_busy		: 		BOOL ;
+	xAX5805PriMC5000mV_Err		: 		BOOL ;
+	udiAX5805PriMC5000mV_ErrID	: 		UDINT ;
+	
+	// Reading the Secondary Micro Controller (MC2) Voltage in mV out of the AX5805
+	fbAX5805SecMC3300mV_ADSRead	: 		ADSREAD ;
+	wAX5805_SecMC3300mV			: 		WORD ;
+	xAX5805SecMC3300mV_busy		: 		BOOL ;
+	xAX5805SecMC3300mV_Err		: 		BOOL ;
+	udiAX5805SecMC3300mV_ErrID	: 		UDINT ;
+	fbAX5805SecMC5000mV_ADSRead	: 		ADSREAD ;
+	wAX5805_SecMC5000mV			: 		WORD ;
+	xAX5805SecMC5000mV_busy		: 		BOOL ;
+	xAX5805SecMC5000mV_Err		: 		BOOL ;
+	udiAX5805SecMC5000mV_ErrID	: 		UDINT ;
+
+	//Read the Configured Safety Option In The AX5000 Drive
+	fbAX5000_SafetyOption				: 		FB_SoERead ;
+	dwSafetyOption						: 		DWORD ;
+	Axis1 								: 		AXIS_REF ;
+	xAX5000_SafetyOption_busy			: 		BOOL ;
+	xAX5000_SafetyOption_Err			: 		BOOL ;
+	udiAX5000_SafetyOption_ErrID		: 		UDINT ;
+	uiAX5000_SafetyOption_SercosErrID	: 		UINT ;
+	dwAX5000_SafetyOption_Attribute		: 		DWORD ;
+	
+	//Read the Configured Motor String For CH-A in The AX5000 Drive
+	fbAX5000_ConfigMotorCHA				: 		FB_SoERead ;
+	sConfigMotorCHA						: 		STRING(30) ;
+	xAX5000_sConfigMotorCHA_busy		: 		BOOL ;
+	xAX5000_sConfigMotorCHA_Err			: 		BOOL ;
+	udiAX5000_sConfigMotorCHA_ErrID		: 		UINT ;
+	xAX5000_ConfigMotorCHA_busy			: 		BOOL ;
+	xAX5000_ConfigMotorCHA_Err			:		BOOL ;
+	udiAX5000_ConfigMotorCHA_ErrID		: 		UDINT ;
+	uiAX5000_ConfigMotorCHA_SercosErrID	: 		UINT ;
+	dwAX5000_ConfigMotorCHA_Attribute	: 		DWORD ;
+	ConfigMotorCHA						: 		ARRAY[0..29] OF UINT ;
+END_VAR
+VAR_INPUT
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[//		8-2-2012
+// 		This Program has been supplied by Beckhoff Automation As-Is and is intended only as an example 
+//		implementation. Functionality is not guaranteed. 
+//
+IF g_bHMI_ScreenBeingDisplayed = 60 THEN
+// Interval timer for CoE Reads
+T1(
+						IN				:= 		NOT xExecute, 
+						PT				:=		T#500MS, 
+						Q				=>		xExecute, 
+						ET				=>		tTime1 ) ;
+
+C1(
+						CU				:= 		xExecute, 
+						RESET			:= 		xReset, 
+						PV				:= 		wPreset, 
+						Q				=> 		xDone, 
+						CV				=> 		wCount) ;
+
+IF C1.CV > 6 	THEN xReset := 1 ;
+				ELSE xReset := 0 ; 
+END_IF ;
+
+// Read the serial number out of the AX5805
+fbAX5805Sn_ADSRead(
+						NETID			:= 		gc_sADSNetID, 
+						PORT			:= 		gc_uiAX5805_EtherCATAdr, 
+						IDXGRP			:= 		16#F302, 
+						IDXOFFS			:= 		16#F9800002, 
+						LEN				:= 		4, 
+						DESTADDR		:= 		ADR(dwAX5805_Sn), 
+						READ			:= 		xExecute, 
+						TMOUT			:= 		T#2S, 
+						BUSY			=> 		xAX5805Sn_busy, 
+						ERR				=> 		xAX5805Sn_Err, 
+						ERRID			=> 		xAX5805Sn_ErrID );
+
+g_dwHMI_AX5805Sn 						:= 		dwAX5805_Sn ;
+
+// Read the DIP Switch Setting out of the AX5805
+IF C1.CV = 1 THEN
+fbAX5805DSw_ADSRead(
+						NETID			:= 		gc_sADSNetID, 
+						PORT			:= 		gc_uiAX5805_EtherCATAdr, 
+						IDXGRP			:= 		16#F302, 
+						IDXOFFS			:= 		16#F9800001, 
+						LEN				:= 		2, 
+						DESTADDR		:= 		ADR(wAX5805_DSw), 
+						READ			:= 		xExecute, 
+						TMOUT			:= 		T#2S, 
+						BUSY			=> 		xAX5805DSw_busy, 
+						ERR				=> 		xAX5805DSw_Err, 
+						ERRID			=> 		udiAX5805DSw_ErrID );
+
+g_wHMI_AX5805DSw 						:= 		wAX5805_DSw ;
+END_IF ;						
+
+//Read the Hardware Version of the AX5805 Logic Terminal
+fbAX5805_HWvers_EcCoESdoRead(
+						sNetId			:= 		gc_sADSNetID, 
+						nSlaveAddr		:= 		gc_uiAX5805_EtherCATAdr, 
+						nSubIndex		:= 		0, 
+						nIndex			:= 		16#1009, 
+						pDstBuf			:=  	ADR(sAX5805_HWvers),
+						cbBufLen		:= 		SIZEOF(sAX5805_HWvers), 
+						bExecute		:= 		xExecute, 
+						tTimeout		:= 		T#2S, 
+						bBusy			=> 		xAX5805_HWvers_Busy, 
+						bError			=> 		xAX5805_HWvers_Err, 
+						nErrId			=> 		udiAX5805_HWvers_ErrID ) ;
+
+g_sHMI_AX5805_HWvers					:= 		sAX5805_HWvers ;
+
+//Read the Software Version of the AX5805 Logic Terminal (It's f/w)
+fbAX5805_FWvers_EcCoESdoRead(
+						sNetId			:= 		gc_sADSNetID, 
+						nSlaveAddr		:= 		gc_uiAX5805_EtherCATAdr, 
+						nSubIndex		:= 		0, 
+						nIndex			:= 		16#100A, 
+						pDstBuf			:=  	ADR(sAX5805_FWvers),
+						cbBufLen		:= 		SIZEOF(sAX5805_FWvers), 
+						bExecute		:= 		xExecute, 
+						tTimeout		:= 		T#2S, 
+						bBusy			=> 		xAX5805_FWvers_Busy, 
+						bError			=> 		xAX5805_FWvers_Err, 
+						nErrId			=> 		udiAX5805_FWvers_ErrID ) ;
+
+g_sHMI_AX5805_FWvers					:= 		sAX5805_FWvers ;
+
+// Read the Primary Micro Controller (MC1) Temperature in DegC out of the AX5805
+IF C1.CV = 2 THEN
+fbAX5805PriMCTemp_ADSRead(
+						NETID			:= 		gc_sADSNetID, 
+						PORT			:= 		gc_uiAX5805_EtherCATAdr, 
+						IDXGRP			:= 		16#F302, 
+						IDXOFFS			:= 		16#FA800001, 
+						LEN				:= 		2, 
+						DESTADDR		:= 		ADR(wAX5805_PriMCTemp), 
+						READ			:= 		xExecute, 
+						TMOUT			:= 		T#2S, 
+						BUSY			=> 		xAX5805PriMCTemp_busy, 
+						ERR				=> 		xAX5805PriMCTemp_Err, 
+						ERRID			=> 		udiAX5805PriMCTemp_ErrID );
+
+g_wHMI_AX5805PriMCTemp 					:= 		wAX5805_PriMCTemp ;
+END_IF ;
+
+// Read the Secondary Micro Controller (MC2) Temperature in DegC out of the AX5805
+IF C1.CV = 3 THEN
+fbAX5805SecMCTemp_ADSRead(
+						NETID			:= 		gc_sADSNetID, 
+						PORT			:= 		gc_uiAX5805_EtherCATAdr, 
+						IDXGRP			:= 		16#F302, 
+						IDXOFFS			:= 		16#FA800002, 
+						LEN				:= 		2, 
+						DESTADDR		:= 		ADR(wAX5805_SecMCTemp), 
+						READ			:= 		xExecute, 
+						TMOUT			:= 		T#2S, 
+						BUSY			=> 		xAX5805SecMCTemp_busy, 
+						ERR				=> 		xAX5805SecMCTemp_Err, 
+						ERRID			=> 		udiAX5805SecMCTemp_ErrID );
+
+g_wHMI_AX5805SecMCTemp 					:= 		wAX5805_SecMCTemp ;
+END_IF ;
+
+// Read the Primary Micro Controller (MC1) 3.3v Nominal Voltage in mV out of the AX5805
+IF C1.CV = 4 THEN
+fbAX5805PriMC3300mV_ADSRead(
+						NETID			:= 		gc_sADSNetID, 
+						PORT			:= 		gc_uiAX5805_EtherCATAdr, 
+						IDXGRP			:= 		16#F302, 
+						IDXOFFS			:= 		16#FA810001, 
+						LEN				:= 		2, 
+						DESTADDR		:= 		ADR(wAX5805_PriMC3300mV), 
+						READ			:= 		xExecute, 
+						TMOUT			:= 		T#2S, 
+						BUSY			=> 		xAX5805PriMC3300mV_busy, 
+						ERR				=> 		xAX5805PriMC3300mV_Err, 
+						ERRID			=> 		udiAX5805PriMC3300mV_ErrID );
+
+g_wHMI_AX5805PriMC_3p3Volts				:= 		WORD_TO_LREAL(wAX5805_PriMC3300mV) / 1000.0 ;
+END_IF ;
+
+// Read the Secondary Micro Controller (MC2) 3.3v Nominal Voltage in mV out of the AX5805
+IF C1.CV = 5 THEN
+fbAX5805SecMC3300mV_ADSRead(
+						NETID			:= 		gc_sADSNetID, 
+						PORT			:= 		gc_uiAX5805_EtherCATAdr, 
+						IDXGRP			:= 		16#F302, 
+						IDXOFFS			:= 		16#FA810002, 
+						LEN				:= 		2, 
+						DESTADDR		:= 		ADR(wAX5805_SecMC3300mV), 
+						READ			:= 		xExecute, 
+						TMOUT			:= 		T#2S, 
+						BUSY			=> 		xAX5805SecMC3300mV_busy, 
+						ERR				=> 		xAX5805SecMC3300mV_Err, 
+						ERRID			=> 		udiAX5805SecMC3300mV_ErrID );
+			
+g_wHMI_AX5805SecMC_3p3Volts 				:= 		WORD_TO_LREAL(wAX5805_SecMC3300mV) / 1000.0 ;
+END_IF ;
+
+// Read the Primary Micro Controller (MC1) 5.0v Nominal Voltage in mV out of the AX5805
+IF C1.CV = 1 THEN
+fbAX5805PriMC5000mV_ADSRead(
+						NETID			:= 		gc_sADSNetID, 
+						PORT			:= 		gc_uiAX5805_EtherCATAdr, 
+						IDXGRP			:= 		16#F302, 
+						IDXOFFS			:= 		16#FA810003, 
+						LEN				:= 		2, 
+						DESTADDR		:= 		ADR(wAX5805_PriMC5000mV), 
+						READ			:= 		xExecute, 
+						TMOUT			:= 		T#2S, 
+						BUSY			=> 		xAX5805PriMC5000mV_busy, 
+						ERR				=> 		xAX5805PriMC5000mV_Err, 
+						ERRID			=> 		udiAX5805PriMC5000mV_ErrID );
+
+g_wHMI_AX5805PriMC_5Volts				:= 		WORD_TO_LREAL(wAX5805_PriMC5000mV) / 1000.0 ;
+END_IF ;
+
+// Read the Secondary Micro Controller (MC2) 5.0v Nominal Voltage in mV out of the AX5805
+IF C1.CV = 2 THEN
+fbAX5805SecMC5000mV_ADSRead(
+						NETID			:= 		gc_sADSNetID, 
+						PORT			:= 		gc_uiAX5805_EtherCATAdr, 
+						IDXGRP			:= 		16#F302, 
+						IDXOFFS			:= 		16#FA810004, 
+						LEN				:= 		2, 
+						DESTADDR		:= 		ADR(wAX5805_SecMC5000mV), 
+						READ			:= 		xExecute, 
+						TMOUT			:= 		T#2S, 
+						BUSY			=> 		xAX5805SecMC5000mV_busy, 
+						ERR				=> 		xAX5805SecMC5000mV_Err, 
+						ERRID			=> 		udiAX5805SecMC5000mV_ErrID );
+			
+g_wHMI_AX5805SecMC_5Volts 				:= 		WORD_TO_LREAL(wAX5805_SecMC5000mV) / 1000.0 ;
+END_IF ;
+
+(* Read the Configured Safety Option For CH-A in The AX5000 Drive
+
+An advantage of using the FB_SoERead function block Form the MC2_Drive library
+is the NedID is the controller's NetID not the EtherCAT master so it is possible 
+to leave that field with just blank single quotes '' and the TwinCAT system 
+assumes the NetID of the computer for you.
+
+The MC2_Drive library has dependencies on the MC2 library in TwinCAT and Tc3 at this point
+(build 3099.1) doesn't notice the dependancy and add the extra library for you.  You must
+manually add it yourself.
+
+	S_0_IDN		: WORD	:= 16#0000;
+	S_1_IDN		: WORD	:= 16#1000;
+	S_2_IDN		: WORD	:= 16#2000;
+	S_3_IDN		: WORD	:= 16#3000;
+	S_4_IDN		: WORD	:= 16#4000;
+	S_5_IDN		: WORD	:= 16#5000;
+	S_6_IDN		: WORD	:= 16#6000;
+	S_7_IDN		: WORD	:= 16#7000;
+
+	P_0_IDN		: WORD	:= 16#8000;
+	P_1_IDN		: WORD	:= 16#9000;
+	P_2_IDN		: WORD	:= 16#A000;
+	P_3_IDN		: WORD	:= 16#B000;
+	P_4_IDN		: WORD	:= 16#C000;
+	P_5_IDN		: WORD	:= 16#D000;
+	P_6_IDN		: WORD	:= 16#E000;
+	P_7_IDN		: WORD	:= 16#F000;
+
+A Few documented SERCOS error codes:
+---------------------------------------
+0x1003 Wrong parameter mode 
+0x1004 Data parameter wrong value size 
+0x1005 False backup parameter type  
+0x1006 Backup list was not IDN 192 
+
+nElement: Element number of the parameter that is to be written. The following values are allowed:
+--------------------------------------------------------------------------------------------------
+Value Description 
+0x01 Data Status 
+0x02 Name (read only) 
+0x04 Attribute 
+0x08 Unit 
+0x10 Minimum 
+0x20 Maximum 
+0x40 Value 
+0x80 Default 
+
+*)
+fbAX5000_SafetyOption(
+						NetId			:= 		'', 
+						Idn				:= 		DINT_TO_WORD(16#8000 + 2000), 
+						Element			:= 		16#40, 
+						pDstBuf			:= 		ADR(dwSafetyOption), 
+						BufLen			:= 		SIZEOF(dwSafetyOption), 
+						Execute			:= 		xExecute, 
+						Timeout			:= 		T#2S, 
+						Axis			:= 		Axis1, 
+						Busy			=> 		xAX5000_SafetyOption_busy, 
+						Error			=> 		xAX5000_SafetyOption_Err, 
+						AdsErrId		=> 		udiAX5000_SafetyOption_ErrID, 
+						SercosErrId		=> 		uiAX5000_SafetyOption_SercosErrID, 
+						Attribute		=> 		dwAX5000_SafetyOption_Attribute) ;
+
+IF dwSafetyOption 						= 		0 THEN
+	g_sHMI_AX5000_SafetyOption			:= 		'No Safety Option Selected' ;
+	ELSIF dwSafetyOption				= 		1 THEN
+	g_sHMI_AX5000_SafetyOption			:= 		'AX5801 Option Selected' ;
+	ELSIF dwSafetyOption				= 		2 THEN
+	g_sHMI_AX5000_SafetyOption			:= 		'AX5805 Option Selected' ;
+ELSE
+	g_sHMI_AX5000_SafetyOption			:= 		'Invalid Option' ;
+END_IF ;
+
+//AX5000 Ch-A Motor String
+fbAX5000_ConfigMotorCHA(
+						NetId			:= 		'', 
+						Idn				:= 		DINT_TO_WORD(16#8000 + 53), 
+						Element			:= 		16#40, 
+						pDstBuf			:= 		ADR(ConfigMotorCHA), 
+						BufLen			:= 		SIZEOF(ConfigMotorCHA), 
+						Execute			:= 		xExecute, 
+						Timeout			:= 		T#2S, 
+						Axis			:= 		Axis1, 
+						Busy			=> 		xAX5000_ConfigMotorCHA_busy, 
+						Error			=> 		xAX5000_ConfigMotorCHA_Err, 
+						AdsErrId		=> 		udiAX5000_ConfigMotorCHA_ErrID, 
+						SercosErrId		=> 		uiAX5000_ConfigMotorCHA_SercosErrID, 
+						Attribute		=> 		dwAX5000_ConfigMotorCHA_Attribute) ;
+
+g_sHMI_AX5000_ConfigMotorCHA 			:= 		 UINT_TO_STRING(ConfigMotorCHA[2]) ;
+
+ELSE xReset := 1 ;
+END_IF ;
+]]></ST>
+    </Implementation>
+    <ObjectProperties />
+  </POU>
+</TcPlcObject>

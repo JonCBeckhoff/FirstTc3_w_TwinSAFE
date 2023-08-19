@@ -1,0 +1,14 @@
+﻿<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.0.18">
+  <DUT Name="ST_MDP_CPU" Id="{4a9ec963-405f-484b-824d-d04f30c8dded}">
+    <Declaration><![CDATA[TYPE ST_MDP_CPU :
+STRUCT
+	uiLen			:UINT;			// Length
+	udiCPUfrequency	:UDINT;			// CPU Frequency in MHz
+	uiCPUusage		:UINT;			// Current CPU Usage [%]
+	iCPUtemp 		:INT;			// Current CPU temperature in DegC
+END_STRUCT
+END_TYPE
+]]></Declaration>
+    <ObjectProperties />
+  </DUT>
+</TcPlcObject>

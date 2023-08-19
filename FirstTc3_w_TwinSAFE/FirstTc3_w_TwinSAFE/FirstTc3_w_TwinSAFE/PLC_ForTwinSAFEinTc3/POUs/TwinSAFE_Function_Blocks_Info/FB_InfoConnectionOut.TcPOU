@@ -1,0 +1,162 @@
+﻿<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.0.14">
+  <POU Name="FB_InfoConnectionOut" Id="{a747a293-2a93-4969-b846-57402b2e7368}">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_InfoConnectionOut
+VAR_INPUT
+	stInfoData 		: 		DUT_ST_InfoDataConnectionOut ;
+END_VAR
+VAR_OUTPUT
+	sState 			: 		STRING ;
+	sDiag  			: 		STRING ;
+	xChannel1 		: 		BOOL ;
+	xChannel2 		: 		BOOL ;	
+	xChannel3 		: 		BOOL ;	
+	xChannel4 		: 		BOOL ;	
+END_VAR
+VAR
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[// Safety Terminal's Connection State
+
+// Value 100 (0x64) - The Reset State: The reset state is used to re-initialize 
+// the Safety over EtherCAT connection after the power-on or a Safety over EtherCAT 
+// communication error
+IF stInfoData.usiMapState 		= 		100 THEN
+				sState 			:= 		'Reset State' ;
+
+// Value 101 (0x65) - The Session State: During the transition to or in the session 
+// state a session ID is transferred from the FSoE master to the SFoE slave. which
+// in turn responds with its own session ID back to the FSoE master
+ELSIF stInfoData.usiMapState 	= 		101 THEN
+				sState 			:= 		'Session State' ;	
+
+// Value 102 (0x66) - The Connection State: In the connection state a connection ID 
+// is transferred from the FSoE master to the FSoE slave
+ELSIF stInfoData.usiMapState 	= 		102 THEN
+				sState 			:= 		'Connection State' ;
+
+// Value 103 (0x67) - The Parameter State: In the parameter state safe communication 
+// and device specific application parameters are transferred from the FSoE master 
+// to the FSoE slave
+ELSIF stInfoData.usiMapState 	= 		103 THEN
+				sState 			:= 		'Parameter State' ;
+
+// Value 104 (0x68) - The Data Exchange State: In the data state FSoE cycles
+// are transferred until either a communications error occurs or an FSoE node
+// is stopped locally
+ELSIF stInfoData.usiMapState 	= 		104 THEN
+				sState 			:= 		'Data State' ;
+
+// Value 105 (0x69) - The Shut Down State: In the shut down state the connection 
+// was shutdown by one of the communication partners
+ELSIF stInfoData.usiMapState 	= 		105 THEN
+				sState 			:= 		'Shutdown State' ;
+
+// Value is not between 100 and 105 so unknown state which is an error
+ELSE
+				sState 			:= 		'Error' ;
+END_IF
+
+// Safety Terminal's Connection Diagnostics
+
+IF stInfoData.usiMapDiag 		= 		0 THEN
+				sDiag 			:= 		'No Error' ;
+
+// Value		Description
+// xxxx 0001	Invalid Command
+ELSIF  stInfoData.usiMapDiag.0 	= 		TRUE THEN
+				sDiag 			:= 		'Invalid Command' ;
+
+// Value		Description
+// xxxx 0010	Unknown Command
+ELSIF  stInfoData.usiMapDiag.1 	= 		TRUE THEN
+				sDiag 			:= 		'Unknown Command' ;
+
+// Value		Description
+// xxxx 0011	Invalid Connection ID
+ELSIF  (stInfoData.usiMapDiag.0 AND stInfoData.usiMapDiag.1) = 	TRUE THEN
+				sDiag 			:= 								'Invalid Connection-ID' ;
+
+// Value		Description
+// xxxx 0100	Invalid CRC
+ELSIF  stInfoData.usiMapDiag.2	= 		TRUE THEN
+				sDiag 			:= 		'Invalid CRC' ;
+
+// Value		Description
+// xxxx 0101	Watchdog Time Elapsed
+ELSIF  (stInfoData.usiMapDiag.0 AND stInfoData.usiMapDiag.2) = TRUE THEN
+	sDiag := 'Watchdog Expired' ;
+	
+// Value		Description
+// xxxx 0110	Invalid FSoE Address	
+ELSIF  (stInfoData.usiMapDiag.1 AND stInfoData.usiMapDiag.2) = 	TRUE THEN
+				sDiag 			:= 								'Invalid FSoE Address' ;
+
+// Value		Description
+// xxxx 0111	Invalid Data
+ELSIF  (stInfoData.usiMapDiag.0 AND stInfoData.usiMapDiag.1 AND stInfoData.usiMapDiag.2) = 	TRUE THEN	
+				sDiag 			:= 															'Invalid Data' ;
+	
+// Value		Description
+// xxxx 1000	Invalid Communication Parameter Length
+ELSIF  stInfoData.usiMapDiag.3 	= 		TRUE THEN
+				sDiag 			:= 		'Invalid Communication Parameter Length' ;
+
+// Value		Description
+// xxxx 1001	Invalid Communication Parameters
+ELSIF  (stInfoData.usiMapDiag.0 AND stInfoData.usiMapDiag.3) = 	TRUE THEN
+				sDiag 			:= 								'Invalid Commuication Parameters' ;
+
+// Value		Description
+// xxxx 1010	Invalid User Parameter Length
+ELSIF  (stInfoData.usiMapDiag.1 AND stInfoData.usiMapDiag.3) = 	TRUE THEN
+				sDiag 			:= 								'Invalid User Parameter Length' ;
+
+// Value		Description
+// xxxx 1011	Invalid User PArameters
+ELSIF  (stInfoData.usiMapDiag.0 AND stInfoData.usiMapDiag.1 AND stInfoData.usiMapDiag.3) = 	TRUE THEN	
+				sDiag 			:= 															'Invalid User Parameters' ;
+
+// Value		Description
+// xxxx 1100	FSoE Master Reset	
+ELSIF  (stInfoData.usiMapDiag.2 AND stInfoData.usiMapDiag.3) = 	TRUE THEN
+				sDiag 			:= 								'FSoE Master Reset' ;
+
+// Value		Description
+// 0001 xxxx	FSoE Slave Error Detected
+ELSIF  stInfoData.usiMapDiag.4 	= 		TRUE THEN
+					sDiag 		:= 		'FSoE Slave Error Detected' ;
+
+// Value		Description
+// 0010 xxxx	FSoE Slave Reports Failsafe Value Active
+ELSIF  stInfoData.usiMapDiag.5 	= 		TRUE THEN
+					sDiag 		:= 		'FSoE Slave Reports Failsafe Value Active' ;
+
+// Value		Description
+// 0100 xxxx	Connection is in Startup
+ELSIF  stInfoData.usiMapDiag.6 	= 		TRUE THEN
+					sDiag 		:= 		'Connection Is In Startup' ;
+
+// Value		Description
+// 1000 xxxx	FSoE Master Reports Failsafe Value Active	
+ELSIF  stInfoData.usiMapDiag.7 	= 		TRUE THEN
+					sDiag 		:= 		'FSoE Master Reports Failsafe Value Active' ;	
+
+// Value		Description
+// 				Something Not Specifically Annunciated Above.
+// 				Maybe a combination of errors are occuring.
+ELSE	
+					sDiag 		:= 		'Error' ;
+
+END_IF
+
+// Safety Terminal's Connection Output Signals
+xChannel1 		:= 		stInfoData.byOutputSignals.0 ;
+xChannel2 		:= 		stInfoData.byOutputSignals.1 ;
+xChannel3 		:= 		stInfoData.byOutputSignals.2 ;
+xChannel4 		:= 		stInfoData.byOutputSignals.3 ;
+]]></ST>
+    </Implementation>
+    <ObjectProperties />
+  </POU>
+</TcPlcObject>

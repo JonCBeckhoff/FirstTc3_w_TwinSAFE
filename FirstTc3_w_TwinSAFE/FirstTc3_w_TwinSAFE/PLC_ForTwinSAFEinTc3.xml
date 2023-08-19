@@ -1,0 +1,3381 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<project xmlns="http://www.plcopen.org/xml/tc6_0200">
+  <fileHeader companyName="Beckhoff Automation GmbH" productName="TwinCAT PLC Control" productVersion="3.5.0.0" creationDateTime="2012-07-11T12:29:45.1632277" />
+  <contentHeader name="PLC_ForTwinSAFEinTc3" modificationDateTime="2012-07-11T12:29:45.1632277">
+    <coordinateInfo>
+      <fbd>
+        <scaling x="1" y="1" />
+      </fbd>
+      <ld>
+        <scaling x="1" y="1" />
+      </ld>
+      <sfc>
+        <scaling x="1" y="1" />
+      </sfc>
+    </coordinateInfo>
+    <addData>
+      <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
+        <ProjectInformation />
+      </data>
+    </addData>
+  </contentHeader>
+  <types>
+    <dataTypes />
+    <pous />
+  </types>
+  <instances>
+    <configurations />
+  </instances>
+  <addData>
+    <data name="http://www.3s-software.com/plcopenxml/application" handleUnknown="implementation">
+      <resource name="PLC_ForTwinSAFEinTc3">
+        <task name="PlcTask" interval="PT0.01S" priority="20">
+          <pouInstance name="MAIN" typeName="">
+            <documentation>
+              <xhtml xmlns="http://www.w3.org/1999/xhtml" />
+            </documentation>
+          </pouInstance>
+          <addData>
+            <data name="http://www.3s-software.com/plcopenxml/tasksettings" handleUnknown="implementation">
+              <TaskSettings KindOfTask="Cyclic" Interval="10000" IntervalUnit="µs">
+                <Watchdog Enabled="false" TimeUnit="ms" />
+              </TaskSettings>
+            </data>
+          </addData>
+        </task>
+        <globalVars name="TC_GLOBAL_IID_LIST">
+          <variable name="IID_ITcUnknown">
+            <type>
+              <derived name="IID" />
+            </type>
+            <initialValue>
+              <structValue>
+                <value member="Data1">
+                  <simpleValue value="16#1" />
+                </value>
+                <value member="Data2">
+                  <simpleValue value="16#0" />
+                </value>
+                <value member="Data3">
+                  <simpleValue value="16#0" />
+                </value>
+                <value member="Data4">
+                  <arrayValue>
+                    <value>
+                      <simpleValue value="16#E0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#64" />
+                    </value>
+                  </arrayValue>
+                </value>
+              </structValue>
+            </initialValue>
+            <addData>
+              <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
+                <Attributes>
+                  <Attribute Name="tc_no_symbol" Value="" />
+                </Attributes>
+              </data>
+            </addData>
+            <documentation>
+              <xhtml xmlns="http://www.w3.org/1999/xhtml"> Interface ID for interface ITcUnknown</xhtml>
+            </documentation>
+          </variable>
+          <variable name="IID_ITComObjCon">
+            <type>
+              <derived name="IID" />
+            </type>
+            <initialValue>
+              <structValue>
+                <value member="Data1">
+                  <simpleValue value="16#16" />
+                </value>
+                <value member="Data2">
+                  <simpleValue value="16#0" />
+                </value>
+                <value member="Data3">
+                  <simpleValue value="16#0" />
+                </value>
+                <value member="Data4">
+                  <arrayValue>
+                    <value>
+                      <simpleValue value="16#E0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#64" />
+                    </value>
+                  </arrayValue>
+                </value>
+              </structValue>
+            </initialValue>
+            <addData>
+              <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
+                <Attributes>
+                  <Attribute Name="tc_no_symbol" Value="" />
+                </Attributes>
+              </data>
+            </addData>
+            <documentation>
+              <xhtml xmlns="http://www.w3.org/1999/xhtml"> Interface ID for interface ITComObjCon</xhtml>
+            </documentation>
+          </variable>
+          <variable name="IID_ITComObjRes">
+            <type>
+              <derived name="IID" />
+            </type>
+            <initialValue>
+              <structValue>
+                <value member="Data1">
+                  <simpleValue value="16#14" />
+                </value>
+                <value member="Data2">
+                  <simpleValue value="16#0" />
+                </value>
+                <value member="Data3">
+                  <simpleValue value="16#0" />
+                </value>
+                <value member="Data4">
+                  <arrayValue>
+                    <value>
+                      <simpleValue value="16#E0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#64" />
+                    </value>
+                  </arrayValue>
+                </value>
+              </structValue>
+            </initialValue>
+            <addData>
+              <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
+                <Attributes>
+                  <Attribute Name="tc_no_symbol" Value="" />
+                </Attributes>
+              </data>
+            </addData>
+            <documentation>
+              <xhtml xmlns="http://www.w3.org/1999/xhtml"> Interface ID for interface ITComObjRes</xhtml>
+            </documentation>
+          </variable>
+          <variable name="IID_ITComObjInd">
+            <type>
+              <derived name="IID" />
+            </type>
+            <initialValue>
+              <structValue>
+                <value member="Data1">
+                  <simpleValue value="16#13" />
+                </value>
+                <value member="Data2">
+                  <simpleValue value="16#0" />
+                </value>
+                <value member="Data3">
+                  <simpleValue value="16#0" />
+                </value>
+                <value member="Data4">
+                  <arrayValue>
+                    <value>
+                      <simpleValue value="16#E0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#64" />
+                    </value>
+                  </arrayValue>
+                </value>
+              </structValue>
+            </initialValue>
+            <addData>
+              <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
+                <Attributes>
+                  <Attribute Name="tc_no_symbol" Value="" />
+                </Attributes>
+              </data>
+            </addData>
+            <documentation>
+              <xhtml xmlns="http://www.w3.org/1999/xhtml"> Interface ID for interface ITComObjInd</xhtml>
+            </documentation>
+          </variable>
+          <variable name="IID_ITcBaseClassFactory">
+            <type>
+              <derived name="IID" />
+            </type>
+            <initialValue>
+              <structValue>
+                <value member="Data1">
+                  <simpleValue value="16#18" />
+                </value>
+                <value member="Data2">
+                  <simpleValue value="16#0" />
+                </value>
+                <value member="Data3">
+                  <simpleValue value="16#0" />
+                </value>
+                <value member="Data4">
+                  <arrayValue>
+                    <value>
+                      <simpleValue value="16#E0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#64" />
+                    </value>
+                  </arrayValue>
+                </value>
+              </structValue>
+            </initialValue>
+            <addData>
+              <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
+                <Attributes>
+                  <Attribute Name="tc_no_symbol" Value="" />
+                </Attributes>
+              </data>
+            </addData>
+            <documentation>
+              <xhtml xmlns="http://www.w3.org/1999/xhtml"> Interface ID for interface ITcBaseClassFactory</xhtml>
+            </documentation>
+          </variable>
+          <variable name="IID_ITComObjectServer">
+            <type>
+              <derived name="IID" />
+            </type>
+            <initialValue>
+              <structValue>
+                <value member="Data1">
+                  <simpleValue value="16#30" />
+                </value>
+                <value member="Data2">
+                  <simpleValue value="16#0" />
+                </value>
+                <value member="Data3">
+                  <simpleValue value="16#0" />
+                </value>
+                <value member="Data4">
+                  <arrayValue>
+                    <value>
+                      <simpleValue value="16#E0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#64" />
+                    </value>
+                  </arrayValue>
+                </value>
+              </structValue>
+            </initialValue>
+            <addData>
+              <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
+                <Attributes>
+                  <Attribute Name="tc_no_symbol" Value="" />
+                </Attributes>
+              </data>
+            </addData>
+            <documentation>
+              <xhtml xmlns="http://www.w3.org/1999/xhtml"> Interface ID for interface ITComObjectServer</xhtml>
+            </documentation>
+          </variable>
+          <variable name="IID_ITcTask">
+            <type>
+              <derived name="IID" />
+            </type>
+            <initialValue>
+              <structValue>
+                <value member="Data1">
+                  <simpleValue value="16#2000002" />
+                </value>
+                <value member="Data2">
+                  <simpleValue value="16#0" />
+                </value>
+                <value member="Data3">
+                  <simpleValue value="16#0" />
+                </value>
+                <value member="Data4">
+                  <arrayValue>
+                    <value>
+                      <simpleValue value="16#E0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#64" />
+                    </value>
+                  </arrayValue>
+                </value>
+              </structValue>
+            </initialValue>
+            <addData>
+              <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
+                <Attributes>
+                  <Attribute Name="tc_no_symbol" Value="" />
+                </Attributes>
+              </data>
+            </addData>
+            <documentation>
+              <xhtml xmlns="http://www.w3.org/1999/xhtml"> Interface ID for interface ITcTask</xhtml>
+            </documentation>
+          </variable>
+          <variable name="IID_ITcCyclic">
+            <type>
+              <derived name="IID" />
+            </type>
+            <initialValue>
+              <structValue>
+                <value member="Data1">
+                  <simpleValue value="16#3000010" />
+                </value>
+                <value member="Data2">
+                  <simpleValue value="16#0" />
+                </value>
+                <value member="Data3">
+                  <simpleValue value="16#0" />
+                </value>
+                <value member="Data4">
+                  <arrayValue>
+                    <value>
+                      <simpleValue value="16#E0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#64" />
+                    </value>
+                  </arrayValue>
+                </value>
+              </structValue>
+            </initialValue>
+            <addData>
+              <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
+                <Attributes>
+                  <Attribute Name="tc_no_symbol" Value="" />
+                </Attributes>
+              </data>
+            </addData>
+            <documentation>
+              <xhtml xmlns="http://www.w3.org/1999/xhtml"> Interface ID for interface ITcCyclic</xhtml>
+            </documentation>
+          </variable>
+          <variable name="IID_ITcPostCyclic">
+            <type>
+              <derived name="IID" />
+            </type>
+            <initialValue>
+              <structValue>
+                <value member="Data1">
+                  <simpleValue value="16#3000025" />
+                </value>
+                <value member="Data2">
+                  <simpleValue value="16#0" />
+                </value>
+                <value member="Data3">
+                  <simpleValue value="16#0" />
+                </value>
+                <value member="Data4">
+                  <arrayValue>
+                    <value>
+                      <simpleValue value="16#E0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#64" />
+                    </value>
+                  </arrayValue>
+                </value>
+              </structValue>
+            </initialValue>
+            <addData>
+              <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
+                <Attributes>
+                  <Attribute Name="tc_no_symbol" Value="" />
+                </Attributes>
+              </data>
+            </addData>
+            <documentation>
+              <xhtml xmlns="http://www.w3.org/1999/xhtml"> Interface ID for interface ITcPostCyclic</xhtml>
+            </documentation>
+          </variable>
+          <variable name="IID_ITcIoCyclic">
+            <type>
+              <derived name="IID" />
+            </type>
+            <initialValue>
+              <structValue>
+                <value member="Data1">
+                  <simpleValue value="16#3000011" />
+                </value>
+                <value member="Data2">
+                  <simpleValue value="16#0" />
+                </value>
+                <value member="Data3">
+                  <simpleValue value="16#0" />
+                </value>
+                <value member="Data4">
+                  <arrayValue>
+                    <value>
+                      <simpleValue value="16#E0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#64" />
+                    </value>
+                  </arrayValue>
+                </value>
+              </structValue>
+            </initialValue>
+            <addData>
+              <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
+                <Attributes>
+                  <Attribute Name="tc_no_symbol" Value="" />
+                </Attributes>
+              </data>
+            </addData>
+            <documentation>
+              <xhtml xmlns="http://www.w3.org/1999/xhtml"> Interface ID for interface ITcIoCyclic</xhtml>
+            </documentation>
+          </variable>
+          <variable name="IID_ITcPersist">
+            <type>
+              <derived name="IID" />
+            </type>
+            <initialValue>
+              <structValue>
+                <value member="Data1">
+                  <simpleValue value="16#2" />
+                </value>
+                <value member="Data2">
+                  <simpleValue value="16#0" />
+                </value>
+                <value member="Data3">
+                  <simpleValue value="16#0" />
+                </value>
+                <value member="Data4">
+                  <arrayValue>
+                    <value>
+                      <simpleValue value="16#E0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#64" />
+                    </value>
+                  </arrayValue>
+                </value>
+              </structValue>
+            </initialValue>
+            <addData>
+              <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
+                <Attributes>
+                  <Attribute Name="tc_no_symbol" Value="" />
+                </Attributes>
+              </data>
+            </addData>
+            <documentation>
+              <xhtml xmlns="http://www.w3.org/1999/xhtml"> Interface ID for interface ITcPersist</xhtml>
+            </documentation>
+          </variable>
+          <variable name="IID_ITComCreateInstance">
+            <type>
+              <derived name="IID" />
+            </type>
+            <initialValue>
+              <structValue>
+                <value member="Data1">
+                  <simpleValue value="16#31" />
+                </value>
+                <value member="Data2">
+                  <simpleValue value="16#0" />
+                </value>
+                <value member="Data3">
+                  <simpleValue value="16#0" />
+                </value>
+                <value member="Data4">
+                  <arrayValue>
+                    <value>
+                      <simpleValue value="16#E0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#64" />
+                    </value>
+                  </arrayValue>
+                </value>
+              </structValue>
+            </initialValue>
+            <addData>
+              <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
+                <Attributes>
+                  <Attribute Name="tc_no_symbol" Value="" />
+                </Attributes>
+              </data>
+            </addData>
+            <documentation>
+              <xhtml xmlns="http://www.w3.org/1999/xhtml"> Interface ID for interface ITComCreateInstance</xhtml>
+            </documentation>
+          </variable>
+          <variable name="IID_ITComObject">
+            <type>
+              <derived name="IID" />
+            </type>
+            <initialValue>
+              <structValue>
+                <value member="Data1">
+                  <simpleValue value="16#12" />
+                </value>
+                <value member="Data2">
+                  <simpleValue value="16#0" />
+                </value>
+                <value member="Data3">
+                  <simpleValue value="16#0" />
+                </value>
+                <value member="Data4">
+                  <arrayValue>
+                    <value>
+                      <simpleValue value="16#E0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#64" />
+                    </value>
+                  </arrayValue>
+                </value>
+              </structValue>
+            </initialValue>
+            <addData>
+              <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
+                <Attributes>
+                  <Attribute Name="tc_no_symbol" Value="" />
+                </Attributes>
+              </data>
+            </addData>
+            <documentation>
+              <xhtml xmlns="http://www.w3.org/1999/xhtml"> Interface ID for interface ITComObject</xhtml>
+            </documentation>
+          </variable>
+          <variable name="IID_ITComObjReq">
+            <type>
+              <derived name="IID" />
+            </type>
+            <initialValue>
+              <structValue>
+                <value member="Data1">
+                  <simpleValue value="16#15" />
+                </value>
+                <value member="Data2">
+                  <simpleValue value="16#0" />
+                </value>
+                <value member="Data3">
+                  <simpleValue value="16#0" />
+                </value>
+                <value member="Data4">
+                  <arrayValue>
+                    <value>
+                      <simpleValue value="16#E0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#64" />
+                    </value>
+                  </arrayValue>
+                </value>
+              </structValue>
+            </initialValue>
+            <addData>
+              <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
+                <Attributes>
+                  <Attribute Name="tc_no_symbol" Value="" />
+                </Attributes>
+              </data>
+            </addData>
+            <documentation>
+              <xhtml xmlns="http://www.w3.org/1999/xhtml"> Interface ID for interface ITComObjReq</xhtml>
+            </documentation>
+          </variable>
+          <variable name="IID_ITcRTimeTask">
+            <type>
+              <derived name="IID" />
+            </type>
+            <initialValue>
+              <structValue>
+                <value member="Data1">
+                  <simpleValue value="16#2000003" />
+                </value>
+                <value member="Data2">
+                  <simpleValue value="16#0" />
+                </value>
+                <value member="Data3">
+                  <simpleValue value="16#0" />
+                </value>
+                <value member="Data4">
+                  <arrayValue>
+                    <value>
+                      <simpleValue value="16#E0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#64" />
+                    </value>
+                  </arrayValue>
+                </value>
+              </structValue>
+            </initialValue>
+            <addData>
+              <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
+                <Attributes>
+                  <Attribute Name="tc_no_symbol" Value="" />
+                </Attributes>
+              </data>
+            </addData>
+            <documentation>
+              <xhtml xmlns="http://www.w3.org/1999/xhtml"> Interface ID for interface ITcRTimeTask</xhtml>
+            </documentation>
+          </variable>
+          <variable name="IID_ITcRTime">
+            <type>
+              <derived name="IID" />
+            </type>
+            <initialValue>
+              <structValue>
+                <value member="Data1">
+                  <simpleValue value="16#200000D" />
+                </value>
+                <value member="Data2">
+                  <simpleValue value="16#0" />
+                </value>
+                <value member="Data3">
+                  <simpleValue value="16#0" />
+                </value>
+                <value member="Data4">
+                  <arrayValue>
+                    <value>
+                      <simpleValue value="16#E0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#64" />
+                    </value>
+                  </arrayValue>
+                </value>
+              </structValue>
+            </initialValue>
+            <addData>
+              <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
+                <Attributes>
+                  <Attribute Name="tc_no_symbol" Value="" />
+                </Attributes>
+              </data>
+            </addData>
+            <documentation>
+              <xhtml xmlns="http://www.w3.org/1999/xhtml"> Interface ID for interface ITcRTime</xhtml>
+            </documentation>
+          </variable>
+          <variable name="IID_ITcPreInputCyclic">
+            <type>
+              <derived name="IID" />
+            </type>
+            <initialValue>
+              <structValue>
+                <value member="Data1">
+                  <simpleValue value="16#3000017" />
+                </value>
+                <value member="Data2">
+                  <simpleValue value="16#0" />
+                </value>
+                <value member="Data3">
+                  <simpleValue value="16#0" />
+                </value>
+                <value member="Data4">
+                  <arrayValue>
+                    <value>
+                      <simpleValue value="16#E0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#64" />
+                    </value>
+                  </arrayValue>
+                </value>
+              </structValue>
+            </initialValue>
+            <addData>
+              <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
+                <Attributes>
+                  <Attribute Name="tc_no_symbol" Value="" />
+                </Attributes>
+              </data>
+            </addData>
+            <documentation>
+              <xhtml xmlns="http://www.w3.org/1999/xhtml"> Interface ID for interface ITcPreInputCyclic</xhtml>
+            </documentation>
+          </variable>
+          <variable name="IID_ITcWatchSource">
+            <type>
+              <derived name="IID" />
+            </type>
+            <initialValue>
+              <structValue>
+                <value member="Data1">
+                  <simpleValue value="16#3000018" />
+                </value>
+                <value member="Data2">
+                  <simpleValue value="16#0" />
+                </value>
+                <value member="Data3">
+                  <simpleValue value="16#0" />
+                </value>
+                <value member="Data4">
+                  <arrayValue>
+                    <value>
+                      <simpleValue value="16#E0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#64" />
+                    </value>
+                  </arrayValue>
+                </value>
+              </structValue>
+            </initialValue>
+            <addData>
+              <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
+                <Attributes>
+                  <Attribute Name="tc_no_symbol" Value="" />
+                </Attributes>
+              </data>
+            </addData>
+            <documentation>
+              <xhtml xmlns="http://www.w3.org/1999/xhtml"> Interface ID for interface ITcWatchSource</xhtml>
+            </documentation>
+          </variable>
+          <variable name="IID_ITcCyclicCaller">
+            <type>
+              <derived name="IID" />
+            </type>
+            <initialValue>
+              <structValue>
+                <value member="Data1">
+                  <simpleValue value="16#300001E" />
+                </value>
+                <value member="Data2">
+                  <simpleValue value="16#0" />
+                </value>
+                <value member="Data3">
+                  <simpleValue value="16#0" />
+                </value>
+                <value member="Data4">
+                  <arrayValue>
+                    <value>
+                      <simpleValue value="16#E0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#64" />
+                    </value>
+                  </arrayValue>
+                </value>
+              </structValue>
+            </initialValue>
+            <addData>
+              <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
+                <Attributes>
+                  <Attribute Name="tc_no_symbol" Value="" />
+                </Attributes>
+              </data>
+            </addData>
+            <documentation>
+              <xhtml xmlns="http://www.w3.org/1999/xhtml"> Interface ID for interface ITcCyclicCaller</xhtml>
+            </documentation>
+          </variable>
+          <variable name="IID_ITcPostCyclicCaller">
+            <type>
+              <derived name="IID" />
+            </type>
+            <initialValue>
+              <structValue>
+                <value member="Data1">
+                  <simpleValue value="16#3000026" />
+                </value>
+                <value member="Data2">
+                  <simpleValue value="16#0" />
+                </value>
+                <value member="Data3">
+                  <simpleValue value="16#0" />
+                </value>
+                <value member="Data4">
+                  <arrayValue>
+                    <value>
+                      <simpleValue value="16#E0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#64" />
+                    </value>
+                  </arrayValue>
+                </value>
+              </structValue>
+            </initialValue>
+            <addData>
+              <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
+                <Attributes>
+                  <Attribute Name="tc_no_symbol" Value="" />
+                </Attributes>
+              </data>
+            </addData>
+            <documentation>
+              <xhtml xmlns="http://www.w3.org/1999/xhtml"> Interface ID for interface ITcPostCyclicCaller</xhtml>
+            </documentation>
+          </variable>
+          <variable name="IID_ITcIoCyclicCaller">
+            <type>
+              <derived name="IID" />
+            </type>
+            <initialValue>
+              <structValue>
+                <value member="Data1">
+                  <simpleValue value="16#300001F" />
+                </value>
+                <value member="Data2">
+                  <simpleValue value="16#0" />
+                </value>
+                <value member="Data3">
+                  <simpleValue value="16#0" />
+                </value>
+                <value member="Data4">
+                  <arrayValue>
+                    <value>
+                      <simpleValue value="16#E0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#64" />
+                    </value>
+                  </arrayValue>
+                </value>
+              </structValue>
+            </initialValue>
+            <addData>
+              <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
+                <Attributes>
+                  <Attribute Name="tc_no_symbol" Value="" />
+                </Attributes>
+              </data>
+            </addData>
+            <documentation>
+              <xhtml xmlns="http://www.w3.org/1999/xhtml"> Interface ID for interface ITcIoCyclicCaller</xhtml>
+            </documentation>
+          </variable>
+          <variable name="IID_ITcADI">
+            <type>
+              <derived name="IID" />
+            </type>
+            <initialValue>
+              <structValue>
+                <value member="Data1">
+                  <simpleValue value="16#3000012" />
+                </value>
+                <value member="Data2">
+                  <simpleValue value="16#0" />
+                </value>
+                <value member="Data3">
+                  <simpleValue value="16#0" />
+                </value>
+                <value member="Data4">
+                  <arrayValue>
+                    <value>
+                      <simpleValue value="16#E0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#64" />
+                    </value>
+                  </arrayValue>
+                </value>
+              </structValue>
+            </initialValue>
+            <addData>
+              <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
+                <Attributes>
+                  <Attribute Name="tc_no_symbol" Value="" />
+                </Attributes>
+              </data>
+            </addData>
+            <documentation>
+              <xhtml xmlns="http://www.w3.org/1999/xhtml"> Interface ID for interface ITcADI</xhtml>
+            </documentation>
+          </variable>
+          <variable name="IID_ITComLicenseServer">
+            <type>
+              <derived name="IID" />
+            </type>
+            <initialValue>
+              <structValue>
+                <value member="Data1">
+                  <simpleValue value="16#1010000" />
+                </value>
+                <value member="Data2">
+                  <simpleValue value="16#0" />
+                </value>
+                <value member="Data3">
+                  <simpleValue value="16#0" />
+                </value>
+                <value member="Data4">
+                  <arrayValue>
+                    <value>
+                      <simpleValue value="16#E0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#64" />
+                    </value>
+                  </arrayValue>
+                </value>
+              </structValue>
+            </initialValue>
+            <addData>
+              <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
+                <Attributes>
+                  <Attribute Name="tc_no_symbol" Value="" />
+                </Attributes>
+              </data>
+            </addData>
+            <documentation>
+              <xhtml xmlns="http://www.w3.org/1999/xhtml"> Interface ID for interface ITComLicenseServer</xhtml>
+            </documentation>
+          </variable>
+          <variable name="IID_ITcAppServices">
+            <type>
+              <derived name="IID" />
+            </type>
+            <initialValue>
+              <structValue>
+                <value member="Data1">
+                  <simpleValue value="16#8500102" />
+                </value>
+                <value member="Data2">
+                  <simpleValue value="16#0" />
+                </value>
+                <value member="Data3">
+                  <simpleValue value="16#0" />
+                </value>
+                <value member="Data4">
+                  <arrayValue>
+                    <value>
+                      <simpleValue value="16#E0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#64" />
+                    </value>
+                  </arrayValue>
+                </value>
+              </structValue>
+            </initialValue>
+            <addData>
+              <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
+                <Attributes>
+                  <Attribute Name="tc_no_symbol" Value="" />
+                </Attributes>
+              </data>
+            </addData>
+            <documentation>
+              <xhtml xmlns="http://www.w3.org/1999/xhtml"> Interface ID for interface ITcAppServices</xhtml>
+            </documentation>
+          </variable>
+          <variable name="IID_ITcAppServices2">
+            <type>
+              <derived name="IID" />
+            </type>
+            <initialValue>
+              <structValue>
+                <value member="Data1">
+                  <simpleValue value="16#8500104" />
+                </value>
+                <value member="Data2">
+                  <simpleValue value="16#0" />
+                </value>
+                <value member="Data3">
+                  <simpleValue value="16#0" />
+                </value>
+                <value member="Data4">
+                  <arrayValue>
+                    <value>
+                      <simpleValue value="16#E0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#64" />
+                    </value>
+                  </arrayValue>
+                </value>
+              </structValue>
+            </initialValue>
+            <addData>
+              <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
+                <Attributes>
+                  <Attribute Name="tc_no_symbol" Value="" />
+                </Attributes>
+              </data>
+            </addData>
+            <documentation>
+              <xhtml xmlns="http://www.w3.org/1999/xhtml"> Interface ID for interface ITcAppServices2</xhtml>
+            </documentation>
+          </variable>
+          <variable name="IID_ITcNcDcConvert">
+            <type>
+              <derived name="IID" />
+            </type>
+            <initialValue>
+              <structValue>
+                <value member="Data1">
+                  <simpleValue value="16#5000005" />
+                </value>
+                <value member="Data2">
+                  <simpleValue value="16#0" />
+                </value>
+                <value member="Data3">
+                  <simpleValue value="16#0" />
+                </value>
+                <value member="Data4">
+                  <arrayValue>
+                    <value>
+                      <simpleValue value="16#E0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#64" />
+                    </value>
+                  </arrayValue>
+                </value>
+              </structValue>
+            </initialValue>
+            <addData>
+              <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
+                <Attributes>
+                  <Attribute Name="tc_no_symbol" Value="" />
+                </Attributes>
+              </data>
+            </addData>
+            <documentation>
+              <xhtml xmlns="http://www.w3.org/1999/xhtml"> Interface ID for interface ITcNcDcConvert</xhtml>
+            </documentation>
+          </variable>
+          <variable name="IID_ITcNcDcConvert2">
+            <type>
+              <derived name="IID" />
+            </type>
+            <initialValue>
+              <structValue>
+                <value member="Data1">
+                  <simpleValue value="16#5000006" />
+                </value>
+                <value member="Data2">
+                  <simpleValue value="16#0" />
+                </value>
+                <value member="Data3">
+                  <simpleValue value="16#0" />
+                </value>
+                <value member="Data4">
+                  <arrayValue>
+                    <value>
+                      <simpleValue value="16#E0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#0" />
+                    </value>
+                    <value>
+                      <simpleValue value="16#64" />
+                    </value>
+                  </arrayValue>
+                </value>
+              </structValue>
+            </initialValue>
+            <addData>
+              <data name="http://www.3s-software.com/plcopenxml/attributes" handleUnknown="implementation">
+                <Attributes>
+                  <Attribute Name="tc_no_symbol" Value="" />
+                </Attributes>
+              </data>
+            </addData>
+            <documentation>
+              <xhtml xmlns="http://www.w3.org/1999/xhtml"> Interface ID for interface ITcNcDcConvert2</xhtml>
+            </documentation>
+          </variable>
+        </globalVars>
+        <globalVars name="GVL_TwinSAFE">
+          <variable name="g_uiTS_ProjectCRC" address="%I*">
+            <type>
+              <UINT />
+            </type>
+            <documentation>
+              <xhtml xmlns="http://www.w3.org/1999/xhtml"> TwinSAFE project CRC	</xhtml>
+            </documentation>
+          </variable>
+          <variable name="q_uiHMI_ProjectCRC">
+            <type>
+              <UINT />
+            </type>
+          </variable>
+          <variable name="g_udiTS_SerialNumber" address="%I*">
+            <type>
+              <UDINT />
+            </type>
+          </variable>
+          <variable name="q_udiHMI_SerialNumber">
+            <type>
+              <UDINT />
+            </type>
+          </variable>
+          <variable name="g_xTS_ErrAck" address="%Q*">
+            <type>
+              <BOOL />
+            </type>
+            <documentation>
+              <xhtml xmlns="http://www.w3.org/1999/xhtml"> Commands to TwinSAFE controller's safety  group	</xhtml>
+            </documentation>
+          </variable>
+          <variable name="q_xHMI_ErrAckPB">
+            <type>
+              <BOOL />
+            </type>
+          </variable>
+          <variable name="g_xTS_EStop_Reset" address="%Q*">
+            <type>
+              <BOOL />
+            </type>
+          </variable>
+          <variable name="q_xHMI_EStopResetPB">
+            <type>
+              <BOOL />
+            </type>
+          </variable>
+          <variable name="g_xTS_FBerror" address="%I*">
+            <type>
+              <BOOL />
+            </type>
+            <documentation>
+              <xhtml xmlns="http://www.w3.org/1999/xhtml"> Feedback from TwinSAFE controller's safety group</xhtml>
+            </documentation>
+          </variable>
+          <variable name="q_xHMI_FBerrorLT">
+            <type>
+              <BOOL />
+            </type>
+          </variable>
+          <variable name="g_xTS_COMerror" address="%I*">
+            <type>
+              <BOOL />
+            </type>
+          </variable>
+          <variable name="q_xHMI_COMerrorLT">
+            <type>
+              <BOOL />
+            </type>
+          </variable>
+          <variable name="g_xTS_EDM_Error" address="%I*">
+            <type>
+              <BOOL />
+            </type>
+            <documentation>
+              <xhtml xmlns="http://www.w3.org/1999/xhtml"> Feedback from TwinSAFE controller's Function Blocks</xhtml>
+            </documentation>
+          </variable>
+          <variable name="q_xHMI_EDMerrorLT">
+            <type>
+              <BOOL />
+            </type>
+          </variable>
+          <variable name="g_xTS_EStop_Complete" address="%I*">
+            <type>
+              <BOOL />
+            </type>
+          </variable>
+          <variable name="q_xHMI_EStop_CompleteLT">
+            <type>
+              <BOOL />
+            </type>
+          </variable>
+          <variable name="g_xTS_EStop_Error" address="%I*">
+            <type>
+              <BOOL />
+            </type>
+          </variable>
+          <variable name="q_xHMI_EStop_errorLT">
+            <type>
+              <BOOL />
+            </type>
+          </variable>
+          <variable name="g_xTS_EStop_OFF_Delay_Complete" address="%I*">
+            <type>
+              <BOOL />
+            </type>
+          </variable>
+          <variable name="q_xHMI_EStop_OFF_Delay_CompleteLT">
+            <type>
+              <BOOL />
+            </type>
+          </variable>
+          <variable name="g_xTS_EStop_ON_Delay_Complete" address="%I*">
+            <type>
+              <BOOL />
+            </type>
+          </variable>
+          <variable name="q_xHMI_EStop_ON_Delay_CompleteLT">
+            <type>
+              <BOOL />
+            </type>
+          </variable>
+          <variable name="g_stTS_InfoGroup1" address="%I*">
+            <type>
+              <derived name="DUT_ST_InfoData" />
+            </type>
+            <documentation>
+              <xhtml xmlns="http://www.w3.org/1999/xhtml"> Safety Group1 Info </xhtml>
+            </documentation>
+          </variable>
+          <variable name="g_sHMI_StatusGroup1">
+            <type>
+              <string />
+            </type>
+          </variable>
+          <variable name="g_stTS_InfoConnection1" address="%I*">
+            <type>
+              <derived name="DUT_ST_InfoDataConnectionIn" />
+            </type>
+            <documentation>
+              <xhtml xmlns="http://www.w3.org/1999/xhtml"> Safety Connection1 Info</xhtml>
+            </documentation>
+          </variable>
+          <variable name="g_sHMI_StateConn1">
+            <type>
+              <string />
+            </type>
+          </variable>
+          <variable name="g_sHMI_DiagConn1">
+            <type>
+              <string />
+            </type>
+          </variable>
+          <variable name="g_xHMI_EL1904Ch1">
+            <type>
+              <BOOL />
+            </type>
+          </variable>
+          <variable name="g_xHMI_EL1904Ch2">
+            <type>
+              <BOOL />
+            </type>
+          </variable>
+          <variable name="g_xHMI_EL1904Ch3">
+            <type>
+              <BOOL />
+            </type>
+          </variable>
+          <variable name="g_xHMI_EL1904Ch4">
+            <type>
+              <BOOL />
+            </type>
+          </variable>
+          <variable name="g_stTS_InfoConnection2" address="%I*">
+            <type>
+              <derived name="DUT_ST_InfoDataConnectionOut" />
+            </type>
+            <documentation>
+              <xhtml xmlns="http://www.w3.org/1999/xhtml"> Safety Connection2 Info</xhtml>
+            </documentation>
+          </variable>
+          <variable name="g_sHMI_StateConn2">
+            <type>
+              <string />
+            </type>
+          </variable>
+          <variable name="g_sHMI_DiagConn2">
+            <type>
+              <string />
+            </type>
+          </variable>
+          <variable name="g_xHMI_EL2904Ch1">
+            <type>
+              <BOOL />
+            </type>
+          </variable>
+          <variable name="g_xHMI_EL2904Ch2">
+            <type>
+              <BOOL />
+            </type>
+          </variable>
+          <variable name="g_xHMI_EL2904Ch3">
+            <type>
+              <BOOL />
+            </type>
+          </variable>
+          <variable name="g_xHMI_EL2904Ch4">
+            <type>
+              <BOOL />
+            </type>
+          </variable>
+          <variable name="g_stTS_InfoAND1" address="%I*">
+            <type>
+              <derived name="DUT_ST_InfoDataFB" />
+            </type>
+            <documentation>
+              <xhtml xmlns="http://www.w3.org/1999/xhtml"> Safety AND#1 FB Info</xhtml>
+            </documentation>
+          </variable>
+          <variable name="g_sHMI_StatusAND1">
+            <type>
+              <string />
+            </type>
+          </variable>
+          <variable name="g_stTS_InfoEStop1" address="%I*">
+            <type>
+              <derived name="DUT_ST_InfoDataFB" />
+            </type>
+            <documentation>
+              <xhtml xmlns="http://www.w3.org/1999/xhtml"> Safety EStop#1 FB Info</xhtml>
+            </documentation>
+          </variable>
+          <variable name="g_sHMI_StatusEStop1">
+            <type>
+              <string />
+            </type>
+          </variable>
+          <variable name="g_sHMI_DiagEStop1">
+            <type>
+              <string />
+            </type>
+          </variable>
+          <variable name="g_stTS_InfoAND2" address="%I*">
+            <type>
+              <derived name="DUT_ST_InfoDataFB" />
+            </type>
+            <documentation>
+              <xhtml xmlns="http://www.w3.org/1999/xhtml"> Safety AND#2 FB Info</xhtml>
+            </documentation>
+          </variable>
+          <variable name="g_sHMI_StatusAND2">
+            <type>
+              <string />
+            </type>
+          </variable>
+          <variable name="g_stTS_InfoTON" address="%I*">
+            <type>
+              <derived name="DUT_ST_InfoDataFB" />
+            </type>
+            <documentation>
+              <xhtml xmlns="http://www.w3.org/1999/xhtml"> Safety TON FB Info</xhtml>
+            </documentation>
+          </variable>
+          <variable name="g_sHMI_StatusTON">
+            <type>
+              <string />
+            </type>
+          </variable>
+          <variable name="g_stTS_InfoTOF" address="%I*">
+            <type>
+              <derived name="DUT_ST_InfoDataFB" />
+            </type>
+            <documentation>
+              <xhtml xmlns="http://www.w3.org/1999/xhtml"> Safety TOF FB Info</xhtml>
+            </documentation>
+          </variable>
+          <variable name="g_sHMI_StatusTOF">
+            <type>
+              <string />
+            </type>
+          </variable>
+          <variable name="g_stTS_InfoEDM" address="%I*">
+            <type>
+              <derived name="DUT_ST_InfoDataFB" />
+            </type>
+            <documentation>
+              <xhtml xmlns="http://www.w3.org/1999/xhtml"> Safety EDM FB Info</xhtml>
+            </documentation>
+          </variable>
+          <variable name="g_sHMI_StatusEDM">
+            <type>
+              <string />
+            </type>
+          </variable>
+          <variable name="g_sHMI_DiagEDM">
+            <type>
+              <string />
+            </type>
+          </variable>
+        </globalVars>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/datatype" handleUnknown="implementation">
+            <dataType name="DUT_ST_InfoDataConnectionIn">
+              <baseType>
+                <struct>
+                  <variable name="usiMapState">
+                    <type>
+                      <USINT />
+                    </type>
+                    <documentation>
+                      <xhtml xmlns="http://www.w3.org/1999/xhtml"> Safety input connections use this structure</xhtml>
+                    </documentation>
+                  </variable>
+                  <variable name="usiMapDiag">
+                    <type>
+                      <USINT />
+                    </type>
+                  </variable>
+                  <variable name="byInputSignals">
+                    <type>
+                      <BYTE />
+                    </type>
+                  </variable>
+                </struct>
+              </baseType>
+            </dataType>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/datatype" handleUnknown="implementation">
+            <dataType name="DUT_ST_InfoData">
+              <baseType>
+                <struct>
+                  <variable name="usiMapState">
+                    <type>
+                      <USINT />
+                    </type>
+                    <documentation>
+                      <xhtml xmlns="http://www.w3.org/1999/xhtml"> Safety Groups use this structure</xhtml>
+                    </documentation>
+                  </variable>
+                  <variable name="usiMapDiag">
+                    <type>
+                      <USINT />
+                    </type>
+                  </variable>
+                </struct>
+              </baseType>
+            </dataType>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/datatype" handleUnknown="implementation">
+            <dataType name="DUT_ST_InfoDataConnectionOut">
+              <baseType>
+                <struct>
+                  <variable name="usiMapState">
+                    <type>
+                      <USINT />
+                    </type>
+                    <documentation>
+                      <xhtml xmlns="http://www.w3.org/1999/xhtml">  Safety output connections use this structure</xhtml>
+                    </documentation>
+                  </variable>
+                  <variable name="usiMapDiag">
+                    <type>
+                      <USINT />
+                    </type>
+                  </variable>
+                  <variable name="byOutputSignals">
+                    <type>
+                      <BYTE />
+                    </type>
+                  </variable>
+                </struct>
+              </baseType>
+            </dataType>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/datatype" handleUnknown="implementation">
+            <dataType name="DUT_ST_InfoDataFB">
+              <baseType>
+                <struct>
+                  <variable name="usiMapState">
+                    <type>
+                      <USINT />
+                    </type>
+                    <documentation>
+                      <xhtml xmlns="http://www.w3.org/1999/xhtml"> Safety FBs use this structure</xhtml>
+                    </documentation>
+                  </variable>
+                  <variable name="uiMapDiag">
+                    <type>
+                      <UINT />
+                    </type>
+                  </variable>
+                </struct>
+              </baseType>
+            </dataType>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/datatype" handleUnknown="implementation">
+            <dataType name="DUT_test">
+              <baseType>
+                <struct>
+                  <variable name="usiMapState">
+                    <type>
+                      <BYTE />
+                    </type>
+                    <documentation>
+                      <xhtml xmlns="http://www.w3.org/1999/xhtml"> Safety test</xhtml>
+                    </documentation>
+                  </variable>
+                  <variable name="uiMapDiag">
+                    <type>
+                      <array>
+                        <dimension lower="0" upper="1" />
+                        <baseType>
+                          <BYTE />
+                        </baseType>
+                      </array>
+                    </type>
+                  </variable>
+                </struct>
+              </baseType>
+            </dataType>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/datatype" handleUnknown="implementation">
+            <dataType name="DUT_Test2">
+              <baseType>
+                <struct>
+                  <variable name="test_byte">
+                    <type>
+                      <BYTE />
+                    </type>
+                  </variable>
+                  <variable name="test_uint">
+                    <type>
+                      <UINT />
+                    </type>
+                  </variable>
+                </struct>
+              </baseType>
+            </dataType>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/pou" handleUnknown="implementation">
+            <pou name="FB_InfoAND" pouType="functionBlock">
+              <interface>
+                <inputVars>
+                  <variable name="stInfoData">
+                    <type>
+                      <derived name="DUT_ST_InfoDataFB" />
+                    </type>
+                  </variable>
+                </inputVars>
+                <outputVars>
+                  <variable name="sState">
+                    <type>
+                      <string />
+                    </type>
+                  </variable>
+                </outputVars>
+              </interface>
+              <body>
+                <ST>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">// AND FB's State
+IF stInfoData.usiMapState = 0 THEN
+	sState := 'Undefined' ;
+	ELSIF stInfoData.usiMapState = 1 THEN
+	sState := 'RUN' ;
+	ELSIF stInfoData.usiMapState = 2 THEN
+	sState := 'STOP' ;
+	ELSIF stInfoData.usiMapState = 3 THEN
+	sState := 'SAFE' ;
+	ELSE
+	sState := 'Unknown' ;
+END_IF
+
+// The AND FB Has No Diagnostic Byte to Decode</xhtml>
+                </ST>
+              </body>
+            </pou>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/pou" handleUnknown="implementation">
+            <pou name="FB_InfoConnectionIn" pouType="functionBlock">
+              <interface>
+                <inputVars>
+                  <variable name="stInfoData">
+                    <type>
+                      <derived name="DUT_ST_InfoDataConnectionIn" />
+                    </type>
+                  </variable>
+                </inputVars>
+                <outputVars>
+                  <variable name="sState">
+                    <type>
+                      <string />
+                    </type>
+                  </variable>
+                  <variable name="sDiag">
+                    <type>
+                      <string />
+                    </type>
+                  </variable>
+                  <variable name="xChannel1">
+                    <type>
+                      <BOOL />
+                    </type>
+                  </variable>
+                  <variable name="xChannel2">
+                    <type>
+                      <BOOL />
+                    </type>
+                  </variable>
+                  <variable name="xChannel3">
+                    <type>
+                      <BOOL />
+                    </type>
+                  </variable>
+                  <variable name="xChannel4">
+                    <type>
+                      <BOOL />
+                    </type>
+                  </variable>
+                </outputVars>
+              </interface>
+              <body>
+                <ST>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">// Safety Terminal's Connection State
+
+// Value 100 (0x64) - The Reset State: The reset state is used to re-initialize 
+// the Safety over EtherCAT connection after the power-on or a Safety over EtherCAT 
+// communication error
+IF stInfoData.usiMapState = 100 THEN
+	sState := 'Reset State' ;
+
+// Value 101 (0x65) - The Session State: During the transition to or in the session 
+// state a session ID is transferred from the FSoE master to the SFoE slave. which
+// in turn responds with its own session ID back to the FSoE master
+ELSIF stInfoData.usiMapState = 101 THEN
+	sState := 'Session State' ;	
+
+// Value 102 (0x66) - The Connection State: In the connection state a connection ID 
+// is transferred from the FSoE master to the FSoE slave
+ELSIF stInfoData.usiMapState = 102 THEN
+	sState := 'Connection State' ;
+
+// Value 103 (0x67) - The Parameter State: In the parameter state safe communication 
+// and device specific application parameters are transferred from the FSoE master 
+// to the FSoE slave
+ELSIF stInfoData.usiMapState = 103 THEN
+	sState := 'Parameter State' ;
+
+// Value 104 (0x68) - The Data Exchange State: In the data state FSoE cycles
+// are transferred until either a communications error occurs or an FSoE node
+// is stopped locally
+ELSIF stInfoData.usiMapState = 104 THEN
+	sState := 'Data State' ;
+
+// Value 105 (0x69) - The Shut Down State: In the shut down state the connection 
+// was shutdown by one of the communication partners
+ELSIF stInfoData.usiMapState = 105 THEN
+	sState := 'Shutdown State' ;
+
+// Value is not between 100 and 105 so unknown state which is an error
+ELSE
+	sState := 'Error' ;
+END_IF
+
+// Safety Terminal's Connection Diagnostics
+
+IF stInfoData.usiMapDiag = 0 THEN
+	sDiag := 'No Error' ;
+
+// Value		Description
+// xxxx 0001	Invalid Command
+ELSIF  stInfoData.usiMapDiag.0 = TRUE THEN
+	sDiag := 'Invalid Command' ;
+
+// Value		Description
+// xxxx 0010	Unknown Command
+ELSIF  stInfoData.usiMapDiag.1 = TRUE THEN
+	sDiag := 'Unknown Command' ;
+
+// Value		Description
+// xxxx 0011	Invalid Connection ID
+ELSIF  (stInfoData.usiMapDiag.0 AND stInfoData.usiMapDiag.1) = TRUE THEN
+	sDiag := 'Invalid Connection-ID' ;
+
+// Value		Description
+// xxxx 0100	Invalid CRC
+ELSIF  stInfoData.usiMapDiag.2 = TRUE THEN
+	sDiag := 'Invalid CRC' ;
+
+// Value		Description
+// xxxx 0101	Watchdog Time Elapsed
+ELSIF  (stInfoData.usiMapDiag.0 AND stInfoData.usiMapDiag.2) = TRUE THEN
+	sDiag := 'Watchdog Expired' ;
+	
+// Value		Description
+// xxxx 0110	Invalid FSoE Address	
+ELSIF  (stInfoData.usiMapDiag.1 AND stInfoData.usiMapDiag.2) = TRUE THEN
+	sDiag := 'Invalid FSoE Address' ;
+
+// Value		Description
+// xxxx 0111	Invalid Data
+ELSIF  (stInfoData.usiMapDiag.0 AND stInfoData.usiMapDiag.1 AND stInfoData.usiMapDiag.2) = TRUE THEN	
+	sDiag := 'Invalid Data' ;
+	
+// Value		Description
+// xxxx 1000	Invalid Communication Parameter Length
+ELSIF  stInfoData.usiMapDiag.3 = TRUE THEN
+	sDiag := 'Invalid Communication Parameter Length' ;
+
+// Value		Description
+// xxxx 1001	Invalid Communication Parameters
+ELSIF  (stInfoData.usiMapDiag.0 AND stInfoData.usiMapDiag.3) = TRUE THEN
+	sDiag := 'Invalid Commuication Parameters' ;
+
+// Value		Description
+// xxxx 1010	Invalid User Parameter Length
+ELSIF  (stInfoData.usiMapDiag.1 AND stInfoData.usiMapDiag.3) = TRUE THEN
+	sDiag := 'Invalid User Parameter Length' ;
+
+// Value		Description
+// xxxx 1011	Invalid User PArameters
+ELSIF  (stInfoData.usiMapDiag.0 AND stInfoData.usiMapDiag.1 AND stInfoData.usiMapDiag.3) = TRUE THEN	
+	sDiag := 'Invalid User Parameters' ;
+
+// Value		Description
+// xxxx 1100	FSoE Master Reset	
+ELSIF  (stInfoData.usiMapDiag.2 AND stInfoData.usiMapDiag.3) = TRUE THEN
+	sDiag := 'FSoE Master Reset' ;
+
+// Value		Description
+// 0001 xxxx	FSoE Slave Error Detected
+ELSIF  stInfoData.usiMapDiag.4 = TRUE THEN
+	sDiag := 'FSoE Slave Error Detected' ;
+
+// Value		Description
+// 0010 xxxx	FSoE Slave Reports Failsafe Value Active
+ELSIF  stInfoData.usiMapDiag.5 = TRUE THEN
+	sDiag := 'FSoE Slave Reports Failsafe Value Active' ;
+
+// Value		Description
+// 0100 xxxx	Connection is in Startup
+ELSIF  stInfoData.usiMapDiag.6 = TRUE THEN
+	sDiag := 'Connection Is In Startup' ;
+
+// Value		Description
+// 1000 xxxx	FSoE Master Reports Failsafe Value Active	
+ELSIF  stInfoData.usiMapDiag.7 = TRUE THEN
+	sDiag := 'FSoE Master Reports Failsafe Value Active' ;	
+
+// Value		Description
+// 				Something Not Specifically Annunciated Above.
+// 				Maybe a combination of errors are occuring.
+ELSE	
+	sDiag := 'Error' ;
+
+END_IF
+
+
+// Safety Terminal's Connection Input Signals
+xChannel1 := stInfoData.byInputSignals.0 ;
+xChannel2 := stInfoData.byInputSignals.1 ;
+xChannel3 := stInfoData.byInputSignals.2 ;
+xChannel4 := stInfoData.byInputSignals.3 ;
+</xhtml>
+                </ST>
+              </body>
+            </pou>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/pou" handleUnknown="implementation">
+            <pou name="FB_InfoConnectionOut" pouType="functionBlock">
+              <interface>
+                <inputVars>
+                  <variable name="stInfoData">
+                    <type>
+                      <derived name="DUT_ST_InfoDataConnectionOut" />
+                    </type>
+                  </variable>
+                </inputVars>
+                <outputVars>
+                  <variable name="sState">
+                    <type>
+                      <string />
+                    </type>
+                  </variable>
+                  <variable name="sDiag">
+                    <type>
+                      <string />
+                    </type>
+                  </variable>
+                  <variable name="xChannel1">
+                    <type>
+                      <BOOL />
+                    </type>
+                  </variable>
+                  <variable name="xChannel2">
+                    <type>
+                      <BOOL />
+                    </type>
+                  </variable>
+                  <variable name="xChannel3">
+                    <type>
+                      <BOOL />
+                    </type>
+                  </variable>
+                  <variable name="xChannel4">
+                    <type>
+                      <BOOL />
+                    </type>
+                  </variable>
+                </outputVars>
+              </interface>
+              <body>
+                <ST>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">// Safety Terminal's Connection State
+
+// Value 100 (0x64) - The Reset State: The reset state is used to re-initialize 
+// the Safety over EtherCAT connection after the power-on or a Safety over EtherCAT 
+// communication error
+IF stInfoData.usiMapState = 100 THEN
+	sState := 'Reset State' ;
+
+// Value 101 (0x65) - The Session State: During the transition to or in the session 
+// state a session ID is transferred from the FSoE master to the SFoE slave. which
+// in turn responds with its own session ID back to the FSoE master
+ELSIF stInfoData.usiMapState = 101 THEN
+	sState := 'Session State' ;	
+
+// Value 102 (0x66) - The Connection State: In the connection state a connection ID 
+// is transferred from the FSoE master to the FSoE slave
+ELSIF stInfoData.usiMapState = 102 THEN
+	sState := 'Connection State' ;
+
+// Value 103 (0x67) - The Parameter State: In the parameter state safe communication 
+// and device specific application parameters are transferred from the FSoE master 
+// to the FSoE slave
+ELSIF stInfoData.usiMapState = 103 THEN
+	sState := 'Parameter State' ;
+
+// Value 104 (0x68) - The Data Exchange State: In the data state FSoE cycles
+// are transferred until either a communications error occurs or an FSoE node
+// is stopped locally
+ELSIF stInfoData.usiMapState = 104 THEN
+	sState := 'Data State' ;
+
+// Value 105 (0x69) - The Shut Down State: In the shut down state the connection 
+// was shutdown by one of the communication partners
+ELSIF stInfoData.usiMapState = 105 THEN
+	sState := 'Shutdown State' ;
+
+// Value is not between 100 and 105 so unknown state which is an error
+ELSE
+	sState := 'Error' ;
+END_IF
+
+// Safety Terminal's Connection Diagnostics
+
+IF stInfoData.usiMapDiag = 0 THEN
+	sDiag := 'No Error' ;
+
+// Value		Description
+// xxxx 0001	Invalid Command
+ELSIF  stInfoData.usiMapDiag.0 = TRUE THEN
+	sDiag := 'Invalid Command' ;
+
+// Value		Description
+// xxxx 0010	Unknown Command
+ELSIF  stInfoData.usiMapDiag.1 = TRUE THEN
+	sDiag := 'Unknown Command' ;
+
+// Value		Description
+// xxxx 0011	Invalid Connection ID
+ELSIF  (stInfoData.usiMapDiag.0 AND stInfoData.usiMapDiag.1) = TRUE THEN
+	sDiag := 'Invalid Connection-ID' ;
+
+// Value		Description
+// xxxx 0100	Invalid CRC
+ELSIF  stInfoData.usiMapDiag.2 = TRUE THEN
+	sDiag := 'Invalid CRC' ;
+
+// Value		Description
+// xxxx 0101	Watchdog Time Elapsed
+ELSIF  (stInfoData.usiMapDiag.0 AND stInfoData.usiMapDiag.2) = TRUE THEN
+	sDiag := 'Watchdog Expired' ;
+	
+// Value		Description
+// xxxx 0110	Invalid FSoE Address	
+ELSIF  (stInfoData.usiMapDiag.1 AND stInfoData.usiMapDiag.2) = TRUE THEN
+	sDiag := 'Invalid FSoE Address' ;
+
+// Value		Description
+// xxxx 0111	Invalid Data
+ELSIF  (stInfoData.usiMapDiag.0 AND stInfoData.usiMapDiag.1 AND stInfoData.usiMapDiag.2) = TRUE THEN	
+	sDiag := 'Invalid Data' ;
+	
+// Value		Description
+// xxxx 1000	Invalid Communication Parameter Length
+ELSIF  stInfoData.usiMapDiag.3 = TRUE THEN
+	sDiag := 'Invalid Communication Parameter Length' ;
+
+// Value		Description
+// xxxx 1001	Invalid Communication Parameters
+ELSIF  (stInfoData.usiMapDiag.0 AND stInfoData.usiMapDiag.3) = TRUE THEN
+	sDiag := 'Invalid Commuication Parameters' ;
+
+// Value		Description
+// xxxx 1010	Invalid User Parameter Length
+ELSIF  (stInfoData.usiMapDiag.1 AND stInfoData.usiMapDiag.3) = TRUE THEN
+	sDiag := 'Invalid User Parameter Length' ;
+
+// Value		Description
+// xxxx 1011	Invalid User PArameters
+ELSIF  (stInfoData.usiMapDiag.0 AND stInfoData.usiMapDiag.1 AND stInfoData.usiMapDiag.3) = TRUE THEN	
+	sDiag := 'Invalid User Parameters' ;
+
+// Value		Description
+// xxxx 1100	FSoE Master Reset	
+ELSIF  (stInfoData.usiMapDiag.2 AND stInfoData.usiMapDiag.3) = TRUE THEN
+	sDiag := 'FSoE Master Reset' ;
+
+// Value		Description
+// 0001 xxxx	FSoE Slave Error Detected
+ELSIF  stInfoData.usiMapDiag.4 = TRUE THEN
+	sDiag := 'FSoE Slave Error Detected' ;
+
+// Value		Description
+// 0010 xxxx	FSoE Slave Reports Failsafe Value Active
+ELSIF  stInfoData.usiMapDiag.5 = TRUE THEN
+	sDiag := 'FSoE Slave Reports Failsafe Value Active' ;
+
+// Value		Description
+// 0100 xxxx	Connection is in Startup
+ELSIF  stInfoData.usiMapDiag.6 = TRUE THEN
+	sDiag := 'Connection Is In Startup' ;
+
+// Value		Description
+// 1000 xxxx	FSoE Master Reports Failsafe Value Active	
+ELSIF  stInfoData.usiMapDiag.7 = TRUE THEN
+	sDiag := 'FSoE Master Reports Failsafe Value Active' ;	
+
+// Value		Description
+// 				Something Not Specifically Annunciated Above.
+// 				Maybe a combination of errors are occuring.
+ELSE	
+	sDiag := 'Error' ;
+
+END_IF
+
+// Safety Terminal's Connection Output Signals
+xChannel1 := stInfoData.byOutputSignals.0 ;
+xChannel2 := stInfoData.byOutputSignals.1 ;
+xChannel3 := stInfoData.byOutputSignals.2 ;
+xChannel4 := stInfoData.byOutputSignals.3 ;
+</xhtml>
+                </ST>
+              </body>
+            </pou>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/pou" handleUnknown="implementation">
+            <pou name="FB_InfoConnectionShutdown" pouType="functionBlock">
+              <interface>
+                <inputVars>
+                  <variable name="stInfoData">
+                    <type>
+                      <derived name="DUT_ST_InfoDataFB" />
+                    </type>
+                  </variable>
+                </inputVars>
+                <outputVars>
+                  <variable name="sState">
+                    <type>
+                      <string />
+                    </type>
+                  </variable>
+                  <variable name="sDiag">
+                    <type>
+                      <string />
+                    </type>
+                  </variable>
+                </outputVars>
+              </interface>
+              <body>
+                <ST>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">// Connection Shutdown FB's State
+IF stInfoData.usiMapState = 0 THEN
+	sState := 'Undefined' ;
+	ELSIF stInfoData.usiMapState = 2 THEN
+	sState := 'STOP' ;
+	ELSIF stInfoData.usiMapState = 3 THEN
+	sState := 'SAFE' ;
+	ELSIF stInfoData.usiMapState = 4 THEN
+	sState := 'Error' ;
+	ELSIF stInfoData.usiMapState = 5 THEN
+	sState := 'Reset' ;
+	ELSIF stInfoData.usiMapState = 10 THEN
+	sState := 'Active' ;
+	ELSIF stInfoData.usiMapState = 11 THEN
+	sState := 'Deactive' ;
+	ELSE
+	sState := 'Unknown' ;
+END_IF
+
+// Connection Shutdown FB's Diagnostics
+IF stInfoData.uiMapDiag = 0 THEN
+	sDiag := 'No Error' ;
+ELSIF  stInfoData.uiMapDiag = 1 THEN
+	sDiag := 'Discrepancy Error Input Group1' ;
+ELSE
+	sDiag := 'Unknown' ;
+END_IF</xhtml>
+                </ST>
+              </body>
+            </pou>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/pou" handleUnknown="implementation">
+            <pou name="FB_InfoDecoupler" pouType="functionBlock">
+              <interface>
+                <inputVars>
+                  <variable name="stInfoData">
+                    <type>
+                      <derived name="DUT_ST_InfoDataFB" />
+                    </type>
+                  </variable>
+                </inputVars>
+                <outputVars>
+                  <variable name="sState">
+                    <type>
+                      <string />
+                    </type>
+                  </variable>
+                </outputVars>
+              </interface>
+              <body>
+                <ST>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">// Decouple FB's State
+IF stInfoData.usiMapState = 0 THEN
+	sState := 'Undefined' ;
+	ELSIF stInfoData.usiMapState = 1 THEN
+	sState := 'RUN' ;
+	ELSIF stInfoData.usiMapState = 2 THEN
+	sState := 'STOP' ;
+ELSE
+	sState := 'Unknown' ;
+END_IF
+
+// The Decouple FB Has No Diagnostic Byte to Decode</xhtml>
+                </ST>
+              </body>
+            </pou>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/pou" handleUnknown="implementation">
+            <pou name="FB_InfoEDM" pouType="functionBlock">
+              <interface>
+                <inputVars>
+                  <variable name="stInfoData">
+                    <type>
+                      <derived name="DUT_ST_InfoDataFB" />
+                    </type>
+                  </variable>
+                </inputVars>
+                <outputVars>
+                  <variable name="sState">
+                    <type>
+                      <string />
+                    </type>
+                  </variable>
+                  <variable name="sDiag">
+                    <type>
+                      <string />
+                    </type>
+                  </variable>
+                </outputVars>
+              </interface>
+              <body>
+                <ST>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">// EDM FB's State
+IF stInfoData.usiMapState = 0 THEN
+	sState := 'Undefined' ;
+	ELSIF stInfoData.usiMapState = 2 THEN
+	sState := 'STOP' ;
+	ELSIF stInfoData.usiMapState = 4 THEN
+	sState := 'ERROR' ;
+	ELSIF stInfoData.usiMapState = 5 THEN
+	sState := 'RESET' ;
+	ELSIF stInfoData.usiMapState = 14 THEN
+	sState := 'Monitor-OFF' ;
+	ELSIF stInfoData.usiMapState = 15 THEN
+	sState := 'Monitor-ON' ;
+	ELSE
+	sState := 'Unknown' ;
+END_IF
+
+// EDM FB's Diagnostics
+IF stInfoData.uiMapDiag = 0 THEN
+	sDiag := 'No Error' ;
+ELSIF  stInfoData.uiMapDiag = 1 THEN
+	sDiag := 'Switch-OFF Timer Elapsed' ;
+ELSIF  stInfoData.uiMapDiag = 2 THEN
+	sDiag := 'Switch-ON Timer Elapsed' ;
+ELSE
+	sDiag := 'Unknown' ;
+END_IF</xhtml>
+                </ST>
+              </body>
+            </pou>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/pou" handleUnknown="implementation">
+            <pou name="FB_InfoEStop" pouType="functionBlock">
+              <interface>
+                <inputVars>
+                  <variable name="stInfoData">
+                    <type>
+                      <derived name="DUT_ST_InfoDataFB" />
+                    </type>
+                  </variable>
+                </inputVars>
+                <outputVars>
+                  <variable name="sState">
+                    <type>
+                      <string />
+                    </type>
+                  </variable>
+                  <variable name="sDiag">
+                    <type>
+                      <string />
+                    </type>
+                  </variable>
+                </outputVars>
+              </interface>
+              <body>
+                <ST>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">// EStop FB's State
+IF stInfoData.usiMapState = 0 THEN
+	sState := 'Undefined' ;
+	ELSIF stInfoData.usiMapState = 1 THEN
+	sState := 'RUN' ;
+	ELSIF stInfoData.usiMapState = 2 THEN
+	sState := 'STOP' ;
+	ELSIF stInfoData.usiMapState = 3 THEN
+	sState := 'SAFE' ;
+	ELSIF stInfoData.usiMapState = 4 THEN
+	sState := 'ERROR' ;
+	ELSIF stInfoData.usiMapState = 5 THEN
+	sState := 'RESET' ;
+	ELSIF stInfoData.usiMapState = 6 THEN
+	sState := 'START' ;
+	ELSIF stInfoData.usiMapState = 8 THEN
+	sState := 'DELAYOUT' ;
+	ELSE
+	sState := 'Unknown' ;
+END_IF
+
+// EStop FB's Diagnostics
+IF stInfoData.uiMapDiag = 0 THEN
+	sDiag := 'No Error' ;
+	ELSIF stInfoData.uiMapDiag = 1 THEN
+	sDiag := 'Discrepancy Error Input Group 1' ;
+	ELSIF stInfoData.uiMapDiag = 2 THEN
+	sDiag := 'Discrepancy Error Input Group 2' ;
+	ELSIF stInfoData.uiMapDiag = 4 THEN
+	sDiag := 'Discrepancy Error Input Group 3' ;
+	ELSIF stInfoData.uiMapDiag = 8 THEN
+	sDiag := 'Discrepancy Error Input Group 4' ;
+	ELSIF stInfoData.uiMapDiag = 16 THEN
+	sDiag := 'EDM 1 Monitoring Error' ;	
+	ELSIF stInfoData.uiMapDiag = 32 THEN
+	sDiag := 'EDM 2 Monitoring Error' ;	
+	ELSE
+	sDiag := 'Unknown' ;
+END_IF</xhtml>
+                </ST>
+              </body>
+            </pou>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/pou" handleUnknown="implementation">
+            <pou name="FB_InfoMON" pouType="functionBlock">
+              <interface>
+                <inputVars>
+                  <variable name="stInfoData">
+                    <type>
+                      <derived name="DUT_ST_InfoDataFB" />
+                    </type>
+                  </variable>
+                </inputVars>
+                <outputVars>
+                  <variable name="sState">
+                    <type>
+                      <string />
+                    </type>
+                  </variable>
+                  <variable name="sDiag">
+                    <type>
+                      <string />
+                    </type>
+                  </variable>
+                </outputVars>
+              </interface>
+              <body>
+                <ST>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">// Guard Door Monitor FB's State
+IF stInfoData.usiMapState = 0 THEN
+	sState := 'Undefined' ;
+	ELSIF stInfoData.usiMapState = 1 THEN
+	sState := 'RUN' ;
+	ELSIF stInfoData.usiMapState = 2 THEN
+	sState := 'STOP' ;
+	ELSIF stInfoData.usiMapState = 3 THEN
+	sState := 'SAFE' ;
+	ELSIF stInfoData.usiMapState = 4 THEN
+	sState := 'ERROR' ;
+	ELSIF stInfoData.usiMapState = 5 THEN
+	sState := 'RESET' ;
+	ELSIF stInfoData.usiMapState = 6 THEN
+	sState := 'START' ;
+	ELSIF stInfoData.usiMapState = 7 THEN
+	sState := 'Error Delay' ;
+	ELSIF stInfoData.usiMapState = 8 THEN
+	sState := 'DelayOut' ;
+	ELSIF stInfoData.usiMapState = 9 THEN
+	sState := 'Function Test' ;
+	ELSE
+	sState := 'Unknown' ;
+END_IF
+
+// Guard Door Monitor FB's Diagnostics
+IF stInfoData.uiMapDiag = 0 THEN
+	sDiag := 'No Error' ;
+ELSIF  stInfoData.uiMapDiag = 1 THEN
+	sDiag := 'Discrepancy Error of Input Group 1' ;
+ELSIF  stInfoData.uiMapDiag = 2 THEN
+	sDiag := 'Discrepancy Error of Input Group 2' ;
+ELSIF  stInfoData.uiMapDiag = 4 THEN
+	sDiag := 'Discrepancy Error of the Secure Inputs' ;
+ELSIF  stInfoData.uiMapDiag = 16 THEN
+	sDiag := 'EDM 1 Monitoring Error' ;
+ELSIF  stInfoData.uiMapDiag = 32 THEN
+	sDiag := 'EDM 2 Monitoring Error' ;
+ELSE
+	sDiag := 'Unknown' ;
+END_IF</xhtml>
+                </ST>
+              </body>
+            </pou>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/pou" handleUnknown="implementation">
+            <pou name="FB_InfoMuting" pouType="functionBlock">
+              <interface>
+                <inputVars>
+                  <variable name="stInfoData">
+                    <type>
+                      <derived name="DUT_ST_InfoDataFB" />
+                    </type>
+                  </variable>
+                </inputVars>
+                <outputVars>
+                  <variable name="sState">
+                    <type>
+                      <string />
+                    </type>
+                  </variable>
+                  <variable name="sDiag">
+                    <type>
+                      <string />
+                    </type>
+                  </variable>
+                </outputVars>
+              </interface>
+              <body>
+                <ST>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">// Muting FB's State
+IF stInfoData.usiMapState = 0 THEN
+	sState := 'Undefined' ;
+	ELSIF stInfoData.usiMapState = 1 THEN
+	sState := 'RUN' ;
+	ELSIF stInfoData.usiMapState = 2 THEN
+	sState := 'STOP' ;
+	ELSIF stInfoData.usiMapState = 3 THEN
+	sState := 'SAFE' ;
+	ELSIF stInfoData.usiMapState = 4 THEN
+	sState := 'ERROR' ;
+	ELSIF stInfoData.usiMapState = 5 THEN
+	sState := 'RESET' ;
+	ELSIF stInfoData.usiMapState = 8 THEN
+	sState := 'DelayOut' ;
+	ELSIF stInfoData.usiMapState = 9 THEN
+	sState := 'Muting 1' ;
+	ELSIF stInfoData.usiMapState = 10 THEN
+	sState := 'Muting 2' ;
+	ELSIF stInfoData.usiMapState = 11 THEN
+	sState := 'Muting 3' ;
+	ELSIF stInfoData.usiMapState = 12 THEN
+	sState := 'Muting 4' ;
+	ELSIF stInfoData.usiMapState = 13 THEN
+	sState := 'Muting 5' ;
+	ELSIF stInfoData.usiMapState = 14 THEN
+	sState := 'Muting 6' ;
+	ELSIF stInfoData.usiMapState = 15 THEN
+	sState := 'Muting 7' ;
+	ELSIF stInfoData.usiMapState = 16 THEN
+	sState := 'Muting 8' ;
+	ELSIF stInfoData.usiMapState = 17 THEN
+	sState := 'Muting 9' ;
+	ELSE
+	sState := 'Unknown' ;
+END_IF
+
+// Muting FB's Diagnostics
+IF stInfoData.uiMapDiag = 0 THEN
+	sDiag := 'No Error' ;
+ELSIF  stInfoData.uiMapDiag = 1 THEN
+	sDiag := 'Discrepancy Error In Muting Input Group 1' ;
+ELSIF  stInfoData.uiMapDiag = 2 THEN
+	sDiag := 'Discrepancy Error In OSSD Input Group' ;
+ELSIF  stInfoData.uiMapDiag = 4 THEN
+	sDiag := 'Discrepancy Error In Muting Input Group 2' ;
+ELSIF  stInfoData.uiMapDiag = 16 THEN
+	sDiag := 'EDM 1 Monitoring Error' ;
+ELSIF  stInfoData.uiMapDiag = 32 THEN
+	sDiag := 'EDM 2 Monitoring Error' ;
+ELSIF  stInfoData.uiMapDiag = 64 THEN
+	sDiag := 'Muting Sequence Was Violated' ;
+ELSIF  stInfoData.uiMapDiag = 128 THEN
+	sDiag := 'Maximum Muting Time Was Exceeded' ;
+ELSE
+	sDiag := 'Unknown' ;
+END_IF</xhtml>
+                </ST>
+              </body>
+            </pou>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/pou" handleUnknown="implementation">
+            <pou name="FB_InfoOperationMode" pouType="functionBlock">
+              <interface>
+                <inputVars>
+                  <variable name="stInfoData">
+                    <type>
+                      <derived name="DUT_ST_InfoDataFB" />
+                    </type>
+                  </variable>
+                </inputVars>
+                <outputVars>
+                  <variable name="sState">
+                    <type>
+                      <string />
+                    </type>
+                  </variable>
+                  <variable name="sDiag">
+                    <type>
+                      <string />
+                    </type>
+                  </variable>
+                </outputVars>
+              </interface>
+              <body>
+                <ST>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">// Operating Mode FB's State
+IF stInfoData.usiMapState = 0 THEN
+	sState := 'Undefined' ;
+	ELSIF stInfoData.usiMapState = 1 THEN
+	sState := 'RUN' ;
+	ELSIF stInfoData.usiMapState = 2 THEN
+	sState := 'STOP' ;
+	ELSIF stInfoData.usiMapState = 3 THEN
+	sState := 'SAFE' ;
+	ELSIF stInfoData.usiMapState = 4 THEN
+	sState := 'ERROR' ;
+	ELSIF stInfoData.usiMapState = 5 THEN
+	sState := 'RESET' ;
+	ELSIF stInfoData.usiMapState = 6 THEN
+	sState := 'START' ;
+	ELSE
+	sState := 'Unknown' ;
+END_IF
+
+// Operating Mode FB's Diagnostics
+IF stInfoData.uiMapDiag = 0 THEN
+	sDiag := 'No Error' ;
+ELSIF  stInfoData.uiMapDiag = 1 THEN
+	sDiag := 'Discrepancy Monitoring Error' ;
+ELSE
+	sDiag := 'Unknown' ;
+END_IF</xhtml>
+                </ST>
+              </body>
+            </pou>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/pou" handleUnknown="implementation">
+            <pou name="FB_InfoOR" pouType="functionBlock">
+              <interface>
+                <inputVars>
+                  <variable name="stInfoData">
+                    <type>
+                      <derived name="DUT_ST_InfoDataFB" />
+                    </type>
+                  </variable>
+                </inputVars>
+                <outputVars>
+                  <variable name="sState">
+                    <type>
+                      <string />
+                    </type>
+                  </variable>
+                </outputVars>
+              </interface>
+              <body>
+                <ST>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">// OR FB's State
+IF stInfoData.usiMapState = 0 THEN
+	sState := 'Undefined' ;
+	ELSIF stInfoData.usiMapState = 1 THEN
+	sState := 'RUN' ;
+	ELSIF stInfoData.usiMapState = 2 THEN
+	sState := 'STOP' ;
+	ELSIF stInfoData.usiMapState = 3 THEN
+	sState := 'SAFE' ;
+	ELSE
+	sState := 'Unknown' ;
+END_IF
+
+// The OR FB Has No Diagnostic Byte to Decode</xhtml>
+                </ST>
+              </body>
+            </pou>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/pou" handleUnknown="implementation">
+            <pou name="FB_InfoRS" pouType="functionBlock">
+              <interface>
+                <inputVars>
+                  <variable name="stInfoData">
+                    <type>
+                      <derived name="DUT_ST_InfoDataFB" />
+                    </type>
+                  </variable>
+                </inputVars>
+                <outputVars>
+                  <variable name="sState">
+                    <type>
+                      <string />
+                    </type>
+                  </variable>
+                </outputVars>
+              </interface>
+              <body>
+                <ST>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">// RS FB's State
+IF stInfoData.usiMapState = 0 THEN
+	sState := 'Undefined' ;
+	ELSIF stInfoData.usiMapState = 2 THEN
+	sState := 'STOP' ;
+	ELSIF stInfoData.usiMapState = 3 THEN
+	sState := 'SAFE' ;
+	ELSIF stInfoData.usiMapState = 9 THEN
+	sState := 'SET' ;
+	ELSE
+	sState := 'Unknown' ;
+END_IF
+
+// The RS FB Has No Diagnostic Byte to Decode</xhtml>
+                </ST>
+              </body>
+            </pou>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/pou" handleUnknown="implementation">
+            <pou name="FB_InfoSafetyGroup" pouType="functionBlock">
+              <interface>
+                <inputVars>
+                  <variable name="stInfoData">
+                    <type>
+                      <derived name="DUT_ST_InfoData" />
+                    </type>
+                  </variable>
+                </inputVars>
+                <outputVars>
+                  <variable name="sState">
+                    <type>
+                      <string />
+                    </type>
+                  </variable>
+                </outputVars>
+              </interface>
+              <body>
+                <ST>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">// Safety Group State
+
+// Value 1 - RUN: All function blocks and TwinSAFE connections assigned to the TwinSAFE
+// group operate properly, and all TwinSAFE connections assigned to the TwinSAFE 
+// group are up and running
+IF stInfoData.usiMapState = 1 THEN
+	sState := 'RUN - All FBs and Connections Operating Properly' ;
+
+// Value 2 - Stop: The state TwinSAFE goes to after initialization
+ELSIF stInfoData.usiMapState = 2 THEN
+	sState := 'STOP - State After Initialization' ;
+
+// Value 3 - SAFE: All function blocks and TwinSAFE connections assigned to the TwinSAFE
+// group operate properly, and at least one of the TwinSAFE connections
+// assigned to the TwinSAFE group is not up and running
+ELSIF stInfoData.usiMapState = 3 THEN
+	sState := 'SAFE - An Assigned Connection Not Up and Running' ;
+
+// Value 4 - ERROR: At least one assigned function block or one assigned TwinSAFE connection
+// has reported an error 
+ELSIF stInfoData.usiMapState = 4 THEN
+	sState := 'ERROR - FB or Connection in Error State' ;
+
+// Value 5 - RESET: A positive edge (FALSE -&gt; TRUE) for the safety group error Ack
+// of a function block or a TwinSAFE connection error was detected on the ERR_ACK input.
+// The system is waiting for a negative edge of the ERR_ACK input.
+ELSIF stInfoData.usiMapState = 5 THEN
+	sState := 'RESET - ErrAck TRUE, Waiting For ErrAck FALSE' ;
+
+// Value 0: Safety group does not exist or safety controller has not been started
+ELSE
+	sState := 'Unknown' ;
+END_IF
+
+// The Safety Group Has No Diagnostic Byte to Decode</xhtml>
+                </ST>
+              </body>
+            </pou>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/pou" handleUnknown="implementation">
+            <pou name="FB_InfoSR" pouType="functionBlock">
+              <interface>
+                <inputVars>
+                  <variable name="stInfoData">
+                    <type>
+                      <derived name="DUT_ST_InfoDataFB" />
+                    </type>
+                  </variable>
+                </inputVars>
+                <outputVars>
+                  <variable name="sState">
+                    <type>
+                      <string />
+                    </type>
+                  </variable>
+                </outputVars>
+              </interface>
+              <body>
+                <ST>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">// SR FB's State
+IF stInfoData.usiMapState = 0 THEN
+	sState := 'Undefined' ;
+	ELSIF stInfoData.usiMapState = 2 THEN
+	sState := 'STOP' ;
+	ELSIF stInfoData.usiMapState = 3 THEN
+	sState := 'SAFE' ;
+	ELSIF stInfoData.usiMapState = 9 THEN
+	sState := 'SET' ;
+	ELSE
+	sState := 'Unknown' ;
+END_IF
+
+// The SR FB Has No Diagnostic Byte to Decode</xhtml>
+                </ST>
+              </body>
+            </pou>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/pou" handleUnknown="implementation">
+            <pou name="FB_InfoTOF" pouType="functionBlock">
+              <interface>
+                <inputVars>
+                  <variable name="stInfoData">
+                    <type>
+                      <derived name="DUT_ST_InfoDataFB" />
+                    </type>
+                  </variable>
+                </inputVars>
+                <outputVars>
+                  <variable name="sState">
+                    <type>
+                      <string />
+                    </type>
+                  </variable>
+                </outputVars>
+              </interface>
+              <body>
+                <ST>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">// Timer-OFF (TOF) FB's State
+IF stInfoData.usiMapState = 0 THEN
+	sState := 'Undefined' ;
+	ELSIF stInfoData.usiMapState = 1 THEN
+	sState := 'RUN' ;
+	ELSIF stInfoData.usiMapState = 2 THEN
+	sState := 'STOP' ;
+	ELSIF stInfoData.usiMapState = 3 THEN
+	sState := 'SAFE' ;
+	ELSIF stInfoData.usiMapState = 8 THEN
+	sState := 'DelayOut' ;
+	ELSE
+	sState := 'Unknown' ;
+END_IF
+
+// The Timer-OFF (TOF) FB Has No Diagnostic Byte to Decode</xhtml>
+                </ST>
+              </body>
+            </pou>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/pou" handleUnknown="implementation">
+            <pou name="FB_InfoTON" pouType="functionBlock">
+              <interface>
+                <inputVars>
+                  <variable name="stInfoData">
+                    <type>
+                      <derived name="DUT_ST_InfoDataFB" />
+                    </type>
+                  </variable>
+                </inputVars>
+                <outputVars>
+                  <variable name="sState">
+                    <type>
+                      <string />
+                    </type>
+                  </variable>
+                </outputVars>
+              </interface>
+              <body>
+                <ST>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">// Timer-ON (TON) FB's State
+IF stInfoData.usiMapState = 0 THEN
+	sState := 'Undefined' ;
+	ELSIF stInfoData.usiMapState = 1 THEN
+	sState := 'RUN' ;
+	ELSIF stInfoData.usiMapState = 2 THEN
+	sState := 'STOP' ;
+	ELSIF stInfoData.usiMapState = 3 THEN
+	sState := 'SAFE' ;
+	ELSIF stInfoData.usiMapState = 9 THEN
+	sState := 'DelayIn' ;
+	ELSE
+	sState := 'Unknown' ;
+END_IF
+
+// The Timer-ON (TON) FB Has No Diagnostic Byte to Decode</xhtml>
+                </ST>
+              </body>
+            </pou>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/pou" handleUnknown="implementation">
+            <pou name="FB_InfoTwoHand" pouType="functionBlock">
+              <interface>
+                <inputVars>
+                  <variable name="stInfoData">
+                    <type>
+                      <derived name="DUT_ST_InfoDataFB" />
+                    </type>
+                  </variable>
+                </inputVars>
+                <outputVars>
+                  <variable name="sState">
+                    <type>
+                      <string />
+                    </type>
+                  </variable>
+                  <variable name="sDiag">
+                    <type>
+                      <string />
+                    </type>
+                  </variable>
+                </outputVars>
+              </interface>
+              <body>
+                <ST>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">// Two-Hand Tie Down FB's State
+IF stInfoData.usiMapState = 0 THEN
+	sState := 'Undefined' ;
+	ELSIF stInfoData.usiMapState = 1 THEN
+	sState := 'RUN' ;
+	ELSIF stInfoData.usiMapState = 2 THEN
+	sState := 'STOP' ;
+	ELSIF stInfoData.usiMapState = 3 THEN
+	sState := 'SAFE' ;
+	ELSIF stInfoData.usiMapState = 4 THEN
+	sState := 'ERROR' ;
+	ELSIF stInfoData.usiMapState = 5 THEN
+	sState := 'RESET' ;
+	ELSIF stInfoData.usiMapState = 6 THEN
+	sState := 'START' ;
+	ELSIF stInfoData.usiMapState = 11 THEN
+	sState := '1BUTTON' ;
+	ELSIF stInfoData.usiMapState = 12 THEN
+	sState := '2BUTTON' ;
+	ELSIF stInfoData.usiMapState = 13 THEN
+	sState := 'RELEASE' ;
+	ELSE
+	sState := 'Unknown' ;
+END_IF
+
+// Two-Hand Tie Down FB's Diagnostics
+IF stInfoData.uiMapDiag = 0 THEN
+	sDiag := 'No Error' ;
+	ELSIF stInfoData.uiMapDiag = 1 THEN
+	sDiag := 'Discrepancy Error Input Group 1' ;
+	ELSIF stInfoData.uiMapDiag = 2 THEN
+	sDiag := 'Discrepancy Error Input Group 2' ;
+	ELSIF stInfoData.uiMapDiag = 4 THEN
+	sDiag := 'Discrepancy Error Between Input Groups' ;
+	ELSE
+	sDiag := 'Unknown' ;
+END_IF</xhtml>
+                </ST>
+              </body>
+            </pou>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/pou" handleUnknown="implementation">
+            <pou name="FB_PleaseExplain" pouType="functionBlock">
+              <interface>
+                <inputVars>
+                  <variable name="stInfoData">
+                    <type>
+                      <derived name="DUT_test2" />
+                    </type>
+                  </variable>
+                </inputVars>
+                <outputVars>
+                  <variable name="sState">
+                    <type>
+                      <string />
+                    </type>
+                  </variable>
+                </outputVars>
+              </interface>
+              <body>
+                <ST>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml"> // does nothing but look at the data size of DUT_Test2
+ ;</xhtml>
+                </ST>
+              </body>
+            </pou>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/pou" handleUnknown="implementation">
+            <pou name="MAIN" pouType="program">
+              <interface>
+                <localVars>
+                  <variable name="fb_InfoSafetyGroup1">
+                    <type>
+                      <derived name="FB_InfoSafetyGroup" />
+                    </type>
+                  </variable>
+                  <variable name="fb_InfoConnection1">
+                    <type>
+                      <derived name="FB_InfoConnectionIn" />
+                    </type>
+                  </variable>
+                  <variable name="fb_InfoConnection2">
+                    <type>
+                      <derived name="FB_InfoConnectionOut" />
+                    </type>
+                  </variable>
+                  <variable name="fb_InfoAND">
+                    <type>
+                      <derived name="FB_InfoAND" />
+                    </type>
+                  </variable>
+                  <variable name="fb_InfoEStop">
+                    <type>
+                      <derived name="FB_InfoEStop" />
+                    </type>
+                  </variable>
+                  <variable name="fb_InfoAND2">
+                    <type>
+                      <derived name="FB_InfoAND" />
+                    </type>
+                  </variable>
+                  <variable name="fb_InfoTON">
+                    <type>
+                      <derived name="FB_InfoTON" />
+                    </type>
+                  </variable>
+                  <variable name="fb_InfoTOF">
+                    <type>
+                      <derived name="FB_InfoTOF" />
+                    </type>
+                  </variable>
+                  <variable name="fb_InfoEDM">
+                    <type>
+                      <derived name="FB_InfoEDM" />
+                    </type>
+                  </variable>
+                </localVars>
+              </interface>
+              <body>
+                <ST>
+                  <xhtml xmlns="http://www.w3.org/1999/xhtml">// Most Important Safety Project Info!!!
+q_udiHMI_SerialNumber := g_udiTS_SerialNumber ;
+q_uiHMI_ProjectCRC := g_uiTS_ProjectCRC ;
+
+// Commands to TwinSAFE controller's safety  group
+g_xTS_ErrAck := q_xHMI_ErrAckPB ;
+g_xTS_EStop_Reset := q_xHMI_EStopResetPB ;
+
+// Feedback from TwinSAFE controller's safety group
+q_xHMI_FBerrorLT := g_xTS_FBerror ;
+q_xHMI_COMerrorLT := g_xTS_COMerror ;
+
+// Feedback from TwinSAFE controller's Function Blocks
+q_xHMI_EDMerrorLT := g_xTS_EDM_Error ;
+q_xHMI_EStop_CompleteLT := g_xTS_EStop_Complete ;
+q_xHMI_EStop_errorLT := g_xTS_EStop_Error ;
+q_xHMI_EStop_OFF_Delay_CompleteLT := g_xTS_EStop_OFF_Delay_Complete ;
+q_xHMI_EStop_ON_Delay_CompleteLT := g_xTS_EStop_ON_Delay_Complete ;
+
+// TwinSAFE Group 1 Info
+fb_InfoSafetyGroup1(
+						stInfoData:= 	g_stTS_InfoGroup1, 
+						sState=&gt; 		g_sHMI_StatusGroup1 );
+
+// TwinSAFE Connection 1 Info to EL1904 safety terminal
+fb_InfoConnection1(
+						stInfoData:= 	g_stTS_InfoConnection1, 
+						sState=&gt; 		g_sHMI_StateConn1, 
+						sDiag=&gt; 		g_sHMI_DiagConn1, 
+						xChannel1=&gt; 	g_xHMI_EL1904Ch1, 
+						xChannel2=&gt; 	g_xHMI_EL1904Ch2, 
+						xChannel3=&gt; 	g_xHMI_EL1904Ch3, 
+						xChannel4=&gt; 	g_xHMI_EL1904Ch4 );
+	
+// TwinSAFE Connection 2 Info to EL2904 safety terminal
+fb_InfoConnection2(
+						stInfoData:= 	g_stTS_InfoConnection2, 
+						sState=&gt; 		g_sHMI_StateConn2, 
+						sDiag=&gt; 		g_sHMI_DiagConn2, 
+						xChannel1=&gt; 	g_xHMI_EL2904Ch1, 
+						xChannel2=&gt; 	g_xHMI_EL2904Ch2, 
+						xChannel3=&gt; 	g_xHMI_EL2904Ch3, 
+						xChannel4=&gt; 	g_xHMI_EL2904Ch4 );	
+								
+// TwinSAFE First AND safety FB Info
+fb_InfoAND(				stInfoData:= 	g_stTS_InfoAND1, 
+						sState=&gt; 		g_sHMI_StatusAND1 );
+
+// TwinSAFE ESTOP safety FB Info
+fb_InfoEStop(			stInfoData:= 	g_stTS_InfoEStop1, 
+						sState=&gt; 		g_sHMI_StatusEStop1, 		
+						sDiag=&gt; 		g_sHMI_DiagEStop1 );
+
+// TwinSAFE Second AND safety FB Info
+fb_InfoAND2(			stInfoData:= 	g_stTS_InfoAND2, 
+						sState=&gt; 		g_sHMI_StatusAND2 );
+						
+// TwinSAFE TON safety FB Info
+fb_InfoTON(				stInfoData:= 	g_stTS_InfoTON, 
+						sState=&gt; 		g_sHMI_StatusTON );
+
+// TwinSAFE TOF safety FB Info
+fb_InfoTOF(				stInfoData:= 	g_stTS_InfoTOF, 
+						sState=&gt; 		g_sHMI_StatusTOF );
+
+// TwinSAFE EDM safety FB Info
+fb_InfoEDM(				stInfoData:= 	g_stTS_InfoEDM, 
+						sState=&gt; 		g_sHMI_StatusEDM, 
+						sDiag=&gt; 		g_sHMI_DiagEDM );						
+
+// st_test.test_byte := fb_InfoAND.stInfoData.usiMapState;
+// MEMCPY(ADR(st_test.test_uint) , ADR(fb_InfoAND.stInfoData.uiMapDiag) , n:=SIZEOF(fb_InfoAND.stInfoData.uiMapDiag) );
+						
+//fb_PleaseExplain(		stInfoData:= g_stTS_InfoFromAnyFB, 
+//						sState=&gt; 							);
+</xhtml>
+                </ST>
+              </body>
+            </pou>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/libraries" handleUnknown="implementation">
+            <Libraries>
+              <Library Name="Tc2_Standard, 3.2.0.0 (Beckhoff Automation GmbH)" Namespace="Tc2_Standard" HideWhenReferencedAsDependency="false" PublishSymbolsInContainer="false" SystemLibrary="false" LinkAllContent="false" />
+              <Library Name="Tc2_System, 3.2.0.0 (Beckhoff Automation GmbH)" Namespace="Tc2_System" HideWhenReferencedAsDependency="false" PublishSymbolsInContainer="false" SystemLibrary="false" LinkAllContent="false" />
+              <Library Name="Tc3_Interfaces, 3.2.0.0 (Beckhoff Automation GmbH)" Namespace="Tc3_Interfaces" HideWhenReferencedAsDependency="false" PublishSymbolsInContainer="false" SystemLibrary="false" LinkAllContent="false" />
+              <Library Name="Tc3_Module, 3.2.0.0 (Beckhoff Automation GmbH)" Namespace="Tc3_Module" HideWhenReferencedAsDependency="false" PublishSymbolsInContainer="false" SystemLibrary="false" LinkAllContent="false" />
+              <Library Name="#System_VisuElems" Namespace="VisuElems" HideWhenReferencedAsDependency="false" PublishSymbolsInContainer="false" SystemLibrary="true" LinkAllContent="false" DefaultResolution="VisuElems, 3.5.0.0 (System)" ResolverGuid="2717eb6a-dd07-4c66-8d8d-cacebd7b18ae" />
+              <Library Name="#System_VisuElemMeter" Namespace="VisuElemMeter" HideWhenReferencedAsDependency="false" PublishSymbolsInContainer="false" SystemLibrary="true" LinkAllContent="false" DefaultResolution="VisuElemMeter, 3.5.0.0 (System)" ResolverGuid="2717eb6a-dd07-4c66-8d8d-cacebd7b18ae" />
+              <Library Name="#System_VisuElemsSpecialControls" Namespace="VisuElemsSpecialControls" HideWhenReferencedAsDependency="false" PublishSymbolsInContainer="false" SystemLibrary="true" LinkAllContent="false" DefaultResolution="VisuElemsSpecialControls, 3.5.0.0 (System)" ResolverGuid="2717eb6a-dd07-4c66-8d8d-cacebd7b18ae" />
+              <Library Name="#System_VisuElemsWinControls" Namespace="VisuElemsWinControls" HideWhenReferencedAsDependency="false" PublishSymbolsInContainer="false" SystemLibrary="true" LinkAllContent="false" DefaultResolution="VisuElemsWinControls, 3.5.0.0 (System)" ResolverGuid="2717eb6a-dd07-4c66-8d8d-cacebd7b18ae" />
+              <Library Name="#System_VisuNativeControl" Namespace="VisuNativeControl" HideWhenReferencedAsDependency="false" PublishSymbolsInContainer="false" SystemLibrary="true" LinkAllContent="false" DefaultResolution="VisuNativeControl, 3.5.0.0 (System)" ResolverGuid="2717eb6a-dd07-4c66-8d8d-cacebd7b18ae" />
+              <Library Name="#system_visuinputs" Namespace="visuinputs" HideWhenReferencedAsDependency="false" PublishSymbolsInContainer="false" SystemLibrary="true" LinkAllContent="false" DefaultResolution="visuinputs, 3.5.0.0 (system)" ResolverGuid="2717eb6a-dd07-4c66-8d8d-cacebd7b18ae" />
+            </Libraries>
+          </data>
+        </addData>
+      </resource>
+    </data>
+    <data name="http://www.3s-software.com/plcopenxml/projectstructure" handleUnknown="discard">
+      <ProjectStructure>
+        <Object Name="PLC_ForTwinSAFEinTc3">
+          <Folder Name="DUTs">
+            <Object Name="DUT_ST_InfoDataConnectionIn" />
+            <Object Name="DUT_ST_InfoData" />
+            <Object Name="DUT_ST_InfoDataConnectionOut" />
+            <Object Name="DUT_ST_InfoDataFB" />
+            <Object Name="DUT_test" />
+            <Object Name="DUT_Test2" />
+          </Folder>
+          <Folder Name="GVLs">
+            <Object Name="GVL_TwinSAFE" />
+          </Folder>
+          <Object Name="Library Manager" />
+          <Object Name="PlcTask" />
+          <Folder Name="POUs">
+            <Object Name="FB_InfoAND" />
+            <Object Name="FB_InfoConnectionIn" />
+            <Object Name="FB_InfoConnectionOut" />
+            <Object Name="FB_InfoConnectionShutdown" />
+            <Object Name="FB_InfoDecoupler" />
+            <Object Name="FB_InfoEDM" />
+            <Object Name="FB_InfoEStop" />
+            <Object Name="FB_InfoMON" />
+            <Object Name="FB_InfoMuting" />
+            <Object Name="FB_InfoOperationMode" />
+            <Object Name="FB_InfoOR" />
+            <Object Name="FB_InfoRS" />
+            <Object Name="FB_InfoSafetyGroup" />
+            <Object Name="FB_InfoSR" />
+            <Object Name="FB_InfoTOF" />
+            <Object Name="FB_InfoTON" />
+            <Object Name="FB_InfoTwoHand" />
+            <Object Name="FB_PleaseExplain" />
+            <Object Name="MAIN" />
+          </Folder>
+        </Object>
+      </ProjectStructure>
+    </data>
+  </addData>
+</project>

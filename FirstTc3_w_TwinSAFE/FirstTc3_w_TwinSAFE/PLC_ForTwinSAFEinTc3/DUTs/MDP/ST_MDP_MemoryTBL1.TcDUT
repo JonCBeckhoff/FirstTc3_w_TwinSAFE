@@ -1,0 +1,16 @@
+﻿<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.0.18">
+  <DUT Name="ST_MDP_MemoryTBL1" Id="{fede8c46-a751-4fda-be53-da0054a7bfd5}">
+    <Declaration><![CDATA[TYPE ST_MDP_MemoryTBL1 :
+STRUCT
+	uiLen					:UINT;			// Length
+	udiProgMemAllocated		:UDINT;			// Program Memory Allocated
+	udiProgMemAvailable		:UDINT;			// Program Memory Available
+	udiStorageMemAllocated	:UDINT;			// Storage Memory Allocated (available for Windows CE)
+	udiStorageMemAvailable	:UDINT;			// Storage Memory Available (available for Windows CE)
+	udiMemoryDivision		:UDINT;			// Memory Division (available for Windows CE)
+END_STRUCT
+END_TYPE
+]]></Declaration>
+    <ObjectProperties />
+  </DUT>
+</TcPlcObject>

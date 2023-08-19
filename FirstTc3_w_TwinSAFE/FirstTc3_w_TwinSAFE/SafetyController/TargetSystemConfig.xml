@@ -1,0 +1,16 @@
+<TargetSystemConfig>
+  <IsExternalDevice>False</IsExternalDevice>
+  <ItemId>#x03020005</ItemId>
+  <FSOEAddress>3</FSOEAddress>
+  <VersionNumber>1</VersionNumber>
+  <SerialNumber>00457486</SerialNumber>
+  <ProjectCRC>0x23E7</ProjectCRC>
+  <MapProjectCRC>True</MapProjectCRC>
+  <MapSerialNumber>True</MapSerialNumber>
+  <AmsNetID>10.12.160.29.2.1</AmsNetID>
+  <AmsPort>1004</AmsPort>
+  <DeviceName>Term 5 (EL6900)</DeviceName>
+  <DipSwitch>3</DipSwitch>
+  <FieldBusAdress>1004</FieldBusAdress>
+  <SoftwareVersion>03</SoftwareVersion>
+</TargetSystemConfig>

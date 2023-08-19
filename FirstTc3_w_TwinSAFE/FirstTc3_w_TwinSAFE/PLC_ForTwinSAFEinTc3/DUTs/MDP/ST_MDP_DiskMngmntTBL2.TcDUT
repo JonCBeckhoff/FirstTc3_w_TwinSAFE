@@ -1,0 +1,17 @@
+﻿<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.0.19">
+  <DUT Name="ST_MDP_DiskMngmntTBL2" Id="{12b9e147-aaef-4934-a124-f65c63c68170}">
+    <Declaration><![CDATA[TYPE ST_MDP_DiskMngmntTBL2 :
+STRUCT
+	uiLen				:UINT;			// Length
+	sVolumeLabel1		:T_MaxSTRING;	// Volume Label
+	sVolumeLabel2		:T_MaxSTRING;	// Volume Label
+	sVolumeLabel3		:T_MaxSTRING;	// Volume Label
+	sVolumeLabel4		:T_MaxSTRING;	// Volume Label
+	sVolumeLabel5		:T_MaxSTRING;	// Volume Label
+	sVolumeLabel6		:T_MaxSTRING;	// Volume Label
+END_STRUCT
+END_TYPE
+]]></Declaration>
+    <ObjectProperties />
+  </DUT>
+</TcPlcObject>

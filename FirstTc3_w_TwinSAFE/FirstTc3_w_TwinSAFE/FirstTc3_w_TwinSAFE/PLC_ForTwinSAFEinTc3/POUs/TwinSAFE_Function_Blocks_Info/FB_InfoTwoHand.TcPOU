@@ -1,0 +1,55 @@
+﻿<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.0.14">
+  <POU Name="FB_InfoTwoHand" Id="{d1d536c1-ab30-4d43-8d82-9ede83388e9d}">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_InfoTwoHand
+VAR_INPUT
+	stInfoData 		:		DUT_ST_InfoDataFB ;
+END_VAR
+VAR_OUTPUT
+	sState 			: 		STRING ;
+	sDiag 			: 		STRING ;
+	END_VAR
+VAR
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[// Two-Hand Tie Down FB's State
+IF stInfoData.usiMapState 			= 	0 THEN
+				sState 				:= 	'Undefined' ;
+	ELSIF stInfoData.usiMapState 	= 	1 THEN
+				sState 				:= 	'RUN' ;
+	ELSIF stInfoData.usiMapState 	= 	2 THEN
+				sState 				:= 	'STOP' ;
+	ELSIF stInfoData.usiMapState 	= 	3 THEN
+				sState 				:= 	'SAFE' ;
+	ELSIF stInfoData.usiMapState 	= 	4 THEN
+				sState 				:= 	'ERROR' ;
+	ELSIF stInfoData.usiMapState 	= 	5 THEN
+				sState 				:= 	'RESET' ;
+	ELSIF stInfoData.usiMapState 	= 	6 THEN
+				sState 				:= 	'START' ;
+	ELSIF stInfoData.usiMapState 	= 	11 THEN
+				sState 				:= 	'1BUTTON' ;
+	ELSIF stInfoData.usiMapState 	= 	12 THEN
+				sState 				:= 	'2BUTTON' ;
+	ELSIF stInfoData.usiMapState 	= 	13 THEN
+				sState 				:= 	'RELEASE' ;
+	ELSE
+				sState 				:= 	'Unknown' ;
+END_IF
+
+// Two-Hand Tie Down FB's Diagnostics
+IF stInfoData.uiMapDiag 			= 	0 THEN
+				sDiag 				:= 	'No Error' ;
+	ELSIF stInfoData.uiMapDiag 		= 	1 THEN
+				sDiag 				:= 	'Discrepancy Error Input Group 1' ;
+	ELSIF stInfoData.uiMapDiag 		= 	2 THEN
+				sDiag 				:= 	'Discrepancy Error Input Group 2' ;
+	ELSIF stInfoData.uiMapDiag 		= 	4 THEN
+				sDiag 				:= 	'Discrepancy Error Between Input Groups' ;
+	ELSE
+				sDiag 				:= 	'Unknown' ;
+END_IF]]></ST>
+    </Implementation>
+    <ObjectProperties />
+  </POU>
+</TcPlcObject>

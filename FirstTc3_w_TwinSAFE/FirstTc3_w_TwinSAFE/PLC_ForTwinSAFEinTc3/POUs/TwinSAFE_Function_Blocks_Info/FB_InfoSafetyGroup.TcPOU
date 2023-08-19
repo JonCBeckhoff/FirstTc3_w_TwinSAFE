@@ -1,0 +1,52 @@
+﻿<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.0.14">
+  <POU Name="FB_InfoSafetyGroup" Id="{9bfb34c6-3e5e-41f8-b4bf-6737b8cc7369}">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_InfoSafetyGroup
+VAR_INPUT
+	stInfoData 		: 		DUT_ST_InfoData ;
+END_VAR
+VAR_OUTPUT
+	sState 			: 		STRING ;
+END_VAR
+VAR
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[// Safety Group State
+
+// Value 1 - RUN: All function blocks and TwinSAFE connections assigned to the TwinSAFE
+// group operate properly, and all TwinSAFE connections assigned to the TwinSAFE 
+// group are up and running
+IF stInfoData.usiMapState 		= 	1 THEN
+				sState 			:= 	'RUN - All FBs and Connections Operating Properly' ;
+
+// Value 2 - Stop: The state TwinSAFE goes to after initialization
+ELSIF stInfoData.usiMapState 	= 	2 THEN
+				sState 			:= 	'STOP - State After Initialization' ;
+
+// Value 3 - SAFE: All function blocks and TwinSAFE connections assigned to the TwinSAFE
+// group operate properly, and at least one of the TwinSAFE connections
+// assigned to the TwinSAFE group is not up and running
+ELSIF stInfoData.usiMapState 	= 	3 THEN
+				sState 			:= 	'SAFE - An Assigned Connection Not Up and Running' ;
+
+// Value 4 - ERROR: At least one assigned function block or one assigned TwinSAFE connection
+// has reported an error 
+ELSIF stInfoData.usiMapState 	= 	4 THEN
+				sState 			:= 	'ERROR - FB or Connection in Error State' ;
+
+// Value 5 - RESET: A positive edge (FALSE -> TRUE) for the safety group error Ack
+// of a function block or a TwinSAFE connection error was detected on the ERR_ACK input.
+// The system is waiting for a negative edge of the ERR_ACK input.
+ELSIF stInfoData.usiMapState 	= 	5 THEN
+				sState 			:= 	'RESET - ErrAck TRUE, Waiting For ErrAck FALSE' ;
+
+// Value 0: Safety group does not exist or safety controller has not been started
+ELSE
+				sState 			:= 	'Unknown' ;
+END_IF
+
+// The Safety Group Has No Diagnostic Byte to Decode]]></ST>
+    </Implementation>
+    <ObjectProperties />
+  </POU>
+</TcPlcObject>

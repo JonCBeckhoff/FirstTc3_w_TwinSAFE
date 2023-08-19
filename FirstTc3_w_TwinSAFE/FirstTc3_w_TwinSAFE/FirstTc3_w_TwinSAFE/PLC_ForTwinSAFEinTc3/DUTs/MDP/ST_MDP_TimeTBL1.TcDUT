@@ -1,0 +1,16 @@
+﻿<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.0.18">
+  <DUT Name="ST_MDP_TimeTBL1" Id="{452c7f29-bfdb-40fa-babb-c35a6fb1406d}">
+    <Declaration><![CDATA[TYPE ST_MDP_TimeTBL1 :
+STRUCT
+	uiLen					:UINT;			// Length
+	sSNTP_Server			:T_MaxSTRING;	// SNTP Server
+	udiSNTP_Refresh			:UDINT;			// SNTP Refresh in Seconds
+	udiSec_Since_1_1_1970	:UDINT;			// Seconds since midnight January 1, 1970
+	sDateTime_Presentation	:T_MaxSTRING;	// Textual DateTime presentation (ISO 8601) YYYY-MM-DDThh:mm:ss.sTZD
+	uiTimezone				:UINT;			// Timezone
+END_STRUCT
+END_TYPE
+]]></Declaration>
+    <ObjectProperties />
+  </DUT>
+</TcPlcObject>

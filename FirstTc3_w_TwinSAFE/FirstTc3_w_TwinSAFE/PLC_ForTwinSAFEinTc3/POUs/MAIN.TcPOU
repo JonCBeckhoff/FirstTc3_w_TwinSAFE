@@ -1,0 +1,143 @@
+﻿<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.0.19">
+  <POU Name="MAIN" Id="{bdbba0bc-76dc-458e-8a02-492360a9da4d}">
+    <Declaration><![CDATA[PROGRAM MAIN
+//		8-2-2012
+// 		This Program has been supplied by Beckhoff Automation As-Is and is intended only as an example 
+//		implementation. Functionality is not guaranteed. 
+//
+VAR
+	fb_InfoSafetyGroup1			: 	FB_InfoSafetyGroup ;
+	fb_InfoConnection1			: 	FB_InfoConnectionIn ;
+	fb_InfoConnection2			: 	FB_InfoConnectionOut ;
+	fb_InfoAND					: 	FB_InfoAND ;
+	fb_InfoEStop				: 	FB_InfoEStop ;
+	fb_InfoAND2					: 	FB_InfoAND ;	
+	fb_InfoTON					: 	FB_InfoTON ;
+	fb_InfoTOF					: 	FB_InfoTOF ;	
+	fb_InfoEDM					: 	FB_InfoEDM ;
+	thgus: INT;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[//		8-2-2012
+// 		This Program has been supplied by Beckhoff Automation As-Is and is intended only as an example 
+//		implementation. Functionality is not guaranteed. 
+//
+// Some standard I/O so EtherCAT BUS is running during TwinSAFE development
+g_xOutput1 := 1 ;
+g_xOutput2 := 1 ;
+g_xOutput3 := 1 ;
+g_xOutput4 := 1 ;
+
+thgus;
+
+IF g_bHMI_ScreenBeingDisplayed = 0 THEN
+// Most Important Safety Project Info!!!
+g_udiHMI_SerialNumber 				:= 		g_udiTS_SerialNumber ;
+g_uiHMI_ProjectCRC 					:= 		g_uiTS_ProjectCRC ;
+
+// Commands to TwinSAFE controller's safety  group
+g_xTS_ErrAck 						:= 		g_xHMI_ErrAckPB ;
+g_xTS_EStop_Reset 					:= 		g_xHMI_EStopResetPB ;
+
+// Feedback from TwinSAFE controller's safety group
+g_xHMI_SafetyGroup1_FBerrorLT 		:= 		g_xTS_SafetyGroup1_FBerror ;
+g_xHMI_SafetyGroup1_COMerrorLT 		:= 		g_xTS_SafetyGroup1_COMerror ;
+
+// Feedback from TwinSAFE controller's Function Blocks
+g_xHMI_EDMerrorLT 					:= 		g_xTS_EDM_Error ;
+g_xHMI_EStop_CompleteLT 			:= 		g_xTS_EStop_Complete ;
+g_xHMI_EStop_errorLT 				:= 		g_xTS_EStop_Error ;
+g_xHMI_EStop_OFF_Delay_CompleteLT 	:= 		g_xTS_EStop_OFF_Delay_Complete ;
+g_xHMI_EStop_ON_Delay_CompleteLT 	:= 		g_xTS_EStop_ON_Delay_Complete ;
+
+// TwinSAFE Group 1 Info
+fb_InfoSafetyGroup1(
+						stInfoData	:= 		g_stTS_InfoGroup1, 
+						sState		=> 		g_sHMI_StatusGroup1 );
+
+// TwinSAFE Connection 1 Info to EL1904 safety terminal
+fb_InfoConnection1(
+						stInfoData	:= 		g_stTS_InfoConnection1, 
+						sState		=> 		g_sHMI_StateConn1, 
+						sDiag		=> 		g_sHMI_DiagConn1, 
+						xChannel1	=> 		g_xHMI_EL1904Ch1, 
+						xChannel2	=> 		g_xHMI_EL1904Ch2, 
+						xChannel3	=> 		g_xHMI_EL1904Ch3, 
+						xChannel4	=> 		g_xHMI_EL1904Ch4 );
+	
+// TwinSAFE Connection 2 Info to EL2904 safety terminal
+fb_InfoConnection2(
+						stInfoData	:= 		g_stTS_InfoConnection2, 
+						sState		=> 		g_sHMI_StateConn2, 
+						sDiag		=> 		g_sHMI_DiagConn2, 
+						xChannel1	=> 		g_xHMI_EL2904Ch1, 
+						xChannel2	=> 		g_xHMI_EL2904Ch2, 
+						xChannel3	=> 		g_xHMI_EL2904Ch3, 
+						xChannel4	=> 		g_xHMI_EL2904Ch4 );	
+								
+// TwinSAFE First AND safety FB Info
+fb_InfoAND(				stInfoData	:= 		g_stTS_InfoAND1, 
+						sState		=> 		g_sHMI_StatusAND1 );
+
+// TwinSAFE ESTOP safety FB Info
+fb_InfoEStop(			stInfoData	:= 		g_stTS_InfoEStop1, 
+						sState		=> 		g_sHMI_StatusEStop1, 		
+						sDiag		=> 		g_sHMI_DiagEStop1 );
+
+// TwinSAFE Second AND safety FB Info
+fb_InfoAND2(			stInfoData	:= 		g_stTS_InfoAND2, 
+						sState		=> 		g_sHMI_StatusAND2 );
+						
+// TwinSAFE TON safety FB Info
+fb_InfoTON(				stInfoData	:= 		g_stTS_InfoTON, 
+						sState		=> 		g_sHMI_StatusTON );
+
+// TwinSAFE TOF safety FB Info
+fb_InfoTOF(				stInfoData	:= 		g_stTS_InfoTOF, 
+						sState		=> 		g_sHMI_StatusTOF );
+
+// TwinSAFE EDM safety FB Info
+fb_InfoEDM(				stInfoData	:= 		g_stTS_InfoEDM, 
+						sState		=> 		g_sHMI_StatusEDM, 
+						sDiag		=> 		g_sHMI_DiagEDM );	
+END_IF ;
+
+// Get Control System Diagnostics 
+EtherCAT_Diag() ;
+System_Functions() ;
+
+//  ***********************************************************************
+//	*																	  *
+//  * NEVER try to WRITE to a safety terminal's CoE area (only read)!!!!  *
+//	*																	  *
+//	***********************************************************************			
+						
+// Get additional diagnostic info from the EL6900 saftey logic terminal
+EL6900_ADS_Reads() ;
+
+// Get additional diagnostic info from the EL1904 saftey terminal
+EL1904_ADS_Reads() ;					
+
+// Get additional diagnostic info from the EP1908-0002 saftey module
+//EP1908_ADS_Reads() ;
+
+// Get additional diagnostic info from the EL1904 saftey terminal
+EL2904_ADS_Reads() ;
+
+// Get additional diagnostic info from the EL6930 saftey logic terminal
+//EL6930_ADS_Reads() ;
+
+// Get additional diagnostic info from the AX5805 Safe Motion Module 
+//AX5805_ADS_Reads() ;
+
+
+
+
+
+
+]]></ST>
+    </Implementation>
+    <ObjectProperties />
+  </POU>
+</TcPlcObject>

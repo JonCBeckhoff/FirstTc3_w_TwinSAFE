@@ -1,0 +1,21 @@
+﻿<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.0.18">
+  <DUT Name="ST_MDP_MainboardTBL1" Id="{21cd2a84-06bd-4eb8-a290-28b3624ec5cd}">
+    <Declaration><![CDATA[TYPE ST_MDP_MainboardTBL1 :
+STRUCT
+	uiLen					:UINT;			// Length
+	sMainboardType			:T_MaxSTRING;	// CX model
+	sMainboardSN			:T_MaxSTRING;	// CX Serial number
+	sMainboardProdDate		:T_MaxSTRING;	// CX production date
+	udiMainboardBootCount	:UDINT;			// Number of times this CX has been booted
+	udiMainboardOperTime	:UDINT;			// Number of Minutes this CX has been in operation
+	diMainboardMinTemp		:DINT;			// CX lowest operating temperature monitored
+	diMainboardMaxTemp		:DINT;			// CX highest operating temperature monitored
+	diMainboardMinVolt		:DINT;			// CX lowest input voltage monitored in mV - 5000 is Nominal value
+	diMainboardMaxVolt		:DINT;			// CX highest input voltage monitored in mV - 5000 is Nominal value
+	iMainboardActualTemp	:INT;			// CX current actual temperature
+END_STRUCT
+END_TYPE
+]]></Declaration>
+    <ObjectProperties />
+  </DUT>
+</TcPlcObject>

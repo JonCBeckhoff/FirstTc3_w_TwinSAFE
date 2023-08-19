@@ -1,0 +1,12 @@
+﻿<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.0.18">
+  <DUT Name="ST_MDP_TimeTBL2" Id="{0da48ddf-42a7-4656-a700-76eee61f32e2}">
+    <Declaration><![CDATA[TYPE ST_MDP_TimeTBL2 :
+STRUCT
+	uiLen					:UINT;			// Length
+	sTimezone				:T_MaxSTRING;	// Timezone
+END_STRUCT
+END_TYPE
+]]></Declaration>
+    <ObjectProperties />
+  </DUT>
+</TcPlcObject>

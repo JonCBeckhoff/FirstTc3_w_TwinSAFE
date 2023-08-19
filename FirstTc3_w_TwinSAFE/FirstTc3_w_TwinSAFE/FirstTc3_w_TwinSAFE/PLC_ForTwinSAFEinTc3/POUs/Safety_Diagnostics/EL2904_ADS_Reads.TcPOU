@@ -1,0 +1,488 @@
+﻿<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.0.18">
+  <POU Name="EL2904_ADS_Reads" Id="{b87b7741-971e-4337-a2ee-efe1ab85853d}">
+    <Declaration><![CDATA[PROGRAM EL2904_ADS_Reads
+//		8-2-2012
+// 		This Program has been supplied by Beckhoff Automation As-Is and is intended only as an example 
+//		implementation. Functionality is not guaranteed. 
+//
+VAR
+	//Time to check CoE values (Every 2 seconds in this case)
+	T1							: 		TON ;
+	xExecute					: 		BOOL ;
+	tTime1						: 		TIME ;
+
+	//Counter for just some very simple sequencing
+	C1							: 		CTU ;
+	xReset						: 		BOOL ;
+	wPreset						: 		WORD := 10 ;
+	xDone						: 		BOOL ;
+	wCount						: 		WORD ;
+	
+	//Get EL2904 terminal's serial number
+	fbEL2904Sn_ADSRead			: 		ADSREAD ;
+	dwEL2904_Sn					: 		DWORD ;
+	xEL2904Sn_busy				: 		BOOL ;
+	xEL2904Sn_Err				: 		BOOL ;
+	xEL2904Sn_ErrID				: 		UDINT ;
+
+	//Get EL2904 terminal's DIP switch setting
+	fbEL2904DSw_ADSRead			: 		ADSREAD ;
+	wEL2904_DSw					: 		WORD ;
+	xEL2904DSw_busy				: 		BOOL ;
+	xEL2904DSw_Err				: 		BOOL ;
+	udiEL2904DSw_ErrID			: 		UDINT ;
+
+	//Read the Hardware Version of the EL2904 Terminal
+	fbEL2904_HWvers_EcCoESdoRead: 		FB_EcCoESdoRead ;
+	sEL2904_HWvers				: 		STRING(2) ;
+	xEL2904_HWvers_Busy			: 		BOOL ;
+	xEL2904_HWvers_Err			: 		BOOL ;
+	udiEL2904_HWvers_ErrID		: 		UDINT ;
+
+	//Read the Software Version of the EL2904 Terminal (It's f/w)
+	fbEL2904_FWvers_EcCoESdoRead: 		FB_EcCoESdoRead ;
+	sEL2904_FWvers				: 		STRING(2) ;
+	xEL2904_FWvers_Busy			: 		BOOL ;
+	xEL2904_FWvers_Err			: 		BOOL ;
+	udiEL2904_FWvers_ErrID		: 		UDINT ;
+	
+	//Get EL1904 terminal's MC1 temperature (in Deg C)
+	fbEL2904PriMCTemp_ADSRead	: 		ADSREAD ;
+	wEL2904_PriMCTemp			: 		WORD ;
+	xEL2904PriMCTemp_busy		: 		BOOL ;
+	xEL2904PriMCTemp_Err		: 		BOOL ;
+	udiEL2904PriMCTemp_ErrID	: 		UDINT ;
+	
+	//Get EL1904 terminal's MC2 termperature (in Deg C)
+	fbEL2904SecMCTemp_ADSRead	: 		ADSREAD ;
+	wEL2904_SecMCTemp			: 		WORD ;
+	xEL2904SecMCTemp_busy		: 		BOOL ;
+	xEL2904SecMCTemp_Err		: 		BOOL ;
+	udiEL2904SecMCTemp_ErrID	: 		UDINT ;
+	
+	//Get EL1904 terminal's MC1 voltage (in mV)
+	fbEL2904PriMCmV_ADSRead		: 		ADSREAD ;
+	wEL2904_PriMCmV				: 		WORD ;
+	xEL2904PriMCmV_busy			: 		BOOL ;
+	xEL2904PriMCmV_Err			: 		BOOL ;
+	udiEL2904PriMCmV_ErrID		: 		UDINT ;
+	
+	//Get EL1904 terminal's MC2 voltage (in mV)
+	fbEL2904SecMCmV_ADSRead		: 		ADSREAD ;
+	wEL2904_SecMCmV				: 		WORD ;
+	xEL2904SecMCmV_busy			: 		BOOL ;
+	xEL2904SecMCmV_Err			: 		BOOL ;
+	udiEL2904SecMCmV_ErrID		: 		UDINT ;
+
+	// EL2904: Error At The Output
+	//Bit0-3 is External supply or cross-circuit Error
+	//Bit4-7 is Open Load, Current Below 20mA, or Current Above Maximum Value of 500mA
+	fbEL2904_OutErr_ADSRead		: 		ADSREAD ;
+	wEL2904_OutErr				: 		WORD ;
+	xEL2904_OutErr_busy			: 		BOOL ;
+	xEL2904_OutErr_Err			: 		BOOL ;
+	udiEL2904_OutErr_ErrID		: 		UDINT ;
+	
+	// EL2904: Supply Error - Field Potential Too High or Too Low
+	//Field Voltage from the Power Rail Is Outside The Specification
+	fbEL2904_SupplyErr_ADSRead	: 		ADSREAD ;
+	wEL2904_SupplyErr			: 		WORD ;
+	xEL2904_SupplyErr_busy		: 		BOOL ;
+	xEL2904_SupplyErr_Err		: 		BOOL ;
+	udiEL2904_SupplyErr_ErrID	: 		UDINT ;
+
+	// EL2904: Temperature Error
+	fbEL2904_TempErr_ADSRead	: 		ADSREAD ;
+	wEL2904_TempErr				: 		WORD ;
+	xEL2904_TempErr_busy		: 		BOOL ;
+	xEL2904_TempErr_Err			: 		BOOL ;
+	udiEL2904_TempErr_ErrID		: 		UDINT ;
+
+	// EL2904 FEATURES: Standard Output Active/Inactive
+	//Standard outputs can be used to directly Enable/Disable a TwinSAFE output
+	//if this feature is ACTIVE (Not Turn it ON/OFF, Allow it or not to turn ON!!!)
+	fbEL2904_StandardOuts_ADSRead: 		ADSREAD ;
+	bEL2904_StandardOuts		: 		BYTE ;
+	xEL2904_StandardsOuts_busy	: 		BOOL ;
+	xEL2904_StandardsOuts_Err	: 		BOOL ;
+	udiEL2904_StandardsOutsID	: 		UDINT ;
+	
+	// EL2904 FEATURES: Current Measurement Active/Inactive
+	//Used to determine TwinSAFE output load current issues
+	fbEL2904_CurrMeas_ADSRead	: 		ADSREAD ;
+	bEL2904_CurrMeas			: 		BYTE ;
+	xEL2904_CurrMeas_busy		: 		BOOL ;
+	xEL2904_CurrMeas_Err		: 		BOOL ;
+	udiEL2904_CurrMeasID		: 		UDINT ;
+
+	// EL2904 FEATURES: Test Pulses Active/Inactive
+	//Used to determine TwinSAFE output wiring is correct
+	fbEL2904_TestP_ADSRead		: 		ADSREAD ;
+	bEL2904_TestP				: 		BYTE ;
+	xEL2904_TestP_busy			: 		BOOL ;
+	xEL2904_TestP_Err			: 		BOOL ;
+	udiEL2904_TestP_ID			: 		UDINT ;
+
+	// EL2904 FEATURES: Error Acknowledge Active/Inactive
+	//Used to reset TwinSAFE output errors instead of focing a cycle power
+	//for a TwinSAFE output error
+	fbEL2904_ErrAck_ADSRead		: 		ADSREAD;
+	bEL2904_ErrAck				: 		BYTE;
+	xEL2904_ErrAck_busy			: 		BOOL;
+	xEL2904_ErrAck_Err			: 		BOOL;
+	udiEL2904_ErrAck_ID			: 		UDINT;
+END_VAR
+VAR_INPUT
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[//		8-2-2012
+// 		This Program has been supplied by Beckhoff Automation As-Is and is intended only as an example 
+//		implementation. Functionality is not guaranteed. 
+//
+//IF g_bHMI_ScreenBeingDisplayed = 30 THEN
+//Interval timer for CoE Reads
+T1(
+						IN				:= 		NOT xExecute, 
+						PT				:=		T#500MS, 
+						Q				=>		xExecute, 
+						ET				=>		tTime1) ;
+
+C1(
+						CU				:= 		xExecute, 
+						RESET			:= 		xReset, 
+						PV				:= 		wPreset, 
+						Q				=> 		xDone, 
+						CV				=> 		wCount) ;
+
+IF C1.CV > 6 	THEN xReset := 1 ;
+				ELSE xReset := 0 ; 
+END_IF ;
+
+// Read the serial number out of the EL2904
+fbEL2904Sn_ADSRead(
+						NETID			:= 		gc_sADSNetID, 
+						PORT			:= 		gc_uiEL2904_EtherCATAdr, 
+						IDXGRP			:= 		16#F302, 
+						IDXOFFS			:= 		16#F9800002, 
+						LEN				:= 		4, 
+						DESTADDR		:=		ADR(dwEL2904_Sn), 
+						READ			:= 		xExecute, 
+						TMOUT			:= 		T#2S, 
+						BUSY			=> 		xEL2904Sn_busy, 
+						ERR				=> 		xEL2904Sn_Err, 
+						ERRID			=> 		xEL2904Sn_ErrID ) ;
+
+g_dwHMI_EL2904Sn 						:= 		dwEL2904_Sn ;
+
+// Read the DIP Switch Setting out of the EL2904
+IF C1.CV = 1 THEN
+fbEL2904DSw_ADSRead(
+						NETID			:= 		gc_sADSNetID, 
+						PORT			:= 		gc_uiEL2904_EtherCATAdr, 
+						IDXGRP			:= 		16#F302, 
+						IDXOFFS			:= 		16#F9800001, 
+						LEN				:= 		2, 
+						DESTADDR		:=		ADR(wEL2904_DSw), 
+						READ			:= 		xExecute, 
+						TMOUT			:= 		T#2S, 
+						BUSY			=> 		xEL2904DSw_busy, 
+						ERR				=> 		xEL2904DSw_Err, 
+						ERRID			=> 		udiEL2904DSw_ErrID ) ;
+
+g_wHMI_EL2904DSw 						:= 		wEL2904_DSw ;
+END_IF ;
+
+//Read the Hardware Version of the EL2904 Terminal
+fbEL2904_HWvers_EcCoESdoRead(
+						sNetId			:= 		gc_sADSNetID, 
+						nSlaveAddr		:= 		gc_uiEL2904_EtherCATAdr, 
+						nSubIndex		:= 		0, 
+						nIndex			:= 		16#1009, 
+						pDstBuf			:=  	ADR(sEL2904_HWvers),
+						cbBufLen		:= 		SIZEOF(sEL2904_HWvers), 
+						bExecute		:= 		xExecute, 
+						tTimeout		:= 		T#2S, 
+						bBusy			=> 		xEL2904_HWvers_Busy, 
+						bError			=> 		xEL2904_HWvers_Err, 
+						nErrId			=> 		udiEL2904_HWvers_ErrID ) ;
+
+g_sHMI_EL2904_HWvers					:= 		sEL2904_HWvers ;
+
+//Read the Software Version of the EL2904 Logic Terminal (It's f/w)
+fbEL2904_FWvers_EcCoESdoRead(
+						sNetId			:= 		gc_sADSNetID, 
+						nSlaveAddr		:= 		gc_uiEL2904_EtherCATAdr, 
+						nSubIndex		:= 		0, 
+						nIndex			:= 		16#100A, 
+						pDstBuf			:=  	ADR(sEL2904_FWvers),
+						cbBufLen		:= 		SIZEOF(sEL2904_FWvers), 
+						bExecute		:= 		xExecute, 
+						tTimeout		:= 		T#2S, 
+						bBusy			=> 		xEL2904_FWvers_Busy, 
+						bError			=> 		xEL2904_FWvers_Err, 
+						nErrId			=> 		udiEL2904_FWvers_ErrID ) ;
+
+g_sHMI_EL2904_FWvers					:= 		sEL2904_FWvers ;
+
+// EL2904 FEATURES: Standard Output Active/Inactive
+//Standard outputs can be used to directly Enable/Disable a TwinSAFE output
+//if this feature is ACTIVE (Not Turn it ON/OFF, Allow it or not to turn ON!!!)
+IF C1.CV = 0 THEN
+fbEL2904_StandardOuts_ADSRead(
+						NETID			:= 		gc_sADSNetID, 
+						PORT			:= 		gc_uiEL2904_EtherCATAdr, 
+						IDXGRP			:= 		16#F302, 
+						IDXOFFS			:= 		16#80000001, 
+						LEN				:= 		1, 
+						DESTADDR		:=		ADR(bEL2904_StandardOuts), 
+						READ			:= 		xExecute, 
+						TMOUT			:= 		T#2S, 
+						BUSY			=> 		xEL2904_StandardsOuts_busy, 
+						ERR				=> 		xEL2904_StandardsOuts_Err, 
+						ERRID			=> 		udiEL2904_StandardsOutsID );
+
+g_xHMI_EL2904_StandardOuts				:= 		bEL2904_StandardOuts.0 ;
+END_IF ;
+
+//EL2904 FEATURES: Current Measurement Active/Inactive
+//Used to determine TwinSAFE output load current issues
+IF C1.CV = 2 THEN
+fbEL2904_CurrMeas_ADSRead(
+						NETID			:= 		gc_sADSNetID, 
+						PORT			:= 		gc_uiEL2904_EtherCATAdr, 
+						IDXGRP			:= 		16#F302, 
+						IDXOFFS			:= 		16#80000002, 
+						LEN				:= 		1, 
+						DESTADDR		:=		ADR(bEL2904_CurrMeas), 
+						READ			:= 		xExecute, 
+						TMOUT			:= 		T#2S, 
+						BUSY			=> 		xEL2904_CurrMeas_busy, 
+						ERR				=> 		xEL2904_CurrMeas_Err, 
+						ERRID			=> 		udiEL2904_CurrMeasID );
+
+g_xHMI_EL2904_CurrentMeas				:= 		bEL2904_CurrMeas.0 ;
+END_IF ;
+
+//EL2904 FEATURES: Test Pulses Active/Inactive
+//Used to determine TwinSAFE output wiring is correct
+IF C1.CV = 4 THEN
+fbEL2904_TestP_ADSRead(
+						NETID			:= 		gc_sADSNetID, 
+						PORT			:= 		gc_uiEL2904_EtherCATAdr, 
+						IDXGRP			:= 		16#F302, 
+						IDXOFFS			:= 		16#80000003, 
+						LEN				:= 		1, 
+						DESTADDR		:=		ADR(bEL2904_TestP), 
+						READ			:= 		xExecute, 
+						TMOUT			:= 		T#2S, 
+						BUSY			=> 		xEL2904_TestP_busy, 
+						ERR				=> 		xEL2904_TestP_Err, 
+						ERRID			=> 		udiEL2904_TestP_ID );
+
+g_xHMI_EL2904_TestPulses				:= 		bEL2904_TestP.0 ;
+END_IF ;
+
+//EL2904 FEATURES: Error Acknowledge Active/Inactive
+//Used to reset TwinSAFE output errors instead of forcing a cycle power
+//for a TwinSAFE output error
+IF C1.CV = 6 THEN
+fbEL2904_ErrAck_ADSRead(
+						NETID			:= 		gc_sADSNetID, 
+						PORT			:= 		gc_uiEL2904_EtherCATAdr, 
+						IDXGRP			:= 		16#F302, 
+						IDXOFFS			:= 		16#80000004, 
+						LEN				:= 		1, 
+						DESTADDR		:= 		ADR(bEL2904_ErrAck), 
+						READ			:= 		xExecute, 
+						TMOUT			:= 		T#2S, 
+						BUSY			=> 		xEL2904_ErrAck_busy, 
+						ERR				=> 		xEL2904_ErrAck_Err, 
+						ERRID			=> 		udiEL2904_ErrAck_ID );
+						
+
+g_xHMI_EL2904_ErrAck					:= 		bEL2904_ErrAck.0 ;
+END_IF ;
+
+// Read the Primary Micro Controller (MC1) Temperature in DegC out of the EL2904
+IF C1.CV = 2 THEN
+fbEL2904PriMCTemp_ADSRead(
+						NETID			:= 		gc_sADSNetID, 
+						PORT			:= 		gc_uiEL2904_EtherCATAdr, 
+						IDXGRP			:= 		16#F302, 
+						IDXOFFS			:= 		16#FA800001, 
+						LEN				:= 		2, 
+						DESTADDR		:=		ADR(wEL2904_PriMCTemp), 
+						READ			:= 		xExecute, 
+						TMOUT			:= 		T#2S, 
+						BUSY			=> 		xEL2904PriMCTemp_busy, 
+						ERR				=> 		xEL2904PriMCTemp_Err, 
+						ERRID			=> 		udiEL2904PriMCTemp_ErrID );
+
+g_wHMI_EL2904PriMCTemp 					:= 		wEL2904_PriMCTemp ;
+END_IF ;
+
+// Read the Secondary Micro Controller (MC2) Temperature in DegC out of the EL2904
+IF C1.CV = 2 THEN
+fbEL2904SecMCTemp_ADSRead(
+						NETID			:= 		gc_sADSNetID, 
+						PORT			:= 		gc_uiEL2904_EtherCATAdr, 
+						IDXGRP			:= 		16#F302, 
+						IDXOFFS			:= 		16#FA800002, 
+						LEN				:= 		2, 
+						DESTADDR		:=		ADR(wEL2904_SecMCTemp), 
+						READ			:= 		xExecute, 
+						TMOUT			:= 		T#2S, 
+						BUSY			=> 		xEL2904SecMCTemp_busy, 
+						ERR				=> 		xEL2904SecMCTemp_Err, 
+						ERRID			=> 		udiEL2904SecMCTemp_ErrID );
+
+g_wHMI_EL2904SecMCTemp 					:= 		wEL2904_SecMCTemp ;
+END_IF ;
+
+// Read the Primary Micro Controller (MC1) Voltage in mV out of the EL2904
+IF C1.CV = 3 THEN
+fbEL2904PriMCmV_ADSRead(
+						NETID			:= 		gc_sADSNetID, 
+						PORT			:= 		gc_uiEL2904_EtherCATAdr, 
+						IDXGRP			:= 		16#F302, 
+						IDXOFFS			:= 		16#FA810001, 
+						LEN				:= 		2, 
+						DESTADDR		:=		ADR(wEL2904_PriMCmV), 
+						READ			:= 		xExecute, 
+						TMOUT			:= 		T#2S, 
+						BUSY			=> 		xEL2904PriMCmV_busy, 
+						ERR				=> 		xEL2904PriMCmV_Err, 
+						ERRID			=> 		udiEL2904PriMCmV_ErrID );
+						
+g_wHMI_EL2904PriMC_Volts				:= 		WORD_TO_LREAL(wEL2904_PriMCmV) / 1000.0 ;
+END_IF ;
+
+// Read the Secondary Micro Controller (MC2) Voltage in mV out of the EL2904
+IF C1.CV = 3 THEN
+fbEL2904SecMCmV_ADSRead(
+						NETID			:= 		gc_sADSNetID, 
+						PORT			:= 		gc_uiEL2904_EtherCATAdr, 
+						IDXGRP			:= 		16#F302, 
+						IDXOFFS			:= 		16#FA810002, 
+						LEN				:= 		2, 
+						DESTADDR		:=		ADR(wEL2904_SecMCmV), 
+						READ			:= 		xExecute, 
+						TMOUT			:= 		T#2S, 
+						BUSY			=> 		xEL2904SecMCmV_busy, 
+						ERR				=> 		xEL2904SecMCmV_Err, 
+						ERRID			=> 		udiEL2904SecMCmV_ErrID );
+						
+g_wHMI_EL2904SecMC_Volts 				:= 		WORD_TO_LREAL(wEL2904_SecMCmV) / 1000.0 ;
+END_IF ;
+//	ELSE xReset := 1 ;
+//	END_IF ;
+//	
+//	EL2904 ALARMS
+//
+//EL2904: Error At The Output
+//Bit0-3 is External supply or cross-circuit Error
+//Bit4-7 is Open Load, Current Below 20mA, or Current Above Maximum Value of 500mA
+fbEL2904_OutErr_ADSRead(
+						NETID			:= 		gc_sADSNetID, 
+						PORT			:= 		gc_uiEL2904_EtherCATAdr, 
+						IDXGRP			:= 		16#F302, 
+						IDXOFFS			:= 		16#800E000C, 
+						LEN				:= 		2, 
+						DESTADDR		:=		ADR(wEL2904_OutErr), 
+						READ			:= 		xExecute, 
+						TMOUT			:= 		T#2S, 
+						BUSY			=> 		xEL2904_OutErr_busy, 
+						ERR				=> 		xEL2904_OutErr_Err, 
+						ERRID			=> 		udiEL2904_OutErr_ErrID );
+
+//These errors may only be present temporarily so they need to be latched and then cleared
+//to be properly noted by the operator
+g_xHMI_EL2904_ExtSup_CrossCirErr_Out1	:= 		wEL2904_OutErr.0 OR (g_xHMI_EL2904_ExtSup_CrossCirErr_Out1 AND NOT g_xHMI_EL2904_ErrClearPB) ;
+g_xHMI_EL2904_ExtSup_CrossCirErr_Out2	:= 		wEL2904_OutErr.1 OR (g_xHMI_EL2904_ExtSup_CrossCirErr_Out2 AND NOT g_xHMI_EL2904_ErrClearPB) ;
+g_xHMI_EL2904_ExtSup_CrossCirErr_Out3	:= 		wEL2904_OutErr.2 OR (g_xHMI_EL2904_ExtSup_CrossCirErr_Out3 AND NOT g_xHMI_EL2904_ErrClearPB) ;
+g_xHMI_EL2904_ExtSup_CrossCirErr_Out4	:= 		wEL2904_OutErr.3 OR (g_xHMI_EL2904_ExtSup_CrossCirErr_Out4 AND NOT g_xHMI_EL2904_ErrClearPB) ;
+g_xHMI_EL2904_OutLoadErr_Out1			:= 		wEL2904_OutErr.4 OR (g_xHMI_EL2904_OutLoadErr_Out1 AND NOT g_xHMI_EL2904_ErrClearPB) ;
+g_xHMI_EL2904_OutLoadErr_Out2			:= 		wEL2904_OutErr.5 OR (g_xHMI_EL2904_OutLoadErr_Out2 AND NOT g_xHMI_EL2904_ErrClearPB) ;
+g_xHMI_EL2904_OutLoadErr_Out3			:= 		wEL2904_OutErr.6 OR (g_xHMI_EL2904_OutLoadErr_Out3 AND NOT g_xHMI_EL2904_ErrClearPB) ;
+g_xHMI_EL2904_OutLoadErr_Out4			:= 		wEL2904_OutErr.7 OR (g_xHMI_EL2904_OutLoadErr_Out4 AND NOT g_xHMI_EL2904_ErrClearPB) ;
+
+
+//EL2904: Power Rail Supply Error - Field Potential Too High or Too Low
+//Field Voltage from the Power Rail Is Outside The Specification
+//Documentation says this is in 800E:0D but testing shows it's in 800E:0A
+//Value = 0x1101 when voltage is below 17.4 v
+//Value = 0x1110 when voltage is above 20.8 v
+fbEL2904_SupplyErr_ADSRead(
+						NETID			:= 		gc_sADSNetID, 
+						PORT			:= 		gc_uiEL2904_EtherCATAdr, 
+						IDXGRP			:= 		16#F302, 
+						IDXOFFS			:= 		16#800E000A, 
+						LEN				:= 		2, 
+						DESTADDR		:=		ADR(wEL2904_SupplyErr), 
+						READ			:= 		xExecute, 
+						TMOUT			:= 		T#2S, 
+						BUSY			=> 		xEL2904_SupplyErr_busy, 
+						ERR				=> 		xEL2904_SupplyErr_Err, 
+						ERRID			=> 		udiEL2904_SupplyErr_ErrID );
+
+//These errors may only be present temporarily so they need to be latched and then cleared
+//to be properly noted by the operator
+g_xHMI_EL2904_PwrRailVoltageHi			:= 		(NOT wEL2904_SupplyErr.0 AND wEL2904_SupplyErr.1 AND wEL2904_SupplyErr.2 AND wEL2904_SupplyErr.3) OR (g_xHMI_EL2904_PwrRailVoltageHi AND NOT g_xHMI_EL2904_ErrClearPB) ;
+g_xHMI_EL2904_PwrRailVoltageLo			:= 		(wEL2904_SupplyErr.0 AND wEL2904_SupplyErr.1 AND NOT wEL2904_SupplyErr.2 AND wEL2904_SupplyErr.3) OR (g_xHMI_EL2904_PwrRailVoltageLo AND NOT g_xHMI_EL2904_ErrClearPB) ;
+
+
+//EL2904: Temperature Error
+//There are two temperature sensors inside each Microcontroller and another
+//on the Output Circuit Board
+fbEL2904_TempErr_ADSRead(
+						NETID			:= 		gc_sADSNetID, 
+						PORT			:= 		gc_uiEL2904_EtherCATAdr, 
+						IDXGRP			:= 		16#F302, 
+						IDXOFFS			:= 		16#800E000E, 
+						LEN				:= 		2, 
+						DESTADDR		:=		ADR(wEL2904_TempErr), 
+						READ			:= 		xExecute, 
+						TMOUT			:= 		T#2S, 
+						BUSY			=> 		xEL2904_TempErr_busy, 
+						ERR				=> 		xEL2904_TempErr_Err, 
+						ERRID			=> 		udiEL2904_TempErr_ErrID );
+
+//These errors may only be present temporarily so they need to be latched and then cleared
+//to be properly noted by the operator
+g_xHMI_EL2904_TempErr_OTMc1				:= 		wEL2904_TempErr.0 OR (g_xHMI_EL2904_TempErr_OTMc1 AND NOT g_xHMI_EL2904_ErrClearPB) ;
+g_xHMI_EL2904_TempErr_OTMc2				:= 		wEL2904_TempErr.1 OR (g_xHMI_EL2904_TempErr_OTMc2 AND NOT g_xHMI_EL2904_ErrClearPB) ;
+g_xHMI_EL2904_TempErr_OTOutBoard		:= 		wEL2904_TempErr.2 OR (g_xHMI_EL2904_TempErr_OTOutBoard AND NOT g_xHMI_EL2904_ErrClearPB) ;
+g_xHMI_EL2904_TempErr_UTMc1				:= 		wEL2904_TempErr.3 OR (g_xHMI_EL2904_TempErr_UTMc1 AND NOT g_xHMI_EL2904_ErrClearPB) ;
+g_xHMI_EL2904_TempErr_UTMc2				:= 		wEL2904_TempErr.4 OR (g_xHMI_EL2904_TempErr_UTMc2 AND NOT g_xHMI_EL2904_ErrClearPB) ;
+g_xHMI_EL2904_TempErr_UTOutBoard		:= 		wEL2904_TempErr.5 OR (g_xHMI_EL2904_TempErr_UTOutBoard AND NOT g_xHMI_EL2904_ErrClearPB) ;
+g_xHMI_EL2904_TempErr_DiffOnBoard		:= 		wEL2904_TempErr.6 OR (g_xHMI_EL2904_TempErr_DiffOnBoard AND NOT g_xHMI_EL2904_ErrClearPB) ;
+g_xHMI_EL2904_TempErr_DiffBetweenMc1Mc2	:= 		wEL2904_TempErr.7 OR (g_xHMI_EL2904_TempErr_DiffBetweenMc1Mc2 AND NOT g_xHMI_EL2904_ErrClearPB) ;
+
+
+//Sum of all errors we know of in the EL2904 terminal
+IF 		g_xHMI_EL2904_ExtSup_CrossCirErr_Out1 
+	OR 	g_xHMI_EL2904_ExtSup_CrossCirErr_Out2
+	OR 	g_xHMI_EL2904_ExtSup_CrossCirErr_Out3 
+	OR 	g_xHMI_EL2904_ExtSup_CrossCirErr_Out4
+	OR 	g_xHMI_EL2904_OutLoadErr_Out1
+	OR 	g_xHMI_EL2904_OutLoadErr_Out2
+	OR 	g_xHMI_EL2904_OutLoadErr_Out3
+	OR 	g_xHMI_EL2904_OutLoadErr_Out4
+	OR	g_xHMI_EL2904_PwrRailVoltageHi
+	OR	g_xHMI_EL2904_PwrRailVoltageLo
+	OR	g_xHMI_EL2904_TempErr_OTMc1
+	OR	g_xHMI_EL2904_TempErr_OTMc2
+	OR	g_xHMI_EL2904_TempErr_OTOutBoard
+	OR	g_xHMI_EL2904_TempErr_UTMc1
+	OR	g_xHMI_EL2904_TempErr_UTMc2
+	OR	g_xHMI_EL2904_TempErr_UTOutBoard
+	OR	g_xHMI_EL2904_TempErr_DiffOnBoard
+	OR	g_xHMI_EL2904_TempErr_DiffBetweenMc1Mc2
+		THEN g_xHMI_EL2904_General_Error := TRUE ;
+		ELSE g_xHMI_EL2904_General_Error := FALSE ;
+END_IF ;
+]]></ST>
+    </Implementation>
+    <ObjectProperties />
+  </POU>
+</TcPlcObject>

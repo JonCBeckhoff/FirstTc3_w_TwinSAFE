@@ -1,0 +1,17 @@
+﻿<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.0.19">
+  <DUT Name="ST_MDP_DiskMngmntTBL4" Id="{f5c9c988-b6e0-4962-b649-7cb0df6fda75}">
+    <Declaration><![CDATA[TYPE ST_MDP_DiskMngmntTBL4 :
+STRUCT
+	uiLen				:UINT;	// Length
+	udiDriveType1		:UDINT;	// DRV_UNKNOWN = 0, DRV_FIXED = 1, DRV_REMOVABLE = 2, DRV_CDROM = 4 
+	udiDriveType2		:UDINT;	// DRV_UNKNOWN = 0, DRV_FIXED = 1, DRV_REMOVABLE = 2, DRV_CDROM = 4 
+	udiDriveType3		:UDINT;	// DRV_UNKNOWN = 0, DRV_FIXED = 1, DRV_REMOVABLE = 2, DRV_CDROM = 4 
+	udiDriveType4		:UDINT;	// DRV_UNKNOWN = 0, DRV_FIXED = 1, DRV_REMOVABLE = 2, DRV_CDROM = 4 
+	udiDriveType5		:UDINT;	// DRV_UNKNOWN = 0, DRV_FIXED = 1, DRV_REMOVABLE = 2, DRV_CDROM = 4 
+	udiDriveType6		:UDINT;	// DRV_UNKNOWN = 0, DRV_FIXED = 1, DRV_REMOVABLE = 2, DRV_CDROM = 4 
+END_STRUCT
+END_TYPE
+]]></Declaration>
+    <ObjectProperties />
+  </DUT>
+</TcPlcObject>

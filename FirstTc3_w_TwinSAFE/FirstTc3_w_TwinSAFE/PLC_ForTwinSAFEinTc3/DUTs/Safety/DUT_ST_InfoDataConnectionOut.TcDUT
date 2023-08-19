@@ -1,0 +1,14 @@
+﻿<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.0.18">
+  <DUT Name="DUT_ST_InfoDataConnectionOut" Id="{8218585f-880a-4934-8db7-eadbe0ed82b7}">
+    <Declaration><![CDATA[TYPE DUT_ST_InfoDataConnectionOut :
+STRUCT
+	///  Safety output connections use this structure
+	usiMapState					: 	USINT ;
+	usiMapDiag					: 	USINT ;
+	byOutputSignals				: 	BYTE ;
+END_STRUCT
+END_TYPE
+]]></Declaration>
+    <ObjectProperties />
+  </DUT>
+</TcPlcObject>

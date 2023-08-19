@@ -1,0 +1,17 @@
+﻿<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.0.19">
+  <DUT Name="ST_MDP_DiskMngmntTBL1" Id="{73bcc8cb-9d5f-40a9-be30-5c5bb7acc72f}">
+    <Declaration><![CDATA[TYPE ST_MDP_DiskMngmntTBL1 :
+STRUCT
+	uiLen				:UINT;			// Length
+	sDriveLetter1		:STRING(8);		// Drive Letter
+	sDriveLetter2		:STRING(8);		// Drive Letter
+	sDriveLetter3		:STRING(8);		// Drive Letter
+	sDriveLetter4		:STRING(8);		// Drive Letter
+	sDriveLetter5		:STRING(8);		// Drive Letter
+	sDriveLetter6		:STRING(8);		// Drive Letter
+END_STRUCT
+END_TYPE
+]]></Declaration>
+    <ObjectProperties />
+  </DUT>
+</TcPlcObject>

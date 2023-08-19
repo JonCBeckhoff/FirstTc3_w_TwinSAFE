@@ -1,0 +1,246 @@
+﻿<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.0.18">
+  <POU Name="FB_MDP_Time_ReadTBL2" Id="{ac61db4f-5896-44d0-807c-9a36a6778bf6}">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_MDP_Time_ReadTBL2
+
+VAR_INPUT
+	xExecute				: BOOL;								// Function block execution is triggered by a rising edge at this input
+	tTimeout				: TIME		:= DEFAULT_ADS_TIMEOUT;	// States the time before the function is cancelled
+	usiModIdx				: USINT		:= 0;					// Index number of chosen MDP device
+	sAmsNetId				: T_AmsNetId;						// keep empty '' for the local device
+END_VAR
+
+VAR_OUTPUT
+	xBusy					: BOOL;
+	xError					: BOOL;
+	udiErrID				: UDINT;
+	usiErrPos				: USINT;							// If a subindex is not supported, iErrPos indicates at which subindex the error appears first
+	stMDP_ModuleHeader		: ST_MDP_ModuleHeader;
+	stMDP_ModuleContent		: ST_MDP_TimeTBL2;	
+END_VAR
+
+VAR
+	fbMDP_ReadModule		: FB_MDP_ReadModule;
+	arrData					: ARRAY[0..3000] OF BYTE;				// requested data
+	arrStartIdx				: ARRAY[0..102] OF UINT;				// startindexes in bytes of each subindex element
+
+	stMDP_Addr				: ST_MDP_Addr;
+	eModuleType				: E_MDP_ModuleType;
+	usiSubIdxCount			: USINT;
+
+	xSubExecute				: BOOL;
+	xReadBusy				: BOOL;
+
+	RisingEdge				: R_TRIG;
+	TimeOut					: TON;								// general timeout	
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[RisingEdge( CLK					:= xExecute );
+IF NOT xBusy THEN										// FB only react to the external execute if it is not busy
+	IF RisingEdge.Q THEN
+		xBusy					:= TRUE;
+
+		// reset variables
+		xError					:= FALSE;
+		udiErrID				:= 0;
+		usiErrPos				:= 0;
+		xSubExecute				:= TRUE;
+
+		// specific values for Mainboard content
+		stMDP_Addr.nArea		:= 16#08;
+//		stMDP_Addr.nModuleId;							will be allocated dynamically
+		stMDP_Addr.nTableId		:= 16#02;
+//		stMDP_Addr.nFlag;								not used up to now
+//		stMDP_Addr.nSubIdx;								all subindexes will be requested
+		eModuleType				:= eMDP_ModT_Time;
+		usiSubIdxCount			:= 102;					// TableId 16#01 contains 101 elements
+
+		MEMSET( ADR(arrData), 0, SIZEOF(arrData) );		// reset buffer
+
+		TimeOut(IN 				:= FALSE);
+		TimeOut(PT 				:= tTimeout, IN 	:= TRUE);
+	END_IF
+END_IF
+
+
+IF xBusy THEN
+	IF xSubExecute THEN
+		xSubExecute 			:= FALSE;
+
+		fbMDP_ReadModule( bExecute := FALSE );
+		fbMDP_ReadModule(
+			stMDP_Addr			:= stMDP_Addr,
+			eModuleType			:= eModuleType,
+			iModIdx				:= usiModIdx,
+			iSubIdxCount		:= usiSubIdxCount,
+			bExecute			:= TRUE,
+			tTimeout			:= tTimeout,
+			pDstBuf				:= ADR(arrData),
+			cbDstBufLen			:= SIZEOF(arrData),
+			sAmsNetId			:= sAmsNetId,
+
+			bBusy				=> xReadBusy,
+			bError				=> xError,
+			nErrID				=> udiErrID,
+			iErrPos				=> usiErrPos,
+			stMDP_DynAddr		=> ,
+			iModuleTypeCount	=> ,
+			iModuleCount		=> ,
+			stMDP_ModuleHeader	=> ,
+			arrStartIdx			=> ,
+		);
+	ELSE
+		fbMDP_ReadModule(
+			bExecute			:= FALSE,
+
+			bBusy				=> xReadBusy,
+			bError				=> xError,
+			nErrID 				=> udiErrID,
+			iErrPos				=> usiErrPos,
+		 );
+		IF NOT xReadBusy THEN
+			// allocate received module header
+			stMDP_ModuleHeader	:= fbMDP_ReadModule.stMDP_ModuleHeader;
+			// allocate information of startindexes in data buffer
+			MEMCPY(ADR(arrStartIdx), ADR(fbMDP_ReadModule.arrStartIdx), SIZEOF(arrStartIdx) );
+			// reset module content struct
+			MEMSET( ADR(stMDP_ModuleContent), 0, SIZEOF(stMDP_ModuleContent) );
+			// allocate received data to NIC struct
+			stMDP_ModuleContent.uiLen		:= arrData[0];
+			MEMCPY(ADR(stMDP_ModuleContent.sTimezone1),		ADR(arrData)+arrStartIdx[1],	MIN(arrStartIdx[2]-arrStartIdx[1],		SIZEOF(stMDP_ModuleContent.sTimezone1))     );
+			MEMCPY(ADR(stMDP_ModuleContent.sTimezone2),		ADR(arrData)+arrStartIdx[2],	MIN(arrStartIdx[3]-arrStartIdx[2],		SIZEOF(stMDP_ModuleContent.sTimezone2))     );
+			MEMCPY(ADR(stMDP_ModuleContent.sTimezone3),		ADR(arrData)+arrStartIdx[3],	MIN(arrStartIdx[4]-arrStartIdx[3],		SIZEOF(stMDP_ModuleContent.sTimezone3))     );
+			MEMCPY(ADR(stMDP_ModuleContent.sTimezone4),		ADR(arrData)+arrStartIdx[4],	MIN(arrStartIdx[5]-arrStartIdx[4],		SIZEOF(stMDP_ModuleContent.sTimezone4))     );
+			MEMCPY(ADR(stMDP_ModuleContent.sTimezone5),		ADR(arrData)+arrStartIdx[5],	MIN(arrStartIdx[6]-arrStartIdx[5],		SIZEOF(stMDP_ModuleContent.sTimezone5))     );
+			MEMCPY(ADR(stMDP_ModuleContent.sTimezone6),		ADR(arrData)+arrStartIdx[6],	MIN(arrStartIdx[7]-arrStartIdx[6],		SIZEOF(stMDP_ModuleContent.sTimezone6))     );
+			MEMCPY(ADR(stMDP_ModuleContent.sTimezone7),		ADR(arrData)+arrStartIdx[7],	MIN(arrStartIdx[8]-arrStartIdx[7],		SIZEOF(stMDP_ModuleContent.sTimezone7))     );
+			MEMCPY(ADR(stMDP_ModuleContent.sTimezone8),		ADR(arrData)+arrStartIdx[8],	MIN(arrStartIdx[9]-arrStartIdx[8],		SIZEOF(stMDP_ModuleContent.sTimezone8))     );
+			MEMCPY(ADR(stMDP_ModuleContent.sTimezone9),		ADR(arrData)+arrStartIdx[9],	MIN(arrStartIdx[10]-arrStartIdx[9],		SIZEOF(stMDP_ModuleContent.sTimezone9))     );
+			MEMCPY(ADR(stMDP_ModuleContent.sTimezone10),	ADR(arrData)+arrStartIdx[10],	MIN(arrStartIdx[11]-arrStartIdx[10],	SIZEOF(stMDP_ModuleContent.sTimezone10))     );
+			MEMCPY(ADR(stMDP_ModuleContent.sTimezone11),	ADR(arrData)+arrStartIdx[11],	MIN(arrStartIdx[12]-arrStartIdx[11],	SIZEOF(stMDP_ModuleContent.sTimezone11))     );
+			MEMCPY(ADR(stMDP_ModuleContent.sTimezone12),	ADR(arrData)+arrStartIdx[12],	MIN(arrStartIdx[13]-arrStartIdx[12],	SIZEOF(stMDP_ModuleContent.sTimezone12))     );
+			MEMCPY(ADR(stMDP_ModuleContent.sTimezone13),	ADR(arrData)+arrStartIdx[13],	MIN(arrStartIdx[14]-arrStartIdx[13],	SIZEOF(stMDP_ModuleContent.sTimezone13))     );
+			MEMCPY(ADR(stMDP_ModuleContent.sTimezone14),	ADR(arrData)+arrStartIdx[14],	MIN(arrStartIdx[15]-arrStartIdx[14],	SIZEOF(stMDP_ModuleContent.sTimezone14))     );
+			MEMCPY(ADR(stMDP_ModuleContent.sTimezone15),	ADR(arrData)+arrStartIdx[15],	MIN(arrStartIdx[16]-arrStartIdx[15],	SIZEOF(stMDP_ModuleContent.sTimezone15))     );
+			MEMCPY(ADR(stMDP_ModuleContent.sTimezone16),	ADR(arrData)+arrStartIdx[16],	MIN(arrStartIdx[17]-arrStartIdx[16],	SIZEOF(stMDP_ModuleContent.sTimezone16))     );
+			MEMCPY(ADR(stMDP_ModuleContent.sTimezone17),	ADR(arrData)+arrStartIdx[17],	MIN(arrStartIdx[18]-arrStartIdx[17],	SIZEOF(stMDP_ModuleContent.sTimezone17))     );
+			MEMCPY(ADR(stMDP_ModuleContent.sTimezone18),	ADR(arrData)+arrStartIdx[18],	MIN(arrStartIdx[19]-arrStartIdx[18],	SIZEOF(stMDP_ModuleContent.sTimezone18))     );
+			MEMCPY(ADR(stMDP_ModuleContent.sTimezone19),	ADR(arrData)+arrStartIdx[19],	MIN(arrStartIdx[20]-arrStartIdx[19],	SIZEOF(stMDP_ModuleContent.sTimezone19))     );
+			MEMCPY(ADR(stMDP_ModuleContent.sTimezone20),	ADR(arrData)+arrStartIdx[20],	MIN(arrStartIdx[21]-arrStartIdx[20],	SIZEOF(stMDP_ModuleContent.sTimezone20))     );
+			MEMCPY(ADR(stMDP_ModuleContent.sTimezone21),	ADR(arrData)+arrStartIdx[21],	MIN(arrStartIdx[22]-arrStartIdx[21],	SIZEOF(stMDP_ModuleContent.sTimezone21))     );
+			MEMCPY(ADR(stMDP_ModuleContent.sTimezone22),	ADR(arrData)+arrStartIdx[22],	MIN(arrStartIdx[23]-arrStartIdx[22],	SIZEOF(stMDP_ModuleContent.sTimezone22))     );
+			MEMCPY(ADR(stMDP_ModuleContent.sTimezone23),	ADR(arrData)+arrStartIdx[23],	MIN(arrStartIdx[24]-arrStartIdx[23],	SIZEOF(stMDP_ModuleContent.sTimezone23))     );
+			MEMCPY(ADR(stMDP_ModuleContent.sTimezone24),	ADR(arrData)+arrStartIdx[24],	MIN(arrStartIdx[25]-arrStartIdx[24],	SIZEOF(stMDP_ModuleContent.sTimezone24))     );
+			MEMCPY(ADR(stMDP_ModuleContent.sTimezone25),	ADR(arrData)+arrStartIdx[25],	MIN(arrStartIdx[26]-arrStartIdx[25],	SIZEOF(stMDP_ModuleContent.sTimezone25))     );
+			MEMCPY(ADR(stMDP_ModuleContent.sTimezone26),	ADR(arrData)+arrStartIdx[26],	MIN(arrStartIdx[27]-arrStartIdx[26],	SIZEOF(stMDP_ModuleContent.sTimezone26))     );
+			MEMCPY(ADR(stMDP_ModuleContent.sTimezone27),	ADR(arrData)+arrStartIdx[27],	MIN(arrStartIdx[28]-arrStartIdx[27],	SIZEOF(stMDP_ModuleContent.sTimezone27))     );
+			MEMCPY(ADR(stMDP_ModuleContent.sTimezone28),	ADR(arrData)+arrStartIdx[28],	MIN(arrStartIdx[29]-arrStartIdx[28],	SIZEOF(stMDP_ModuleContent.sTimezone28))     );
+			MEMCPY(ADR(stMDP_ModuleContent.sTimezone29),	ADR(arrData)+arrStartIdx[29],	MIN(arrStartIdx[30]-arrStartIdx[29],	SIZEOF(stMDP_ModuleContent.sTimezone29))     );
+			MEMCPY(ADR(stMDP_ModuleContent.sTimezone30),	ADR(arrData)+arrStartIdx[30],	MIN(arrStartIdx[31]-arrStartIdx[30],	SIZEOF(stMDP_ModuleContent.sTimezone30))     );			
+			MEMCPY(ADR(stMDP_ModuleContent.sTimezone31),	ADR(arrData)+arrStartIdx[31],	MIN(arrStartIdx[32]-arrStartIdx[31],	SIZEOF(stMDP_ModuleContent.sTimezone31))     );
+			MEMCPY(ADR(stMDP_ModuleContent.sTimezone32),	ADR(arrData)+arrStartIdx[32],	MIN(arrStartIdx[33]-arrStartIdx[32],	SIZEOF(stMDP_ModuleContent.sTimezone32))     );
+			MEMCPY(ADR(stMDP_ModuleContent.sTimezone33),	ADR(arrData)+arrStartIdx[33],	MIN(arrStartIdx[34]-arrStartIdx[33],	SIZEOF(stMDP_ModuleContent.sTimezone33))     );
+			MEMCPY(ADR(stMDP_ModuleContent.sTimezone34),	ADR(arrData)+arrStartIdx[34],	MIN(arrStartIdx[35]-arrStartIdx[34],	SIZEOF(stMDP_ModuleContent.sTimezone34))     );
+			MEMCPY(ADR(stMDP_ModuleContent.sTimezone35),	ADR(arrData)+arrStartIdx[35],	MIN(arrStartIdx[36]-arrStartIdx[35],	SIZEOF(stMDP_ModuleContent.sTimezone35))     );
+			MEMCPY(ADR(stMDP_ModuleContent.sTimezone36),	ADR(arrData)+arrStartIdx[36],	MIN(arrStartIdx[37]-arrStartIdx[36],	SIZEOF(stMDP_ModuleContent.sTimezone36))     );
+			MEMCPY(ADR(stMDP_ModuleContent.sTimezone37),	ADR(arrData)+arrStartIdx[37],	MIN(arrStartIdx[38]-arrStartIdx[37],	SIZEOF(stMDP_ModuleContent.sTimezone37))     );
+			MEMCPY(ADR(stMDP_ModuleContent.sTimezone38),	ADR(arrData)+arrStartIdx[38],	MIN(arrStartIdx[39]-arrStartIdx[38],	SIZEOF(stMDP_ModuleContent.sTimezone38))     );
+			MEMCPY(ADR(stMDP_ModuleContent.sTimezone39),	ADR(arrData)+arrStartIdx[39],	MIN(arrStartIdx[40]-arrStartIdx[39],	SIZEOF(stMDP_ModuleContent.sTimezone39))     );
+			MEMCPY(ADR(stMDP_ModuleContent.sTimezone40),	ADR(arrData)+arrStartIdx[40],	MIN(arrStartIdx[41]-arrStartIdx[40],	SIZEOF(stMDP_ModuleContent.sTimezone40))     );
+			MEMCPY(ADR(stMDP_ModuleContent.sTimezone41),	ADR(arrData)+arrStartIdx[41],	MIN(arrStartIdx[42]-arrStartIdx[41],	SIZEOF(stMDP_ModuleContent.sTimezone41))     );
+			MEMCPY(ADR(stMDP_ModuleContent.sTimezone42),	ADR(arrData)+arrStartIdx[42],	MIN(arrStartIdx[43]-arrStartIdx[42],	SIZEOF(stMDP_ModuleContent.sTimezone42))     );
+			MEMCPY(ADR(stMDP_ModuleContent.sTimezone43),	ADR(arrData)+arrStartIdx[43],	MIN(arrStartIdx[44]-arrStartIdx[43],	SIZEOF(stMDP_ModuleContent.sTimezone43))     );
+			MEMCPY(ADR(stMDP_ModuleContent.sTimezone44),	ADR(arrData)+arrStartIdx[44],	MIN(arrStartIdx[45]-arrStartIdx[44],	SIZEOF(stMDP_ModuleContent.sTimezone44))     );
+			MEMCPY(ADR(stMDP_ModuleContent.sTimezone45),	ADR(arrData)+arrStartIdx[45],	MIN(arrStartIdx[46]-arrStartIdx[45],	SIZEOF(stMDP_ModuleContent.sTimezone45))     );
+			MEMCPY(ADR(stMDP_ModuleContent.sTimezone46),	ADR(arrData)+arrStartIdx[46],	MIN(arrStartIdx[47]-arrStartIdx[46],	SIZEOF(stMDP_ModuleContent.sTimezone46))     );
+			MEMCPY(ADR(stMDP_ModuleContent.sTimezone47),	ADR(arrData)+arrStartIdx[47],	MIN(arrStartIdx[48]-arrStartIdx[47],	SIZEOF(stMDP_ModuleContent.sTimezone47))     );
+			MEMCPY(ADR(stMDP_ModuleContent.sTimezone48),	ADR(arrData)+arrStartIdx[48],	MIN(arrStartIdx[49]-arrStartIdx[48],	SIZEOF(stMDP_ModuleContent.sTimezone48))     );
+			MEMCPY(ADR(stMDP_ModuleContent.sTimezone49),	ADR(arrData)+arrStartIdx[49],	MIN(arrStartIdx[50]-arrStartIdx[49],	SIZEOF(stMDP_ModuleContent.sTimezone49))     );
+			MEMCPY(ADR(stMDP_ModuleContent.sTimezone50),	ADR(arrData)+arrStartIdx[50],	MIN(arrStartIdx[51]-arrStartIdx[50],	SIZEOF(stMDP_ModuleContent.sTimezone50))     );		
+			MEMCPY(ADR(stMDP_ModuleContent.sTimezone51),	ADR(arrData)+arrStartIdx[51],	MIN(arrStartIdx[52]-arrStartIdx[51],	SIZEOF(stMDP_ModuleContent.sTimezone51))     );
+			MEMCPY(ADR(stMDP_ModuleContent.sTimezone52),	ADR(arrData)+arrStartIdx[52],	MIN(arrStartIdx[53]-arrStartIdx[52],	SIZEOF(stMDP_ModuleContent.sTimezone52))     );
+			MEMCPY(ADR(stMDP_ModuleContent.sTimezone53),	ADR(arrData)+arrStartIdx[53],	MIN(arrStartIdx[54]-arrStartIdx[53],	SIZEOF(stMDP_ModuleContent.sTimezone53))     );
+			MEMCPY(ADR(stMDP_ModuleContent.sTimezone54),	ADR(arrData)+arrStartIdx[54],	MIN(arrStartIdx[55]-arrStartIdx[54],	SIZEOF(stMDP_ModuleContent.sTimezone54))     );
+			MEMCPY(ADR(stMDP_ModuleContent.sTimezone55),	ADR(arrData)+arrStartIdx[55],	MIN(arrStartIdx[56]-arrStartIdx[55],	SIZEOF(stMDP_ModuleContent.sTimezone55))     );
+			MEMCPY(ADR(stMDP_ModuleContent.sTimezone56),	ADR(arrData)+arrStartIdx[56],	MIN(arrStartIdx[57]-arrStartIdx[56],	SIZEOF(stMDP_ModuleContent.sTimezone56))     );
+			MEMCPY(ADR(stMDP_ModuleContent.sTimezone57),	ADR(arrData)+arrStartIdx[57],	MIN(arrStartIdx[58]-arrStartIdx[57],	SIZEOF(stMDP_ModuleContent.sTimezone57))     );
+			MEMCPY(ADR(stMDP_ModuleContent.sTimezone58),	ADR(arrData)+arrStartIdx[58],	MIN(arrStartIdx[59]-arrStartIdx[58],	SIZEOF(stMDP_ModuleContent.sTimezone58))     );
+			MEMCPY(ADR(stMDP_ModuleContent.sTimezone59),	ADR(arrData)+arrStartIdx[59],	MIN(arrStartIdx[60]-arrStartIdx[59],	SIZEOF(stMDP_ModuleContent.sTimezone59))     );
+			MEMCPY(ADR(stMDP_ModuleContent.sTimezone60),	ADR(arrData)+arrStartIdx[60],	MIN(arrStartIdx[61]-arrStartIdx[60],	SIZEOF(stMDP_ModuleContent.sTimezone60))     );
+			MEMCPY(ADR(stMDP_ModuleContent.sTimezone61),	ADR(arrData)+arrStartIdx[61],	MIN(arrStartIdx[62]-arrStartIdx[61],	SIZEOF(stMDP_ModuleContent.sTimezone61))     );
+			MEMCPY(ADR(stMDP_ModuleContent.sTimezone62),	ADR(arrData)+arrStartIdx[62],	MIN(arrStartIdx[63]-arrStartIdx[62],	SIZEOF(stMDP_ModuleContent.sTimezone62))     );
+			MEMCPY(ADR(stMDP_ModuleContent.sTimezone63),	ADR(arrData)+arrStartIdx[63],	MIN(arrStartIdx[64]-arrStartIdx[63],	SIZEOF(stMDP_ModuleContent.sTimezone63))     );
+			MEMCPY(ADR(stMDP_ModuleContent.sTimezone64),	ADR(arrData)+arrStartIdx[64],	MIN(arrStartIdx[65]-arrStartIdx[64],	SIZEOF(stMDP_ModuleContent.sTimezone64))     );
+			MEMCPY(ADR(stMDP_ModuleContent.sTimezone65),	ADR(arrData)+arrStartIdx[65],	MIN(arrStartIdx[66]-arrStartIdx[65],	SIZEOF(stMDP_ModuleContent.sTimezone65))     );
+			MEMCPY(ADR(stMDP_ModuleContent.sTimezone66),	ADR(arrData)+arrStartIdx[66],	MIN(arrStartIdx[67]-arrStartIdx[66],	SIZEOF(stMDP_ModuleContent.sTimezone66))     );
+			MEMCPY(ADR(stMDP_ModuleContent.sTimezone67),	ADR(arrData)+arrStartIdx[67],	MIN(arrStartIdx[68]-arrStartIdx[67],	SIZEOF(stMDP_ModuleContent.sTimezone67))     );
+			MEMCPY(ADR(stMDP_ModuleContent.sTimezone68),	ADR(arrData)+arrStartIdx[68],	MIN(arrStartIdx[69]-arrStartIdx[68],	SIZEOF(stMDP_ModuleContent.sTimezone68))     );
+			MEMCPY(ADR(stMDP_ModuleContent.sTimezone69),	ADR(arrData)+arrStartIdx[69],	MIN(arrStartIdx[70]-arrStartIdx[69],	SIZEOF(stMDP_ModuleContent.sTimezone69))     );
+			MEMCPY(ADR(stMDP_ModuleContent.sTimezone70),	ADR(arrData)+arrStartIdx[70],	MIN(arrStartIdx[71]-arrStartIdx[70],	SIZEOF(stMDP_ModuleContent.sTimezone70))     );			
+			MEMCPY(ADR(stMDP_ModuleContent.sTimezone71),	ADR(arrData)+arrStartIdx[71],	MIN(arrStartIdx[72]-arrStartIdx[71],	SIZEOF(stMDP_ModuleContent.sTimezone71))     );
+			MEMCPY(ADR(stMDP_ModuleContent.sTimezone72),	ADR(arrData)+arrStartIdx[72],	MIN(arrStartIdx[73]-arrStartIdx[72],	SIZEOF(stMDP_ModuleContent.sTimezone72))     );
+			MEMCPY(ADR(stMDP_ModuleContent.sTimezone73),	ADR(arrData)+arrStartIdx[73],	MIN(arrStartIdx[74]-arrStartIdx[73],	SIZEOF(stMDP_ModuleContent.sTimezone73))     );
+			MEMCPY(ADR(stMDP_ModuleContent.sTimezone74),	ADR(arrData)+arrStartIdx[74],	MIN(arrStartIdx[75]-arrStartIdx[74],	SIZEOF(stMDP_ModuleContent.sTimezone74))     );
+			MEMCPY(ADR(stMDP_ModuleContent.sTimezone75),	ADR(arrData)+arrStartIdx[75],	MIN(arrStartIdx[76]-arrStartIdx[75],	SIZEOF(stMDP_ModuleContent.sTimezone75))     );
+			MEMCPY(ADR(stMDP_ModuleContent.sTimezone76),	ADR(arrData)+arrStartIdx[76],	MIN(arrStartIdx[77]-arrStartIdx[76],	SIZEOF(stMDP_ModuleContent.sTimezone76))     );
+			MEMCPY(ADR(stMDP_ModuleContent.sTimezone77),	ADR(arrData)+arrStartIdx[77],	MIN(arrStartIdx[78]-arrStartIdx[77],	SIZEOF(stMDP_ModuleContent.sTimezone77))     );
+			MEMCPY(ADR(stMDP_ModuleContent.sTimezone78),	ADR(arrData)+arrStartIdx[78],	MIN(arrStartIdx[79]-arrStartIdx[78],	SIZEOF(stMDP_ModuleContent.sTimezone78))     );
+			MEMCPY(ADR(stMDP_ModuleContent.sTimezone79),	ADR(arrData)+arrStartIdx[79],	MIN(arrStartIdx[80]-arrStartIdx[79],	SIZEOF(stMDP_ModuleContent.sTimezone79))     );
+			MEMCPY(ADR(stMDP_ModuleContent.sTimezone80),	ADR(arrData)+arrStartIdx[80],	MIN(arrStartIdx[81]-arrStartIdx[80],	SIZEOF(stMDP_ModuleContent.sTimezone80))     );
+			MEMCPY(ADR(stMDP_ModuleContent.sTimezone81),	ADR(arrData)+arrStartIdx[81],	MIN(arrStartIdx[82]-arrStartIdx[81],	SIZEOF(stMDP_ModuleContent.sTimezone81))     );
+			MEMCPY(ADR(stMDP_ModuleContent.sTimezone82),	ADR(arrData)+arrStartIdx[82],	MIN(arrStartIdx[83]-arrStartIdx[82],	SIZEOF(stMDP_ModuleContent.sTimezone82))     );
+			MEMCPY(ADR(stMDP_ModuleContent.sTimezone83),	ADR(arrData)+arrStartIdx[83],	MIN(arrStartIdx[84]-arrStartIdx[83],	SIZEOF(stMDP_ModuleContent.sTimezone83))     );
+			MEMCPY(ADR(stMDP_ModuleContent.sTimezone84),	ADR(arrData)+arrStartIdx[84],	MIN(arrStartIdx[85]-arrStartIdx[84],	SIZEOF(stMDP_ModuleContent.sTimezone84))     );
+			MEMCPY(ADR(stMDP_ModuleContent.sTimezone85),	ADR(arrData)+arrStartIdx[85],	MIN(arrStartIdx[86]-arrStartIdx[85],	SIZEOF(stMDP_ModuleContent.sTimezone85))     );
+			MEMCPY(ADR(stMDP_ModuleContent.sTimezone86),	ADR(arrData)+arrStartIdx[86],	MIN(arrStartIdx[87]-arrStartIdx[86],	SIZEOF(stMDP_ModuleContent.sTimezone86))     );
+			MEMCPY(ADR(stMDP_ModuleContent.sTimezone87),	ADR(arrData)+arrStartIdx[87],	MIN(arrStartIdx[88]-arrStartIdx[87],	SIZEOF(stMDP_ModuleContent.sTimezone87))     );
+			MEMCPY(ADR(stMDP_ModuleContent.sTimezone88),	ADR(arrData)+arrStartIdx[88],	MIN(arrStartIdx[89]-arrStartIdx[88],	SIZEOF(stMDP_ModuleContent.sTimezone88))     );
+			MEMCPY(ADR(stMDP_ModuleContent.sTimezone89),	ADR(arrData)+arrStartIdx[89],	MIN(arrStartIdx[90]-arrStartIdx[89],	SIZEOF(stMDP_ModuleContent.sTimezone89))     );
+			MEMCPY(ADR(stMDP_ModuleContent.sTimezone90),	ADR(arrData)+arrStartIdx[90],	MIN(arrStartIdx[91]-arrStartIdx[90],	SIZEOF(stMDP_ModuleContent.sTimezone90))     );
+			MEMCPY(ADR(stMDP_ModuleContent.sTimezone91),	ADR(arrData)+arrStartIdx[91],	MIN(arrStartIdx[92]-arrStartIdx[91],	SIZEOF(stMDP_ModuleContent.sTimezone91))     );
+			MEMCPY(ADR(stMDP_ModuleContent.sTimezone92),	ADR(arrData)+arrStartIdx[92],	MIN(arrStartIdx[93]-arrStartIdx[92],	SIZEOF(stMDP_ModuleContent.sTimezone92))     );
+			MEMCPY(ADR(stMDP_ModuleContent.sTimezone93),	ADR(arrData)+arrStartIdx[93],	MIN(arrStartIdx[94]-arrStartIdx[93],	SIZEOF(stMDP_ModuleContent.sTimezone93))     );
+			MEMCPY(ADR(stMDP_ModuleContent.sTimezone94),	ADR(arrData)+arrStartIdx[94],	MIN(arrStartIdx[95]-arrStartIdx[94],	SIZEOF(stMDP_ModuleContent.sTimezone94))     );
+			MEMCPY(ADR(stMDP_ModuleContent.sTimezone95),	ADR(arrData)+arrStartIdx[95],	MIN(arrStartIdx[96]-arrStartIdx[95],	SIZEOF(stMDP_ModuleContent.sTimezone95))     );
+			MEMCPY(ADR(stMDP_ModuleContent.sTimezone96),	ADR(arrData)+arrStartIdx[96],	MIN(arrStartIdx[97]-arrStartIdx[96],	SIZEOF(stMDP_ModuleContent.sTimezone96))     );
+			MEMCPY(ADR(stMDP_ModuleContent.sTimezone97),	ADR(arrData)+arrStartIdx[97],	MIN(arrStartIdx[98]-arrStartIdx[97],	SIZEOF(stMDP_ModuleContent.sTimezone97))     );
+			MEMCPY(ADR(stMDP_ModuleContent.sTimezone98),	ADR(arrData)+arrStartIdx[98],	MIN(arrStartIdx[99]-arrStartIdx[98],	SIZEOF(stMDP_ModuleContent.sTimezone98))     );
+			MEMCPY(ADR(stMDP_ModuleContent.sTimezone99),	ADR(arrData)+arrStartIdx[99],	MIN(arrStartIdx[100]-arrStartIdx[99],	SIZEOF(stMDP_ModuleContent.sTimezone99))     );
+			MEMCPY(ADR(stMDP_ModuleContent.sTimezone100),	ADR(arrData)+arrStartIdx[100],	MIN(arrStartIdx[101]-arrStartIdx[100],	SIZEOF(stMDP_ModuleContent.sTimezone100))     );
+			MEMCPY(ADR(stMDP_ModuleContent.sTimezone101),	ADR(arrData)+arrStartIdx[101],	MIN(arrStartIdx[102]-arrStartIdx[101],	SIZEOF(stMDP_ModuleContent.sTimezone101))     );
+
+			// reset FB
+			xBusy 				:= FALSE;
+		END_IF
+	END_IF
+
+	// check timeout
+	TimeOut();
+	IF TimeOut.Q THEN
+		TimeOut(IN 				:= FALSE);
+		xError					:= TRUE;
+		udiErrID				:= INT_TO_UINT(eMDP_Err_PLC) * 16#10000 + INT_TO_UINT(eMDP_ErrPLC_TimeOut);
+	END_IF
+END_IF
+
+IF xError THEN
+	// reset FB
+	xBusy 						:= FALSE;
+END_IF]]></ST>
+    </Implementation>
+    <ObjectProperties>﻿<XmlArchive>
+  <Data>
+    <o xml:space="preserve" t="POUImageProperty">
+      <n n="ImageData" />
+      <v n="TransparencyColor">"White"</v>
+      <v n="MakeTransparent">false</v>
+    </o>
+  </Data>
+  <TypeList>
+    <Type n="Boolean">System.Boolean</Type>
+    <Type n="POUImageProperty">{bb741845-1ec5-4be9-bb0d-2cf7058af574}</Type>
+    <Type n="String">System.String</Type>
+  </TypeList>
+</XmlArchive></ObjectProperties>
+  </POU>
+</TcPlcObject>

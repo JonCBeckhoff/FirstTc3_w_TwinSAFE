@@ -1,0 +1,57 @@
+﻿<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.0.14">
+  <POU Name="FB_InfoEStop" Id="{51b39e46-4f03-452e-b5a3-a5f7f87cfa92}">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_InfoEStop
+VAR_INPUT
+	stInfoData 			:		DUT_ST_InfoDataFB ;
+END_VAR
+VAR_OUTPUT
+	sState 				: 		STRING ;
+	sDiag 				: 		STRING ;
+	END_VAR
+VAR
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[// EStop FB's State
+IF stInfoData.usiMapState 			= 	0 THEN
+				sState 				:= 	'Undefined' ;
+	ELSIF stInfoData.usiMapState 	= 	1 THEN
+				sState 				:= 	'RUN' ;
+	ELSIF stInfoData.usiMapState	=	2 THEN
+				sState 				:= 'STOP' ;
+	ELSIF stInfoData.usiMapState 	= 	3 THEN
+				sState 				:= 	'SAFE' ;
+	ELSIF stInfoData.usiMapState 	= 	4 THEN
+				sState 				:= 	'ERROR' ;
+	ELSIF stInfoData.usiMapState 	= 	5 THEN
+				sState 				:= 	'RESET' ;
+	ELSIF stInfoData.usiMapState 	= 	6 THEN
+				sState 				:= 	'START' ;
+	ELSIF stInfoData.usiMapState 	= 	8 THEN
+				sState 				:= 	'DELAYOUT' ;
+	ELSE
+				sState 				:= 	'Unknown' ;
+END_IF
+
+// EStop FB's Diagnostics
+IF stInfoData.uiMapDiag 			= 	0 THEN
+				sDiag 				:= 	'No Error' ;
+	ELSIF stInfoData.uiMapDiag		= 	1 THEN
+				sDiag 				:= 	'Discrepancy Error Input Group 1' ;
+	ELSIF stInfoData.uiMapDiag 		= 	2 THEN
+				sDiag 				:= 	'Discrepancy Error Input Group 2' ;
+	ELSIF stInfoData.uiMapDiag 		= 	4 THEN
+				sDiag 				:= 	'Discrepancy Error Input Group 3' ;
+	ELSIF stInfoData.uiMapDiag 		= 	8 THEN
+				sDiag 				:= 	'Discrepancy Error Input Group 4' ;
+	ELSIF stInfoData.uiMapDiag 		= 	16 THEN
+				sDiag 				:= 	'EDM 1 Monitoring Error' ;	
+	ELSIF stInfoData.uiMapDiag 		= 	32 THEN
+				sDiag 				:= 	'EDM 2 Monitoring Error' ;	
+	ELSE
+				sDiag 				:= 	'Unknown' ;
+END_IF]]></ST>
+    </Implementation>
+    <ObjectProperties />
+  </POU>
+</TcPlcObject>

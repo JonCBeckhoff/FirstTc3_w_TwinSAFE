@@ -1,0 +1,150 @@
+﻿<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.0.18">
+  <POU Name="FB_MDP_Memory_ReadTBL1" Id="{70bcc8e9-d58b-46ad-845e-e7fd302f06a0}">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_MDP_Memory_ReadTBL1
+
+VAR_INPUT
+	xExecute				: BOOL;								// Function block execution is triggered by a rising edge at this input
+	tTimeout				: TIME		:= DEFAULT_ADS_TIMEOUT;	// States the time before the function is cancelled
+	usiModIdx				: USINT		:= 0;					// Index number of chosen MDP device
+	sAmsNetId				: T_AmsNetId;						// keep empty '' for the local device
+END_VAR
+
+VAR_OUTPUT
+	xBusy					: BOOL;
+	xError					: BOOL;
+	udiErrID				: UDINT;
+	usiErrPos				: USINT;							// If a subindex is not supported, iErrPos indicates at which subindex the error appears first
+	stMDP_ModuleHeader		: ST_MDP_ModuleHeader;
+	stMDP_ModuleContent		: ST_MDP_MemoryTBL1;	
+END_VAR
+
+VAR
+	fbMDP_ReadModule		: FB_MDP_ReadModule;
+	arrData					: ARRAY[0..10] OF BYTE;			// requested data
+	arrStartIdx				: ARRAY[0..7] OF UINT;				// startindexes in bytes of each subindex element
+
+	stMDP_Addr				: ST_MDP_Addr;
+	eModuleType				: E_MDP_ModuleType;
+	usiSubIdxCount			: USINT;
+
+	xSubExecute				: BOOL;
+	xReadBusy				: BOOL;
+
+	RisingEdge				: R_TRIG;
+	TimeOut					: TON;								// general timeout	
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[RisingEdge( CLK					:= xExecute );
+IF NOT xBusy THEN										// FB only react to the external execute if it is not busy
+	IF RisingEdge.Q THEN
+		xBusy					:= TRUE;
+
+		// reset variables
+		xError					:= FALSE;
+		udiErrID				:= 0;
+		usiErrPos				:= 0;
+		xSubExecute				:= TRUE;
+
+		// specific values for Mainboard content
+		stMDP_Addr.nArea		:= 16#08;
+//		stMDP_Addr.nModuleId;							will be allocated dynamically
+		stMDP_Addr.nTableId		:= 16#01;
+//		stMDP_Addr.nFlag;								not used up to now
+//		stMDP_Addr.nSubIdx;								all subindexes will be requested
+		eModuleType				:= eMDP_ModT_Memory;
+		usiSubIdxCount			:= 6;					// TableId 16#01 contains 5 elements
+
+		MEMSET( ADR(arrData), 0, SIZEOF(arrData) );		// reset buffer
+
+		TimeOut(IN 				:= FALSE);
+		TimeOut(PT 				:= tTimeout, IN 	:= TRUE);
+	END_IF
+END_IF
+
+
+IF xBusy THEN
+	IF xSubExecute THEN
+		xSubExecute 			:= FALSE;
+
+		fbMDP_ReadModule( bExecute := FALSE );
+		fbMDP_ReadModule(
+			stMDP_Addr			:= stMDP_Addr,
+			eModuleType			:= eModuleType,
+			iModIdx				:= usiModIdx,
+			iSubIdxCount		:= usiSubIdxCount,
+			bExecute			:= TRUE,
+			tTimeout			:= tTimeout,
+			pDstBuf				:= ADR(arrData),
+			cbDstBufLen			:= SIZEOF(arrData),
+			sAmsNetId			:= sAmsNetId,
+
+			bBusy				=> xReadBusy,
+			bError				=> xError,
+			nErrID				=> udiErrID,
+			iErrPos				=> usiErrPos,
+			stMDP_DynAddr		=> ,
+			iModuleTypeCount	=> ,
+			iModuleCount		=> ,
+			stMDP_ModuleHeader	=> ,
+			arrStartIdx			=> ,
+		);
+	ELSE
+		fbMDP_ReadModule(
+			bExecute			:= FALSE,
+
+			bBusy				=> xReadBusy,
+			bError				=> xError,
+			nErrID 				=> udiErrID,
+			iErrPos				=> usiErrPos,
+		 );
+		IF NOT xReadBusy THEN
+			// allocate received module header
+			stMDP_ModuleHeader	:= fbMDP_ReadModule.stMDP_ModuleHeader;
+			// allocate information of startindexes in data buffer
+			MEMCPY(ADR(arrStartIdx), ADR(fbMDP_ReadModule.arrStartIdx), SIZEOF(arrStartIdx) );
+			// reset module content struct
+			MEMSET( ADR(stMDP_ModuleContent), 0, SIZEOF(stMDP_ModuleContent) );
+			// allocate received data to NIC struct
+			stMDP_ModuleContent.uiLen		:= arrData[0];
+			MEMCPY(ADR(stMDP_ModuleContent.udiProgMemAllocated),		ADR(arrData)+arrStartIdx[1],	MIN(arrStartIdx[2]-arrStartIdx[1],	SIZEOF(stMDP_ModuleContent.udiProgMemAllocated))     );
+			MEMCPY(ADR(stMDP_ModuleContent.udiProgMemAvailable),		ADR(arrData)+arrStartIdx[2],	MIN(arrStartIdx[3]-arrStartIdx[2],	SIZEOF(stMDP_ModuleContent.udiProgMemAvailable))     );
+//CE only	MEMCPY(ADR(stMDP_ModuleContent.udiStorageMemAllocated),		ADR(arrData)+arrStartIdx[3],	MIN(arrStartIdx[4]-arrStartIdx[3],	SIZEOF(stMDP_ModuleContent.udiStorageMemAllocated))     );
+//CE omly	MEMCPY(ADR(stMDP_ModuleContent.udiStorageMemAvailable),		ADR(arrData)+arrStartIdx[4],	MIN(arrStartIdx[5]-arrStartIdx[4],	SIZEOF(stMDP_ModuleContent.udiStorageMemAvailable))     );
+//CE only	MEMCPY(ADR(stMDP_ModuleContent.udiMemoryDivision),			ADR(arrData)+arrStartIdx[5],	MIN(arrStartIdx[6]-arrStartIdx[5],	SIZEOF(stMDP_ModuleContent.udiMemoryDivision))     );
+
+			// reset FB
+			xBusy 				:= FALSE;
+		END_IF
+	END_IF
+
+	// check timeout
+	TimeOut();
+	IF TimeOut.Q THEN
+		TimeOut(IN 				:= FALSE);
+		xError					:= TRUE;
+		udiErrID				:= INT_TO_UINT(eMDP_Err_PLC) * 16#10000 + INT_TO_UINT(eMDP_ErrPLC_TimeOut);
+	END_IF
+END_IF
+
+IF xError THEN
+	// reset FB
+	xBusy 						:= FALSE;
+END_IF]]></ST>
+    </Implementation>
+    <ObjectProperties>﻿<XmlArchive>
+  <Data>
+    <o xml:space="preserve" t="POUImageProperty">
+      <n n="ImageData" />
+      <v n="TransparencyColor">"White"</v>
+      <v n="MakeTransparent">false</v>
+    </o>
+  </Data>
+  <TypeList>
+    <Type n="Boolean">System.Boolean</Type>
+    <Type n="POUImageProperty">{bb741845-1ec5-4be9-bb0d-2cf7058af574}</Type>
+    <Type n="String">System.String</Type>
+  </TypeList>
+</XmlArchive></ObjectProperties>
+  </POU>
+</TcPlcObject>

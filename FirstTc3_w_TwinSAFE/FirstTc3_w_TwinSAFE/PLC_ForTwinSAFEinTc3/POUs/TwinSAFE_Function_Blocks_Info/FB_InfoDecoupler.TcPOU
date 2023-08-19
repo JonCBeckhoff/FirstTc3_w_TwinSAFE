@@ -1,0 +1,29 @@
+﻿<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.0.14">
+  <POU Name="FB_InfoDecoupler" Id="{2ff0dfed-39a0-4e2e-a748-05636e7ae2f5}">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_InfoDecoupler
+VAR_INPUT
+	stInfoData 			: 		DUT_ST_InfoDataFB ;
+END_VAR
+VAR_OUTPUT
+	sState 				: 		STRING ;
+END_VAR
+VAR
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[// Decouple FB's State
+IF stInfoData.usiMapState 			=	0 THEN
+				sState 				:= 	'Undefined' ;
+	ELSIF stInfoData.usiMapState 	= 	1 THEN
+				sState 				:= 	'RUN' ;
+	ELSIF stInfoData.usiMapState 	= 	2 THEN
+				sState 				:= 	'STOP' ;
+ELSE
+				sState 				:= 	'Unknown' ;
+END_IF
+
+// The Decouple FB Has No Diagnostic Byte to Decode]]></ST>
+    </Implementation>
+    <ObjectProperties />
+  </POU>
+</TcPlcObject>

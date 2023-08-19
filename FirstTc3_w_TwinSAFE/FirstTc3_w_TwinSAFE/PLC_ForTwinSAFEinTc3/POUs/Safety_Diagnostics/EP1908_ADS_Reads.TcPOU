@@ -1,0 +1,1303 @@
+﻿<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.0.14">
+  <POU Name="EP1908_ADS_Reads" Id="{4c213206-9d2a-444e-9ece-156abd090329}">
+    <Declaration><![CDATA[PROGRAM EP1908_ADS_Reads
+VAR
+//		8-2-2012
+// 		This Program has been supplied by Beckhoff Automation As-Is and is intended only as an example 
+//		implementation. Functionality is not guaranteed. 
+//
+	//Time to check CoE values (Every 2 seconds in this case)
+	T1							: 		TON ;
+	xExecute					: 		BOOL ;
+	tTime1						: 		TIME ;
+
+	//Counter for just some very simple sequencing
+	C1							: 		CTU ;
+	xReset						: 		BOOL ;
+	wPreset						: 		WORD := 10 ;
+	xDone						: 		BOOL ;
+	wCount						: 		WORD ;
+
+	// Reading the serial number out of the EP1908-0002
+	fbEP1908Sn_ADSRead			: 		ADSREAD ;
+	dwEP1908_Sn					: 		DWORD ;
+	xEP1908Sn_busy				: 		BOOL ;
+	xEP1908Sn_Err				: 		BOOL ;
+	xEP1908Sn_ErrID				: 		UDINT ;
+
+	// Reading the DIP Switch Setting out of the EP1908-0002
+	fbEP1908DSw_ADSRead			: 		ADSREAD ;
+	wEP1908_DSw					: 		WORD ;
+	xEP1908DSw_busy				: 		BOOL ;
+	xEP1908DSw_Err				: 		BOOL ;
+	udiEP1908DSw_ErrID			: 		UDINT ;
+
+	//Read the Hardware Version of the EP1908-0002 Terminal
+	fbEP1908_HWvers_EcCoESdoRead	: 	FB_EcCoESdoRead ;
+	sEP1908_HWvers					: 	STRING(2) ;
+	xEP1908_HWvers_Busy				: 	BOOL ;
+	xEP1908_HWvers_Err				: 	BOOL ;
+	udiEP1908_HWvers_ErrID			: 	UDINT ;
+
+	//Read the Software Version of the EP1908-0002 Logic Terminal (It's f/w)
+	fbEP1908_FWvers_EcCoESdoRead	: 	FB_EcCoESdoRead ;
+	sEP1908_FWvers					: 	STRING(2) ;
+	xEP1908_FWvers_Busy				: 	BOOL ;
+	xEP1908_FWvers_Err				: 	BOOL ;
+	udiEP1908_FWvers_ErrID			: 	UDINT ;
+	
+	// Reading the Primary Micro Controller (MC1) Temperature in DegC out of the EP1908-0002
+	fbEP1908PriMCTemp_ADSRead	: 		ADSREAD ;
+	wEP1908_PriMCTemp			: 		WORD ;
+	xEP1908PriMCTemp_busy		: 		BOOL ;
+	xEP1908PriMCTemp_Err		: 		BOOL ;
+	udiEP1908PriMCTemp_ErrID	: 		UDINT ;
+
+	// Reading the Secondary Micro Controller (MC2) Temperature in DegC out of the EP1908-0002
+	fbEP1908SecMCTemp_ADSRead	: 		ADSREAD ;
+	wEP1908_SecMCTemp			: 		WORD ;
+	xEP1908SecMCTemp_busy		: 		BOOL ;
+	xEP1908SecMCTemp_Err		: 		BOOL ;
+	udiEP1908SecMCTemp_ErrID	: 		UDINT ;
+
+	// Reading the Primary Micro Controller (MC1) Voltage in mV out of the EP1908-0002
+	fbEP1908PriMCmV_ADSRead		: 		ADSREAD ;
+	wEP1908_PriMCmV				: 		WORD ;
+	xEP1908PriMCmV_busy			: 		BOOL ;
+	xEL1904PriMCmV_Err			: 		BOOL ;
+	xEP1908PriMCmV_Err			: 		BOOL ;
+	udiEP1908PriMCmV_ErrID		: 		UDINT ;
+
+	// Reading the Secondary Micro Controller (MC2) Voltage in mV out of the EP1908-0002
+	fbEP1908SecMCmV_ADSRead		: 		ADSREAD ;
+	wEP1908_SecMCmV				: 		WORD ;
+	xEP1908SecMCmV_busy			: 		BOOL ;
+	xEP1908SecMCmV_Err			: 		BOOL ;
+	udiEP1908SecMCmV_ErrID		: 		UDINT ;
+
+	// EP1908-0002: Sensor Test Error
+	fbEP1908SensT_ADSRead		: 		ADSREAD ;
+	wEP1908_SenT				: 		WORD ;
+	xEP1908SenT_busy			: 		BOOL ;
+	xEP1908SenT_Err				: 		BOOL ;
+	udiEP1908SenT_ErrID			: 		UDINT ;
+
+	// EP1908-002: 2-Channel Evaluation Error
+	// The two channels contradict each other (not same value)
+	fbEP1908_2CHEval_ADSRead	: 		ADSREAD ;
+	wEP1908_2CHEval				: 		WORD ;
+	xEP1908_2CHEval_busy		: 		BOOL ;
+	xEP1908_2CHEval_Err			: 		BOOL ;
+	udiEP1908_2CHEval_ErrID		: 		UDINT ;
+
+	// EP1908-0002: Error In Safety Mat Operating Mode
+	// Input pairs not in the same state (not same value)
+	fbEP1908_SMiPair_ADSRead	: 		ADSREAD ;
+	wEP1908_SMiPair				: 		WORD ;
+	xEP1908_SMiPair_busy		: 		BOOL ;
+	xEP1908_SMiPair_Err			: 		BOOL ;
+	udiEP1908_SMiPair_ErrID		: 		UDINT ;
+
+	// EP1908-0002: Error in Safety Mat Operating Supply
+	// External supply detected (Input channel not getting test pulses)
+	fbEP1908_SMExtSupply_ADSRead: ADSREAD;
+	wEP1908_SMExtSupply			: 		WORD;
+	xEP1908_SMExtSupply_busy	: 		BOOL;
+	xEP1908_SMExtSupply_Err		: 		BOOL;
+	udiEP1908_SMExtSupply_ErrID	: 		UDINT;
+
+	// EP1908-0002: Error During Speed Monitoring
+	// Frquency Greater Than 500Hz
+	fbEP1908_FreqGT500_ADSRead	: 		ADSREAD ;
+	wEP1908_FreqGT500			: 		WORD ;
+	xEP1908_FreqGT500_busy		: 		BOOL ;
+	xEP1908_FreqGT500_Err		: 		BOOL ;
+	udiEP1908_FreqGT500_ErrID	: 		UDINT ;
+	
+	// EP1908-0002: Error In Operating Mode: Two Channel Sync Velocity Control
+	// Both inputs of a "pair" cannot be inactive in this mode
+	fbEP1908_BothInPairInact_ADSRead: ADSREAD ;
+	wEP1908_BothInPairInact			: 	WORD ;
+	xEP1908_BothInPairInact_busy	: 	BOOL ;
+	xEP1908_BothInPairInact_Err		: 	BOOL ;
+	udiEP1908_BothInPairInact_ErrID	: 	UDINT ;
+
+	// EP1908-0002: Error In Operating Modes: Two Channel Sync Velocity Control and Two Channel Encoder Velocity Control
+	// For a channel pair, two different motor speeds detected
+	fbEP1908_PairUnequalFreq_ADSRead: 	ADSREAD ;
+	wEP1908_PairUnequalFreq			: 	WORD ;
+	xEP1908_PairUnequalFreq_busy	: 	BOOL ;
+	xEP1908_PairUnequalFreq_Err		: 	BOOL ;
+	udiEP1908_PairUnequalFreq_ErrID	: 	UDINT ;
+
+	// EP1908-0002 FEATURES: Operating Mode
+	fbEP1908_OperatingMode_ADSRead	: 	ADSREAD ;
+	wEP1908_OperMode				: 	WORD ;
+	xEP1908_OperMode_busy			: 	BOOL ;
+	xEP1908_OperMode_Err			: 	BOOL ;
+	udiEP1908_OperModeID			: 	UDINT ;
+
+	//Sequence through 0x8001 FS Sensor Test
+	iFS_Sensor_Test					: 	INT ;
+
+	// EP1908-0002 FEATURES: Sensor Test Channel 1 Active/Inactive
+	fbEP1908_STActive1_EcCoESdoRead	: 	FB_EcCoESdoRead ;
+	bEP1908_STActive1				: 	BYTE ;
+	xEP1908_STActive1_busy			: 	BOOL ;
+	xEP1908_STActive1_Err			: 	BOOL ;
+	udiEP1908_STActive1ID			: 	UDINT ;
+	iCaseZeroScans					: 	INT ;
+	
+	// EP1908-0002 FEATURES: Sensor Test Channel 2 Active/Inactive
+	fbEP1908_STActive2_EcCoESdoRead	: 	FB_EcCoESdoRead ;
+	bEP1908_STActive2				: 	BYTE ;
+	xEP1908_STActive2_busy			: 	BOOL ;
+	xEP1908_STActive2_Err			: 	BOOL ;
+	udiEP1908_STActive2ID			: 	UDINT ;
+	iCaseOneScans					: 	INT ;
+	
+	// EP1908-0002 FEATURES: Sensor Test Channel 3 Active/Inactive
+	fbEP1908_STActive3_EcCoESdoRead	: 	FB_EcCoESdoRead ;
+	bEP1908_STActive3				: 	BYTE ;
+	xEP1908_STActive3_busy			: 	BOOL ;
+	xEP1908_STActive3_Err			: 	BOOL ;
+	udiEP1908_STActive3ID			: 	UDINT ;
+	iCaseTwoScans					: 	INT ;
+	
+	// EP1908-0002 FEATURES: Sensor Test Channel 4 Active/Inactive
+	fbEP1908_STActive4_EcCoESdoRead	: 	FB_EcCoESdoRead ;
+	bEP1908_STActive4				: 	BYTE ;
+	xEP1908_STActive4_busy			: 	BOOL ;
+	xEP1908_STActive4_Err			: 	BOOL ;
+	udiEP1908_STActive4ID			: 	UDINT ;
+	iCaseThreeScans					: 	INT ;
+	
+	// EP1908-0002 FEATURES: Sensor Test Channel 5 Active/Inactive
+	fbEP1908_STActive5_EcCoESdoRead	: 	FB_EcCoESdoRead ;
+	bEP1908_STActive5				: 	BYTE ;
+	xEP1908_STActive5_busy			: 	BOOL ;
+	xEP1908_STActive5_Err			: 	BOOL ;
+	udiEP1908_STActive5ID			: 	UDINT ;
+	iCaseFourScans					: 	INT ;
+	
+	// EP1908-0002 FEATURES: Sensor Test Channel 6 Active/Inactive
+	fbEP1908_STActive6_EcCoESdoRead	: 	FB_EcCoESdoRead ;
+	bEP1908_STActive6				: 	BYTE ;
+	xEP1908_STActive6_busy			: 	BOOL ;
+	xEP1908_STActive6_Err			: 	BOOL ;
+	udiEP1908_STActive6ID			: 	UDINT ;
+	iCaseFiveScans					: 	INT ;
+	
+	// EP1908-0002 FEATURES: Sensor Test Channel 7 Active/Inactive
+	fbEP1908_STActive7_EcCoESdoRead	: 	FB_EcCoESdoRead ;
+	bEP1908_STActive7				: 	BYTE ;
+	xEP1908_STActive7_busy			: 	BOOL ;
+	xEP1908_STActive7_Err			: 	BOOL ;
+	udiEP1908_STActive7ID			: 	UDINT ;
+	iCaseSixScans					: 	INT ;
+	
+	// EP1908-0002 FEATURES: Sensor Test Channel 8 Active/Inactive
+	fbEP1908_STActive8_EcCoESdoRead	: 	FB_EcCoESdoRead ;
+	bEP1908_STActive8				: 	BYTE ;
+	xEP1908_STActive8_busy			: 	BOOL ;
+	xEP1908_STActive8_Err			: 	BOOL ;
+	udiEP1908_STActive8ID			: 	UDINT ;
+	iCaseSevenScans					: 	INT ;
+
+	//Sequence through 0x8002 FS Logic Of Input Pairs
+	iFS_LogicOfInputPairs			: 	INT ;
+	
+	// EP1908-0002 FEATURES: Logic of Channels 1 and 2
+	fbEP1908_Logic1_2_EcCoESdoRead	: 	FB_EcCoESdoRead ;
+	bEP1908_Logic1_2				: 	BYTE ;
+	xEP1908_Logic1_2_busy			: 	BOOL ;
+	xEP1908_Logic1_2_Err			: 	BOOL ;
+	udiEP1908_Logic1_2ID			: 	UDINT ;
+	iCaseLogicZeroScans				: 	INT ;
+
+	// EP1908-0002 FEATURES: Logic of Channels 3 and 4
+	fbEP1908_Logic3_4_EcCoESdoRead	: 	FB_EcCoESdoRead ;
+	bEP1908_Logic3_4				: 	BYTE ;
+	xEP1908_Logic3_4_busy			: 	BOOL ;
+	xEP1908_Logic3_4_Err			: 	BOOL ;
+	udiEP1908_Logic3_4ID			: 	UDINT ;
+	iCaseLogicOneScans				: 	INT ;
+	
+	// EP1908-0002 FEATURES: Logic of Channels 5 and 6
+	fbEP1908_Logic5_6_EcCoESdoRead	: 	FB_EcCoESdoRead ;
+	bEP1908_Logic5_6				: 	BYTE ;
+	xEP1908_Logic5_6_busy			: 	BOOL ;
+	xEP1908_Logic5_6_Err			: 	BOOL ;
+	udiEP1908_Logic5_6ID			: 	UDINT ;
+	iCaseLogicTwoScans				: 	INT ;
+	
+	// EP1908-0002 FEATURES: Logic of Channels 7 and 8
+	fbEP1908_Logic7_8_EcCoESdoRead	: 	FB_EcCoESdoRead ;
+	bEP1908_Logic7_8				: 	BYTE ;
+	xEP1908_Logic7_8_busy			: 	BOOL ;
+	xEP1908_Logic7_8_Err			: 	BOOL ;
+	udiEP1908_Logic7_8ID			: 	UDINT ;
+	iCaseLogicThreeScans			: 	INT ;
+
+	//Sequence through 0x8003 FS Velocity Limits
+	iFS_VelocityLimits				: 	INT ;
+	
+	// EP1908-0002 FEATURES: Velocity Limit Value Channel 1
+	fbEP1908_VelLimit1_EcCoESdoRead	: 	FB_EcCoESdoRead ;
+	wEP1908_VelLimit1				: 	WORD ;
+	xEP1908_VelLimit1_busy			: 	BOOL ;
+	xEP1908_VelLimit1_Err			: 	BOOL ;
+	udiEP1908_VelLimit1ID			: 	UDINT ;
+	iCaseVelLIMZeroScans			: 	INT ;
+	
+	// EP1908-0002 FEATURES: Velocity Limit Value Channel 2
+	fbEP1908_VelLimit2_EcCoESdoRead	: 	FB_EcCoESdoRead ;
+	wEP1908_VelLimit2				: 	WORD ;
+	xEP1908_VelLimit2				: 	BOOL ;
+	xEP1908_VelLimit2_busy			: 	BOOL ;
+	xEP1908_VelLimit2_Err			: 	BOOL ;
+	udiEP1908_VelLimit2ID			:	UDINT ;
+	iCaseVelLIMOneScans				: 	INT ;
+
+	// EP1908-0002 FEATURES: Velocity Limit Value Channel 3
+	fbEP1908_VelLimit3_EcCoESdoRead	: 	FB_EcCoESdoRead ;
+	wEP1908_VelLimit3				: 	WORD ;
+	xEP1908_VelLimit3_busy			: 	BOOL ;
+	xEP1908_VelLimit3_Err			: 	BOOL ;
+	udiEP1908_VelLimit3ID			: 	UDINT ;
+	iCaseVelLIMTwoScans				: 	INT ;
+	
+	// EP1908-0002 FEATURES: Velocity Limit Value Channel 4
+	fbEP1908_VelLimit4_EcCoESdoRead	: 	FB_EcCoESdoRead ;
+	wEP1908_VelLimit4				: 	WORD ;
+	xEP1908_VelLimit4_busy			: 	BOOL ;
+	xEP1908_VelLimit4_Err			: 	BOOL ;
+	udiEP1908_VelLimit4ID			: 	UDINT ;
+	iCaseVelLIMThreeScans			: 	INT ;
+	
+	// EP1908-0002 FEATURES: Velocity Limit Value Channel 5
+	fbEP1908_VelLimit5_EcCoESdoRead	: 	FB_EcCoESdoRead ;
+	wEP1908_VelLimit5				: 	WORD ;
+	xEP1908_VelLimit5_busy			: 	BOOL ;
+	xEP1908_VelLimit5_Err			:	BOOL ;
+	udiEP1908_VelLimit5ID			: 	UDINT ;
+	iCaseVelLIMFourScans			: 	INT ;
+	
+	// EP1908-0002 FEATURES: Velocity Limit Value Channel 6
+	fbEP1908_VelLimit6_EcCoESdoRead	: 	FB_EcCoESdoRead ;
+	wEP1908_VelLimit6				: 	WORD ;
+	xEP1908_VelLimit6_busy			: 	BOOL ;
+	xEP1908_VelLimit6_Err			: 	BOOL ;
+	udiEP1908_VelLimit6ID			: 	UDINT ;
+	iCaseVelLIMFiveScans				: 	INT ;
+	
+	// EP1908-0002 FEATURES: Velocity Limit Value Channel 7
+	fbEP1908_VelLimit7_EcCoESdoRead	: 	FB_EcCoESdoRead ;
+	wEP1908_VelLimit7				: 	WORD ;
+	xEP1908_VelLimit7_busy			: 	BOOL ;
+	xEP1908_VelLimit7_Err			: 	BOOL ;
+	udiEP1908_VelLimit7ID			: 	UDINT ;
+	iCaseVelLIMSixScans				: 	INT ;
+	
+	// EP1908-0002 FEATURES: Velocity Limit Value Channel 8
+	fbEP1908_VelLimit8_EcCoESdoRead	: 	FB_EcCoESdoRead ;
+	wEP1908_VelLimit8				: 	WORD ;
+	xEP1908_VelLimit8_busy			: 	BOOL ;
+	xEP1908_VelLimit8_Err			: 	BOOL ; 
+	udiEP1908_VelLimit8ID			: 	UDINT ;
+	iCaseVelLIMSevenScans			: 	INT ;
+END_VAR
+VAR_INPUT
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[//		8-2-2012
+// 		This Program has been supplied by Beckhoff Automation As-Is and is intended only as an example 
+//		implementation. Functionality is not guaranteed. 
+//
+IF g_bHMI_ScreenBeingDisplayed = 20 THEN
+// Interval timer for CoE Reads
+T1(
+						IN				:= 		NOT xExecute, 
+						PT				:=		T#500MS, 
+						Q				=>		xExecute, 
+						ET				=>		tTime1 ) ;
+
+C1(
+						CU				:= 		xExecute, 
+						RESET			:= 		xReset, 
+						PV				:= 		wPreset, 
+						Q				=> 		xDone, 
+						CV				=> 		wCount) ;
+
+IF C1.CV > 8 	THEN xReset := 1 ;
+				ELSE xReset := 0 ; 
+END_IF ;
+
+// Read the serial number out of the EP1908-0002
+fbEP1908Sn_ADSRead(
+						NETID			:= 		gc_sADSNetID, 
+						PORT			:= 		gc_uiEP1908_EtherCATAdr, 
+						IDXGRP			:= 		16#F302, 
+						IDXOFFS			:= 		16#F9800002, 
+						LEN				:= 		4, 
+						DESTADDR		:= 		ADR(dwEP1908_Sn), 
+						READ			:= 		xExecute, 
+						TMOUT			:= 		T#2S, 
+						BUSY			=> 		xEP1908Sn_busy, 
+						ERR				=> 		xEP1908Sn_Err, 
+						ERRID			=> 		xEP1908Sn_ErrID );
+
+g_dwHMI_EP1908Sn 						:= 		dwEP1908_Sn ;
+
+// Read the DIP Switch Setting out of the EP1908-0002
+IF C1.CV = 1 THEN
+fbEP1908DSw_ADSRead(
+						NETID			:= 		gc_sADSNetID, 
+						PORT			:= 		gc_uiEP1908_EtherCATAdr, 
+						IDXGRP			:= 		16#F302, 
+						IDXOFFS			:= 		16#F9800001, 
+						LEN				:= 		2, 
+						DESTADDR		:= 		ADR(wEP1908_DSw), 
+						READ			:= 		xExecute, 
+						TMOUT			:= 		T#2S, 
+						BUSY			=> 		xEP1908DSw_busy, 
+						ERR				=> 		xEP1908DSw_Err, 
+						ERRID			=> 		udiEP1908DSw_ErrID );
+
+g_wHMI_EP1908DSw 						:= 		wEP1908_DSw ;
+END_IF ;						
+
+//Read the Hardware Version of the EP1908-0002 Terminal
+fbEP1908_HWvers_EcCoESdoRead(
+						sNetId			:= 		gc_sADSNetID, 
+						nSlaveAddr		:= 		gc_uiEP1908_EtherCATAdr, 
+						nSubIndex		:= 		0, 
+						nIndex			:= 		16#1009, 
+						pDstBuf			:=  	ADR(sEP1908_HWvers),
+						cbBufLen		:= 		SIZEOF(sEP1908_HWvers), 
+						bExecute		:= 		xExecute, 
+						tTimeout		:= 		T#2S, 
+						bBusy			=> 		xEP1908_HWvers_Busy, 
+						bError			=> 		xEP1908_HWvers_Err, 
+						nErrId			=> 		udiEP1908_HWvers_ErrID ) ;
+
+g_sHMI_EP1908_HWvers					:= 		sEP1908_HWvers ;
+
+//Read the Software Version of the EP1908-002 Logic Terminal (It's f/w)
+fbEP1908_FWvers_EcCoESdoRead(
+						sNetId			:= 		gc_sADSNetID, 
+						nSlaveAddr		:= 		gc_uiEP1908_EtherCATAdr, 
+						nSubIndex		:= 		0, 
+						nIndex			:= 		16#100A, 
+						pDstBuf			:=  	ADR(sEP1908_FWvers),
+						cbBufLen		:= 		SIZEOF(sEP1908_FWvers), 
+						bExecute		:= 		xExecute, 
+						tTimeout		:= 		T#2S, 
+						bBusy			=> 		xEP1908_FWvers_Busy, 
+						bError			=> 		xEP1908_FWvers_Err, 
+						nErrId			=> 		udiEP1908_FWvers_ErrID ) ;
+						
+g_sHMI_EP1908_FWvers					:= 		sEP1908_FWvers ;
+
+// EP1908-0002 FEATURES: Operating Mode
+fbEP1908_OperatingMode_ADSRead(
+						NETID			:= 		gc_sADSNetID, 
+						PORT			:= 		gc_uiEP1908_EtherCATAdr, 
+						IDXGRP			:= 		16#F302, 
+						IDXOFFS			:= 		16#80000001, 
+						LEN				:= 		2, 
+						DESTADDR		:=		ADR(wEP1908_OperMode), 
+						READ			:= 		xExecute, 
+						TMOUT			:= 		T#2S, 
+						BUSY			=> 		xEP1908_OperMode_busy, 
+						ERR				=> 		xEP1908_OperMode_Err, 
+						ERRID			=> 		udiEP1908_OperModeID );
+		
+IF wEP1908_OperMode 					= 		0 THEN
+	g_sHMI_EP1908_OperatingMode 		:= 		'Digital' ;
+	ELSIF wEP1908_OperMode 				= 		1 THEN
+	g_sHMI_EP1908_OperatingMode 		:= 		'Standstill Monitoring 1' ;
+	ELSIF wEP1908_OperMode 				= 		2 THEN
+	g_sHMI_EP1908_OperatingMode 		:= 		'Standstill Monitoring 2' ;
+ELSE
+	g_sHMI_EP1908_OperatingMode 		:= 		'Invalid Mode' ;
+END_IF ;
+
+
+CASE iFS_Sensor_Test OF
+
+0:
+// EP1908-0002 FEATURES: Sensor Test Channel 1 Active/Inactive
+iCaseSevenScans 						:= 		0 ;
+fbEP1908_STActive1_EcCoESdoRead(
+						sNetId			:= 		gc_sADSNetID, 
+						nSlaveAddr		:= 		gc_uiEP1908_EtherCATAdr, 
+						nSubIndex		:= 		1, 
+						nIndex			:= 		16#8001, 
+						pDstBuf			:= 		ADR(bEP1908_STActive1), 
+						cbBufLen		:= 		SIZEOF(bEP1908_STActive1), 
+						bExecute		:= 		xExecute, 
+						tTimeout		:= 		T#2S, 
+						bBusy			=> 		xEP1908_STActive1_busy, 
+						bError			=> 		xEP1908_STActive1_Err, 
+						nErrId			=> 		udiEP1908_STActive1ID );
+
+g_xHMI_EP1908_SensTestActive1			:= 		bEP1908_STActive1.0 ;
+
+iCaseZeroScans := iCaseZeroScans + 1 ; //Prevent code from passing through in only one pass
+
+IF NOT xEP1908_STActive1_busy AND NOT xEP1908_STActive1_Err AND iCaseZeroScans <> 0 THEN
+	iFS_Sensor_Test := 1 ;
+END_IF ;
+
+1:
+// EP1908-0002 FEATURES: Sensor Test Channel 2 Active/Inactive
+iCaseZeroScans 							:= 		0 ;
+fbEP1908_STActive2_EcCoESdoRead(
+						sNetId			:= 		gc_sADSNetID, 
+						nSlaveAddr		:= 		gc_uiEP1908_EtherCATAdr, 
+						nSubIndex		:= 		2, 
+						nIndex			:= 		16#8001, 
+						pDstBuf			:= 		ADR(bEP1908_STActive2), 
+						cbBufLen		:= 		SIZEOF(bEP1908_STActive2), 
+						bExecute		:= 		xExecute, 
+						tTimeout		:= 		T#2S, 
+						bBusy			=> 		xEP1908_STActive2_busy, 
+						bError			=> 		xEP1908_STActive2_Err, 
+						nErrId			=> 		udiEP1908_STActive2ID );
+
+g_xHMI_EP1908_SensTestActive2			:= 		bEP1908_STActive2.0 ;
+
+iCaseOneScans := iCaseOneScans + 1 ; //Prevent code from passing through in only one pass
+
+IF NOT xEP1908_STActive2_busy AND NOT xEP1908_STActive2_Err AND iCaseOneScans <> 0 THEN
+	iFS_Sensor_Test := 2 ;
+END_IF ;
+
+2:
+// EP1908-0002 FEATURES: Sensor Test Channel 3 Active/Inactive
+iCaseOneScans := 0 ;
+fbEP1908_STActive3_EcCoESdoRead(
+						sNetId			:= 		gc_sADSNetID, 
+						nSlaveAddr		:= 		gc_uiEP1908_EtherCATAdr, 
+						nSubIndex		:= 		3, 
+						nIndex			:= 		16#8001, 
+						pDstBuf			:= 		ADR(bEP1908_STActive3), 
+						cbBufLen		:= 		SIZEOF(bEP1908_STActive3), 
+						bExecute		:= 		xExecute, 
+						tTimeout		:= 		T#2S, 
+						bBusy			=> 		xEP1908_STActive3_busy, 
+						bError			=> 		xEP1908_STActive3_Err, 
+						nErrId			=> 		udiEP1908_STActive3ID );
+
+g_xHMI_EP1908_SensTestActive3			:= 		bEP1908_STActive3.0 ;
+
+iCaseTwoScans := iCaseTwoScans + 1 ; //Prevent code from passing through in only one pass
+
+IF NOT xEP1908_STActive3_busy AND NOT xEP1908_STActive3_Err AND iCaseTwoScans <> 0 THEN
+	iFS_Sensor_Test := 3 ;
+END_IF ;
+
+3:
+// EP1908-0002 FEATURES: Sensor Test Channel 4 Active/Inactive
+iCaseTwoScans := 0 ;
+fbEP1908_STActive4_EcCoESdoRead(
+						sNetId			:= 		gc_sADSNetID, 
+						nSlaveAddr		:= 		gc_uiEP1908_EtherCATAdr, 
+						nSubIndex		:= 		4, 
+						nIndex			:= 		16#8001, 
+						pDstBuf			:= 		ADR(bEP1908_STActive4), 
+						cbBufLen		:= 		SIZEOF(bEP1908_STActive4), 
+						bExecute		:= 		xExecute, 
+						tTimeout		:= 		T#2S, 
+						bBusy			=> 		xEP1908_STActive4_busy, 
+						bError			=> 		xEP1908_STActive4_Err, 
+						nErrId			=> 		udiEP1908_STActive4ID );
+
+g_xHMI_EP1908_SensTestActive4			:= 		bEP1908_STActive4.0 ;
+
+iCaseThreeScans := iCaseThreeScans + 1 ; //Prevent code from passing through in only one pass
+
+IF NOT xEP1908_STActive4_busy AND NOT xEP1908_STActive4_Err AND iCaseThreeScans <> 0 THEN
+	iFS_Sensor_Test := 4 ;
+END_IF ;
+
+4:
+// EP1908-0002 FEATURES: Sensor Test Channel 5 Active/Inactive
+iCaseThreeScans := 0 ;
+fbEP1908_STActive5_EcCoESdoRead(
+						sNetId			:= 		gc_sADSNetID, 
+						nSlaveAddr		:= 		gc_uiEP1908_EtherCATAdr, 
+						nSubIndex		:= 		5, 
+						nIndex			:= 		16#8001, 
+						pDstBuf			:= 		ADR(bEP1908_STActive5), 
+						cbBufLen		:= 		SIZEOF(bEP1908_STActive5), 
+						bExecute		:= 		xExecute, 
+						tTimeout		:= 		T#2S, 
+						bBusy			=> 		xEP1908_STActive5_busy, 
+						bError			=> 		xEP1908_STActive5_Err, 
+						nErrId			=> 		udiEP1908_STActive5ID );
+
+g_xHMI_EP1908_SensTestActive5			:= 		bEP1908_STActive5.0 ;
+
+iCaseFourScans := iCaseFourScans + 1 ; //Prevent code from passing through in only one pass
+
+IF NOT xEP1908_STActive5_busy AND NOT xEP1908_STActive5_Err AND iCaseFourScans <> 0 THEN
+	iFS_Sensor_Test := 5 ;
+END_IF ;
+
+5:
+// EP1908-0002 FEATURES: Sensor Test Channel 6 Active/Inactive
+iCaseFourScans := 0 ;
+fbEP1908_STActive6_EcCoESdoRead(
+						sNetId			:= 		gc_sADSNetID, 
+						nSlaveAddr		:= 		gc_uiEP1908_EtherCATAdr, 
+						nSubIndex		:= 		6, 
+						nIndex			:= 		16#8001, 
+						pDstBuf			:= 		ADR(bEP1908_STActive6), 
+						cbBufLen		:= 		SIZEOF(bEP1908_STActive6), 
+						bExecute		:= 		xExecute, 
+						tTimeout		:= 		T#2S, 
+						bBusy			=> 		xEP1908_STActive6_busy, 
+						bError			=> 		xEP1908_STActive6_Err, 
+						nErrId			=> 		udiEP1908_STActive6ID );
+
+g_xHMI_EP1908_SensTestActive6			:= 		bEP1908_STActive6.0 ;
+
+iCaseFiveScans := iCaseFiveScans + 1 ; //Prevent code from passing through in only one pass
+
+IF NOT xEP1908_STActive6_busy AND NOT xEP1908_STActive6_Err AND iCaseFiveScans <> 0 THEN
+	iFS_Sensor_Test := 6 ;
+END_IF ;
+
+6:
+// EP1908-0002 FEATURES: Sensor Test Channel 7 Active/Inactive
+iCaseFiveScans := 0 ;
+fbEP1908_STActive7_EcCoESdoRead(
+						sNetId			:= 		gc_sADSNetID, 
+						nSlaveAddr		:= 		gc_uiEP1908_EtherCATAdr, 
+						nSubIndex		:= 		7, 
+						nIndex			:= 		16#8001, 
+						pDstBuf			:= 		ADR(bEP1908_STActive7), 
+						cbBufLen		:= 		SIZEOF(bEP1908_STActive7), 
+						bExecute		:= 		xExecute, 
+						tTimeout		:= 		T#2S, 
+						bBusy			=> 		xEP1908_STActive7_busy, 
+						bError			=> 		xEP1908_STActive7_Err, 
+						nErrId			=> 		udiEP1908_STActive7ID );
+
+g_xHMI_EP1908_SensTestActive7			:= 		bEP1908_STActive7.0 ;
+
+iCaseSixScans := iCaseSixScans + 1 ; //Prevent code from passing through in only one pass
+
+IF NOT xEP1908_STActive7_busy AND NOT xEP1908_STActive7_Err AND iCaseSixScans <> 0 THEN
+	iFS_Sensor_Test := 7 ;
+END_IF ;
+
+7:
+// EP1908-0002 FEATURES: Sensor Test Channel 8 Active/Inactive
+iCaseSixScans := 0 ;
+fbEP1908_STActive8_EcCoESdoRead(
+						sNetId			:= 		gc_sADSNetID, 
+						nSlaveAddr		:= 		gc_uiEP1908_EtherCATAdr, 
+						nSubIndex		:= 		8, 
+						nIndex			:= 		16#8001, 
+						pDstBuf			:= 		ADR(bEP1908_STActive8), 
+						cbBufLen		:= 		SIZEOF(bEP1908_STActive8), 
+						bExecute		:= 		xExecute, 
+						tTimeout		:= 		T#2S, 
+						bBusy			=> 		xEP1908_STActive8_busy, 
+						bError			=> 		xEP1908_STActive8_Err, 
+						nErrId			=> 		udiEP1908_STActive8ID );
+
+g_xHMI_EP1908_SensTestActive8			:= 		bEP1908_STActive8.0 ;
+
+iCaseSevenScans := iCaseSevenScans + 1 ; //Prevent code from passing through in only one pass
+
+IF NOT xEP1908_STActive8_busy AND NOT xEP1908_STActive8_Err AND iCaseSevenScans <> 0 THEN
+	iFS_Sensor_Test := 0 ;
+END_IF ;
+	END_CASE ;
+
+
+//Sequence through 0x8002 FS Logic Of Input Pairs
+CASE iFS_LogicOfInputPairs OF
+
+0:
+// EP1908-0002 FEATURES: Logic of Channels 1 and 2
+iCaseLogicThreeScans 					:= 		0 ;
+fbEP1908_Logic1_2_EcCoESdoRead(
+						sNetId			:= 		gc_sADSNetID, 
+						nSlaveAddr		:= 		gc_uiEP1908_EtherCATAdr, 
+						nSubIndex		:= 		1, 
+						nIndex			:= 		16#8002, 
+						pDstBuf			:= 		ADR(bEP1908_Logic1_2), 
+						cbBufLen		:= 		SIZEOF(bEP1908_Logic1_2), 
+						bExecute		:= 		xExecute, 
+						tTimeout		:= 		T#2S, 
+						bBusy			=> 		xEP1908_Logic1_2_busy, 
+						bError			=> 		xEP1908_Logic1_2_Err, 
+						nErrId			=> 		udiEP1908_Logic1_2ID );
+
+IF bEP1908_Logic1_2 					= 		0 THEN
+	g_sHMI_EP1908_LogicCh1andCh2 		:= 		'Single Channel Logic' ;
+	ELSIF bEP1908_Logic1_2 				= 		1 THEN
+	g_sHMI_EP1908_LogicCh1andCh2 		:= 		'Asynchronous Analysis OSSD, Sensor Test Must Be Disabled!' ;
+	ELSIF bEP1908_Logic1_2 				= 		2 THEN
+	g_sHMI_EP1908_LogicCh1andCh2 		:= 		'Any Pulse Repetitive OSSD, Sensor Test Must Be Disabled!' ;
+	ELSIF bEP1908_Logic1_2 				= 		3 THEN
+	g_sHMI_EP1908_LogicCh1andCh2 		:= 		'Short Cut, No Module Fault (Safety Mat Operation)' ;
+	ELSIF bEP1908_Logic1_2 				= 		4 THEN
+	g_sHMI_EP1908_LogicCh1andCh2 		:= 		'Velocity Control Ch1 / Single Channel Logic Ch2' ;
+	ELSIF bEP1908_Logic1_2 				= 		5 THEN
+	g_sHMI_EP1908_LogicCh1andCh2 		:= 		'Single Channel Logic Ch1 / Velocity Control Ch2' ;
+	ELSIF bEP1908_Logic1_2 				= 		6 THEN
+	g_sHMI_EP1908_LogicCh1andCh2 		:= 		'Velocity Control For Both Ch1 and Ch2' ;
+	ELSIF bEP1908_Logic1_2 				= 		7 THEN
+	g_sHMI_EP1908_LogicCh1andCh2 		:= 		'Two Channel Sync Velocity (Speed Monitoring Prox.es)' ;
+	ELSIF bEP1908_Logic1_2 				= 		8 THEN
+	g_sHMI_EP1908_LogicCh1andCh2 		:= 		'Two Channel Encoder Velocity (Speed Monitoring Encoder)' ;
+	ELSIF bEP1908_Logic1_2 				= 		9 THEN
+	g_sHMI_EP1908_LogicCh1andCh2 		:= 		'Two Channel Asynch Velocity (Prox Switches)' ;	
+ELSE
+	g_sHMI_EP1908_LogicCh1andCh2 		:= 		'Invalid Logic CH1 and CH2' ;
+END_IF ;						
+
+iCaseLogicZeroScans := iCaseLogicZeroScans + 1 ; //Prevent code from passing through in only one pass
+
+IF NOT xEP1908_Logic1_2_busy AND NOT xEP1908_Logic1_2_Err AND iCaseLogicZeroScans <> 0 THEN
+	iFS_LogicOfInputPairs := 1 ;
+END_IF ;
+
+1:			
+// EP1908-0002 FEATURES: Logic of Channels 3 and 4
+iCaseLogicZeroScans := 0 ;
+fbEP1908_Logic3_4_EcCoESdoRead(
+						sNetId			:= 		gc_sADSNetID, 
+						nSlaveAddr		:= 		gc_uiEP1908_EtherCATAdr, 
+						nSubIndex		:= 		5, 
+						nIndex			:= 		16#8002, 
+						pDstBuf			:= 		ADR(bEP1908_Logic3_4), 
+						cbBufLen		:= 		SIZEOF(bEP1908_Logic3_4), 
+						bExecute		:= 		xExecute, 
+						tTimeout		:= 		T#2S, 
+						bBusy			=> 		xEP1908_Logic3_4_busy, 
+						bError			=> 		xEP1908_Logic3_4_Err, 
+						nErrId			=> 		udiEP1908_Logic3_4ID );
+
+IF bEP1908_Logic3_4 					= 		0 THEN
+	g_sHMI_EP1908_LogicCh3andCh4 		:= 		'Single Channel Logic' ;
+	ELSIF bEP1908_Logic3_4 				= 		1 THEN
+	g_sHMI_EP1908_LogicCh3andCh4 		:= 		'Asynchronous Analysis OSSD, Sensor Test Must Be Disabled!' ;
+	ELSIF bEP1908_Logic3_4 				= 		2 THEN
+	g_sHMI_EP1908_LogicCh3andCh4 		:= 		'Any Pulse Repetitive OSSD, Sensor Test Must Be Disabled!' ;
+	ELSIF bEP1908_Logic3_4 				= 		3 THEN
+	g_sHMI_EP1908_LogicCh3andCh4 		:= 		'Short Cut, No Module Fault (Safety Mat Operation)' ;
+	ELSIF bEP1908_Logic3_4 				= 		4 THEN
+	g_sHMI_EP1908_LogicCh3andCh4 		:= 		'Velocity Control Ch3 / Single Channel Logic Ch4' ;
+	ELSIF bEP1908_Logic3_4 				= 		5 THEN
+	g_sHMI_EP1908_LogicCh3andCh4 		:= 		'Single Channel Logic Ch3 / Velocity Control Ch4' ;
+	ELSIF bEP1908_Logic3_4 				= 		6 THEN
+	g_sHMI_EP1908_LogicCh3andCh4 		:= 		'Velocity Control For Both Ch3 and Ch4' ;
+	ELSIF bEP1908_Logic3_4 				= 		7 THEN
+	g_sHMI_EP1908_LogicCh3andCh4 		:= 		'Two Channel Sync Velocity (Speed Monitoring Prox.es)' ;
+	ELSIF bEP1908_Logic3_4 				= 		8 THEN
+	g_sHMI_EP1908_LogicCh3andCh4 		:= 		'Two Channel Encoder Velocity (Speed Monitoring Encoder)' ;
+	ELSIF bEP1908_Logic3_4 				= 		9 THEN
+	g_sHMI_EP1908_LogicCh3andCh4 		:= 		'Two Channel Asynch Velocity (Prox Switches)' ;	
+ELSE
+	g_sHMI_EP1908_LogicCh3andCh4 		:= 		'Invalid Logic CH3 and CH4' ;
+END_IF ;						
+
+iCaseLogicOneScans := iCaseLogicOneScans + 1 ; //Prevent code from passing through in only one pass
+
+IF NOT xEP1908_Logic3_4_busy AND NOT xEP1908_Logic3_4_Err AND iCaseLogicOneScans <> 0 THEN
+	iFS_LogicOfInputPairs := 2 ;
+END_IF ;
+	
+2:
+// EP1908-0002 FEATURES: Logic of Channels 5 and 6
+iCaseLogicOneScans := 0 ;
+fbEP1908_Logic5_6_EcCoESdoRead(
+						sNetId			:= 		gc_sADSNetID, 
+						nSlaveAddr		:= 		gc_uiEP1908_EtherCATAdr, 
+						nSubIndex		:= 		9, 
+						nIndex			:= 		16#8002, 
+						pDstBuf			:= 		ADR(bEP1908_Logic5_6), 
+						cbBufLen		:= 		SIZEOF(bEP1908_Logic5_6), 
+						bExecute		:= 		xExecute, 
+						tTimeout		:= 		T#2S, 
+						bBusy			=> 		xEP1908_Logic5_6_busy, 
+						bError			=> 		xEP1908_Logic5_6_Err, 
+						nErrId			=> 		udiEP1908_Logic5_6ID );
+
+IF bEP1908_Logic5_6 					= 		0 THEN
+	g_sHMI_EP1908_LogicCh5andCh6 		:= 		'Single Channel Logic' ;
+	ELSIF bEP1908_Logic5_6 				= 		1 THEN
+	g_sHMI_EP1908_LogicCh5andCh6 		:= 		'Asynchronous Analysis OSSD, Sensor Test Must Be Disabled!' ;
+	ELSIF bEP1908_Logic5_6 				= 		2 THEN
+	g_sHMI_EP1908_LogicCh5andCh6 		:= 		'Any Pulse Repetitive OSSD, Sensor Test Must Be Disabled!' ;
+	ELSIF bEP1908_Logic5_6 				= 		3 THEN
+	g_sHMI_EP1908_LogicCh5andCh6 		:= 		'Short Cut, No Module Fault (Safety Mat Operation)' ;
+	ELSIF bEP1908_Logic5_6 				= 		4 THEN
+	g_sHMI_EP1908_LogicCh5andCh6 		:= 		'Velocity Control Ch5 / Single Channel Logic Ch6' ;
+	ELSIF bEP1908_Logic5_6 				= 		5 THEN
+	g_sHMI_EP1908_LogicCh5andCh6 		:= 		'Single Channel Logic Ch5 / Velocity Control Ch6' ;
+	ELSIF bEP1908_Logic5_6 				= 		6 THEN
+	g_sHMI_EP1908_LogicCh5andCh6 		:= 		'Velocity Control For Both Ch5 and Ch6' ;
+	ELSIF bEP1908_Logic5_6 				= 		7 THEN
+	g_sHMI_EP1908_LogicCh5andCh6 		:= 		'Two Channel Sync Velocity (Speed Monitoring Prox.es)' ;
+	ELSIF bEP1908_Logic5_6 				= 		8 THEN
+	g_sHMI_EP1908_LogicCh5andCh6 		:= 		'Two Channel Encoder Velocity (Speed Monitoring Encoder)' ;
+	ELSIF bEP1908_Logic5_6 				= 		9 THEN
+	g_sHMI_EP1908_LogicCh5andCh6 		:= 		'Two Channel Asynch Velocity (Prox Switches)' ;	
+ELSE
+	g_sHMI_EP1908_LogicCh5andCh6 		:= 		'Invalid Logic CH5 and CH6' ;
+END_IF ;		
+
+iCaseLogicTwoScans := iCaseLogicTwoScans + 1 ; //Prevent code from passing through in only one pass
+
+IF NOT xEP1908_Logic5_6_busy AND NOT xEP1908_Logic5_6_Err AND iCaseLogicTwoScans <> 0 THEN
+	iFS_LogicOfInputPairs := 3 ;
+END_IF ;
+
+3:
+// EP1908-0002 FEATURES: Logic of Channels 7 and 8
+iCaseLogicTwoScans := 0 ;
+fbEP1908_Logic7_8_EcCoESdoRead(
+						sNetId			:= 		gc_sADSNetID, 
+						nSlaveAddr		:= 		gc_uiEP1908_EtherCATAdr, 
+						nSubIndex		:= 		16#D, 
+						nIndex			:= 		16#8002, 
+						pDstBuf			:= 		ADR(bEP1908_Logic7_8), 
+						cbBufLen		:= 		SIZEOF(bEP1908_Logic7_8), 
+						bExecute		:= 		xExecute, 
+						tTimeout		:= 		T#2S, 
+						bBusy			=> 		xEP1908_Logic7_8_busy, 
+						bError			=> 		xEP1908_Logic7_8_Err, 
+						nErrId			=> 		udiEP1908_Logic7_8ID );
+
+IF bEP1908_Logic7_8 					= 		0 THEN
+	g_sHMI_EP1908_LogicCh7andCh8 		:= 		'Single Channel Logic' ;
+	ELSIF bEP1908_Logic7_8 				= 		1 THEN
+	g_sHMI_EP1908_LogicCh7andCh8 		:= 		'Asynchronous Analysis OSSD, Sensor Test Must Be Disabled!' ;
+	ELSIF bEP1908_Logic7_8 				= 		2 THEN
+	g_sHMI_EP1908_LogicCh7andCh8 		:= 		'Any Pulse Repetitive OSSD, Sensor Test Must Be Disabled!' ;
+	ELSIF bEP1908_Logic7_8 				= 		3 THEN
+	g_sHMI_EP1908_LogicCh7andCh8 		:= 		'Short Cut, No Module Fault (Safety Mat Operation)' ;
+	ELSIF bEP1908_Logic7_8 				= 		4 THEN
+	g_sHMI_EP1908_LogicCh7andCh8 		:= 		'Velocity Control Ch7 / Single Channel Logic Ch8' ;
+	ELSIF bEP1908_Logic7_8 				= 		5 THEN
+	g_sHMI_EP1908_LogicCh7andCh8 		:= 		'Single Channel Logic Ch7 / Velocity Control Ch8' ;
+	ELSIF bEP1908_Logic7_8 				= 		6 THEN
+	g_sHMI_EP1908_LogicCh7andCh8 		:= 		'Velocity Control For Both Ch7 and Ch8' ;
+	ELSIF bEP1908_Logic7_8 				= 		7 THEN
+	g_sHMI_EP1908_LogicCh7andCh8 		:= 		'Two Channel Sync Velocity (Speed Monitoring Prox.es)' ;
+	ELSIF bEP1908_Logic7_8 				= 		8 THEN
+	g_sHMI_EP1908_LogicCh7andCh8 		:= 		'Two Channel Encoder Velocity (Speed Monitoring Encoder)' ;
+	ELSIF bEP1908_Logic7_8 				= 		9 THEN
+	g_sHMI_EP1908_LogicCh7andCh8 		:= 		'Two Channel Asynch Velocity (Prox Switches)' ;	
+ELSE
+	g_sHMI_EP1908_LogicCh7andCh8 		:= 		'Invalid Logic CH7 and CH8' ;
+END_IF ;
+
+iCaseLogicThreeScans := iCaseLogicThreeScans + 1 ; //Prevent code from passing through in only one pass
+
+IF NOT xEP1908_Logic7_8_busy AND NOT xEP1908_Logic7_8_Err AND iCaseLogicThreeScans <> 0 THEN
+	iFS_LogicOfInputPairs := 0 ;
+END_IF ;
+END_CASE ;
+
+
+CASE iFS_VelocityLimits OF
+
+0:
+// EP1908-0002 FEATURES: Velocity Limit Channel 1
+iCaseVelLIMSevenScans := 0 ;
+fbEP1908_VelLimit1_EcCoESdoRead(
+						sNetId			:= 		gc_sADSNetID, 
+						nSlaveAddr		:= 		gc_uiEP1908_EtherCATAdr, 
+						nSubIndex		:= 		1, 
+						nIndex			:= 		16#8003, 
+						pDstBuf			:= 		ADR(wEP1908_VelLimit1), 
+						cbBufLen		:= 		SIZEOF(wEP1908_VelLimit1), 
+						bExecute		:= 		xExecute, 
+						tTimeout		:= 		T#2S, 
+						bBusy			=> 		xEP1908_VelLimit1_busy, 
+						bError			=> 		xEP1908_VelLimit1_Err, 
+						nErrId			=> 		udiEP1908_VelLimit1ID );
+
+g_wHMI_EP1908_VelLimit1					:= 		wEP1908_VelLimit1 ;
+
+iCaseVelLIMZeroScans := iCaseVelLIMZeroScans + 1 ; //Prevent code from passing through in only one pass
+
+IF NOT xEP1908_VelLimit1_busy AND NOT xEP1908_VelLimit1_Err AND iCaseVelLIMZeroScans <> 0 THEN
+	iFS_VelocityLimits := 1 ;
+END_IF ;
+
+1:
+// EP1908-0002 FEATURES: Velocity Limit Channel 2
+iCaseVelLIMZeroScans := 0 ;
+fbEP1908_VelLimit2_EcCoESdoRead(
+						sNetId			:= 		gc_sADSNetID, 
+						nSlaveAddr		:= 		gc_uiEP1908_EtherCATAdr, 
+						nSubIndex		:= 		2, 
+						nIndex			:= 		16#8003, 
+						pDstBuf			:= 		ADR(wEP1908_VelLimit2), 
+						cbBufLen		:= 		SIZEOF(wEP1908_VelLimit2), 
+						bExecute		:= 		xExecute, 
+						tTimeout		:= 		T#2S, 
+						bBusy			=> 		xEP1908_VelLimit2_busy, 
+						bError			=> 		xEP1908_VelLimit2_Err, 
+						nErrId			=> 		udiEP1908_VelLimit2ID );
+
+g_wHMI_EP1908_VelLimit2					:= 		wEP1908_VelLimit2 ;
+
+iCaseVelLIMOneScans := iCaseVelLIMOneScans + 1 ; //Prevent code from passing through in only one pass
+
+IF NOT xEP1908_VelLimit2_busy AND NOT xEP1908_VelLimit2_Err AND iCaseVelLIMOneScans <> 0 THEN
+	iFS_VelocityLimits := 2 ;
+END_IF ;
+
+2:
+// EP1908-0002 FEATURES: Velocity Limit Channel 3
+iCaseVelLIMOneScans := 0 ;
+fbEP1908_VelLimit3_EcCoESdoRead(
+						sNetId			:= 		gc_sADSNetID, 
+						nSlaveAddr		:= 		gc_uiEP1908_EtherCATAdr, 
+						nSubIndex		:= 		3, 
+						nIndex			:= 		16#8003, 
+						pDstBuf			:= 		ADR(wEP1908_VelLimit3), 
+						cbBufLen		:= 		SIZEOF(wEP1908_VelLimit3), 
+						bExecute		:= 		xExecute, 
+						tTimeout		:= 		T#2S, 
+						bBusy			=> 		xEP1908_VelLimit3_busy, 
+						bError			=> 		xEP1908_VelLimit3_Err, 
+						nErrId			=> 		udiEP1908_VelLimit3ID );
+
+g_wHMI_EP1908_VelLimit3					:= 		wEP1908_VelLimit3 ;
+
+iCaseVelLIMTwoScans := iCaseVelLIMTwoScans + 1 ; //Prevent code from passing through in only one pass
+
+IF NOT xEP1908_VelLimit3_busy AND NOT xEP1908_VelLimit3_Err AND iCaseVelLIMTwoScans <> 0 THEN
+	iFS_VelocityLimits := 3 ;
+END_IF ;
+
+3:
+// EP1908-0002 FEATURES: Velocity Limit Channel 4
+iCaseVelLIMTwoScans := 0 ;
+fbEP1908_VelLimit4_EcCoESdoRead(
+						sNetId			:= 		gc_sADSNetID, 
+						nSlaveAddr		:= 		gc_uiEP1908_EtherCATAdr, 
+						nSubIndex		:= 		4, 
+						nIndex			:= 		16#8003, 
+						pDstBuf			:= 		ADR(wEP1908_VelLimit4), 
+						cbBufLen		:= 		SIZEOF(wEP1908_VelLimit4), 
+						bExecute		:= 		xExecute, 
+						tTimeout		:= 		T#2S, 
+						bBusy			=> 		xEP1908_VelLimit4_busy, 
+						bError			=> 		xEP1908_VelLimit4_Err, 
+						nErrId			=> 		udiEP1908_VelLimit4ID );
+
+g_wHMI_EP1908_VelLimit4					:= 		wEP1908_VelLimit4 ;
+
+iCaseVelLIMThreeScans := iCaseVelLIMThreeScans + 1 ; //Prevent code from passing through in only one pass
+
+IF NOT xEP1908_VelLimit4_busy AND NOT xEP1908_VelLimit4_Err AND iCaseVelLIMThreeScans <> 0 THEN
+	iFS_VelocityLimits := 4 ;
+END_IF ;
+
+4:
+// EP1908-0002 FEATURES: Velocity Limit Channel 5
+iCaseVelLIMThreeScans := 0 ;
+fbEP1908_VelLimit5_EcCoESdoRead(
+						sNetId			:= 		gc_sADSNetID, 
+						nSlaveAddr		:= 		gc_uiEP1908_EtherCATAdr, 
+						nSubIndex		:= 		5, 
+						nIndex			:= 		16#8003, 
+						pDstBuf			:= 		ADR(wEP1908_VelLimit5), 
+						cbBufLen		:= 		SIZEOF(wEP1908_VelLimit5), 
+						bExecute		:= 		xExecute, 
+						tTimeout		:= 		T#2S, 
+						bBusy			=> 		xEP1908_VelLimit5_busy, 
+						bError			=> 		xEP1908_VelLimit5_Err, 
+						nErrId			=> 		udiEP1908_VelLimit5ID );
+
+g_wHMI_EP1908_VelLimit5					:= 		wEP1908_VelLimit5 ;
+
+iCaseVelLIMFourScans := iCaseVelLIMFourScans + 1 ; //Prevent code from passing through in only one pass
+
+IF NOT xEP1908_VelLimit5_busy AND NOT xEP1908_VelLimit5_Err AND iCaseVelLIMFourScans <> 0 THEN
+	iFS_VelocityLimits := 5 ;
+END_IF ;
+
+5:
+// EP1908-0002 FEATURES: Velocity Limit Channel 6
+iCaseVelLIMFourScans := 0 ;
+fbEP1908_VelLimit6_EcCoESdoRead(
+						sNetId			:= 		gc_sADSNetID, 
+						nSlaveAddr		:= 		gc_uiEP1908_EtherCATAdr, 
+						nSubIndex		:= 		6, 
+						nIndex			:= 		16#8003, 
+						pDstBuf			:= 		ADR(wEP1908_VelLimit6), 
+						cbBufLen		:= 		SIZEOF(wEP1908_VelLimit6), 
+						bExecute		:= 		xExecute, 
+						tTimeout		:= 		T#2S, 
+						bBusy			=> 		xEP1908_VelLimit6_busy, 
+						bError			=> 		xEP1908_VelLimit6_Err, 
+						nErrId			=> 		udiEP1908_VelLimit6ID );
+
+g_wHMI_EP1908_VelLimit6					:= 		wEP1908_VelLimit6 ;
+
+iCaseVelLIMFiveScans := iCaseVelLIMFiveScans + 1 ; //Prevent code from passing through in only one pass
+
+IF NOT xEP1908_VelLimit6_busy AND NOT xEP1908_VelLimit6_Err AND iCaseVelLIMFiveScans <> 0 THEN
+	iFS_VelocityLimits := 6 ;
+END_IF ;
+
+6:
+// EP1908-0002 FEATURES: Velocity Limit Channel 7
+iCaseVelLIMFiveScans := 0 ;
+fbEP1908_VelLimit7_EcCoESdoRead(
+						sNetId			:= 		gc_sADSNetID, 
+						nSlaveAddr		:= 		gc_uiEP1908_EtherCATAdr, 
+						nSubIndex		:= 		7, 
+						nIndex			:= 		16#8003, 
+						pDstBuf			:= 		ADR(wEP1908_VelLimit7), 
+						cbBufLen		:= 		SIZEOF(wEP1908_VelLimit7), 
+						bExecute		:= 		xExecute, 
+						tTimeout		:= 		T#2S, 
+						bBusy			=> 		xEP1908_VelLimit7_busy, 
+						bError			=> 		xEP1908_VelLimit7_Err, 
+						nErrId			=> 		udiEP1908_VelLimit7ID );
+
+g_wHMI_EP1908_VelLimit7					:= 		wEP1908_VelLimit7 ;
+
+iCaseVelLIMSixScans := iCaseVelLIMSixScans + 1 ; //Prevent code from passing through in only one pass
+
+IF NOT xEP1908_VelLimit7_busy AND NOT xEP1908_VelLimit7_Err AND iCaseVelLIMSixScans <> 0 THEN
+	iFS_VelocityLimits := 7 ;
+END_IF ;
+
+7:
+// EP1908-0002 FEATURES: Velocity Limit Channel 8
+fbEP1908_VelLimit8_EcCoESdoRead(
+						sNetId			:= 		gc_sADSNetID, 
+						nSlaveAddr		:= 		gc_uiEP1908_EtherCATAdr, 
+						nSubIndex		:= 		8, 
+						nIndex			:= 		16#8003, 
+						pDstBuf			:= 		ADR(wEP1908_VelLimit8), 
+						cbBufLen		:= 		SIZEOF(wEP1908_VelLimit8), 
+						bExecute		:= 		xExecute, 
+						tTimeout		:= 		T#2S, 
+						bBusy			=> 		xEP1908_VelLimit8_busy, 
+						bError			=> 		xEP1908_VelLimit8_Err, 
+						nErrId			=> 		udiEP1908_VelLimit8ID );
+
+g_wHMI_EP1908_VelLimit8					:= 		wEP1908_VelLimit8 ;
+
+iCaseVelLIMSevenScans := iCaseVelLIMSevenScans + 1 ; //Prevent code from passing through in only one pass
+
+IF NOT xEP1908_VelLimit8_busy AND NOT xEP1908_VelLimit8_Err AND iCaseVelLIMSevenScans <> 0 THEN
+	iFS_VelocityLimits := 0 ;
+END_IF ;
+	END_CASE ;
+
+// Read the Primary Micro Controller (MC1) Temperature in DegC out of the EP1908-0002
+IF C1.CV = 2 THEN
+fbEP1908PriMCTemp_ADSRead(
+						NETID			:= 		gc_sADSNetID, 
+						PORT			:= 		gc_uiEP1908_EtherCATAdr, 
+						IDXGRP			:= 		16#F302, 
+						IDXOFFS			:= 		16#FA800001, 
+						LEN				:= 		2, 
+						DESTADDR		:= 		ADR(wEP1908_PriMCTemp), 
+						READ			:= 		xExecute, 
+						TMOUT			:= 		T#2S, 
+						BUSY			=> 		xEP1908PriMCTemp_busy, 
+						ERR				=> 		xEP1908PriMCTemp_Err, 
+						ERRID			=> 		udiEP1908PriMCTemp_ErrID );
+
+g_wHMI_EP1908PriMCTemp 						:= 		wEP1908_PriMCTemp ;
+END_IF ;
+
+// Read the Secondary Micro Controller (MC2) Temperature in DegC out of the EP1908-0002
+IF C1.CV = 3 THEN
+fbEP1908SecMCTemp_ADSRead(
+						NETID			:= 		gc_sADSNetID, 
+						PORT			:= 		gc_uiEP1908_EtherCATAdr, 
+						IDXGRP			:= 		16#F302, 
+						IDXOFFS			:= 		16#FA800002, 
+						LEN				:= 		2, 
+						DESTADDR		:= 		ADR(wEP1908_SecMCTemp), 
+						READ			:= 		xExecute, 
+						TMOUT			:= 		T#2S, 
+						BUSY			=> 		xEP1908SecMCTemp_busy, 
+						ERR				=> 		xEP1908SecMCTemp_Err, 
+						ERRID			=> 		udiEP1908SecMCTemp_ErrID );
+
+g_wHMI_EP1908SecMCTemp 						:= 		wEP1908_SecMCTemp ;
+END_IF ;
+
+// Read the Primary Micro Controller (MC1) Voltage in mV out of the EP1908-0002
+IF C1.CV = 4 THEN
+fbEP1908PriMCmV_ADSRead(
+						NETID			:= 		gc_sADSNetID, 
+						PORT			:= 		gc_uiEP1908_EtherCATAdr, 
+						IDXGRP			:= 		16#F302, 
+						IDXOFFS			:= 		16#FA810001, 
+						LEN				:= 		2, 
+						DESTADDR		:= 		ADR(wEP1908_PriMCmV), 
+						READ			:= 		xExecute, 
+						TMOUT			:= 		T#2S, 
+						BUSY			=> 		xEP1908PriMCmV_busy, 
+						ERR				=> 		xEP1908PriMCmV_Err, 
+						ERRID			=> 		udiEP1908PriMCmV_ErrID );
+						
+g_wHMI_EP1908PriMC_Volts				:= 		WORD_TO_LREAL(wEP1908_PriMCmV) / 1000.0 ;
+END_IF ;
+
+// Read the Secondary Micro Controller (MC2) Voltage in mV out of the EP1908-0002
+IF C1.CV = 5 THEN
+fbEP1908SecMCmV_ADSRead(
+						NETID			:= 		gc_sADSNetID, 
+						PORT			:= 		gc_uiEP1908_EtherCATAdr, 
+						IDXGRP			:= 		16#F302, 
+						IDXOFFS			:= 		16#FA810002, 
+						LEN				:= 		2, 
+						DESTADDR		:= 		ADR(wEP1908_SecMCmV), 
+						READ			:= 		xExecute, 
+						TMOUT			:= 		T#2S, 
+						BUSY			=> 		xEP1908SecMCmV_busy, 
+						ERR				=> 		xEP1908SecMCmV_Err, 
+						ERRID			=> 		udiEP1908SecMCmV_ErrID );
+			
+g_wHMI_EP1908SecMC_Volts 				:= 		WORD_TO_LREAL(wEP1908_SecMCmV) / 1000.0 ;
+END_IF ;
+	ELSE xReset := 1 ;
+	END_IF ;
+//
+//		EP1908-0002 MODULE ALARMS
+//
+// EP1908-0002: Sensor Test Error
+fbEP1908SensT_ADSRead(
+						NETID			:= 		gc_sADSNetID, 
+						PORT			:= 		gc_uiEP1908_EtherCATAdr, 
+						IDXGRP			:= 		16#F302, 
+						IDXOFFS			:= 		16#800E000A, 
+						LEN				:= 		2, 
+						DESTADDR		:= 		ADR(wEP1908_SenT), 
+						READ			:= 		xExecute, 
+						TMOUT			:= 		T#2S, 
+						BUSY			=> 		xEP1908SenT_busy, 
+						ERR				=> 		xEP1908SenT_Err, 
+						ERRID			=> 		udiEP1908SenT_ErrID );
+
+//These errors may only be present temporarily so they need to be latched and then cleared
+//to be properly noted by the operator
+g_xHMI_EP1908SenT1 						:= 		wEP1908_SenT.0 OR (g_xHMI_EP1908SenT1 AND NOT g_xHMI_EP1908_ErrClearPB) ;
+g_xHMI_EP1908SenT2 						:= 		wEP1908_SenT.1 OR (g_xHMI_EP1908SenT2 AND NOT g_xHMI_EP1908_ErrClearPB) ;
+g_xHMI_EP1908SenT3 						:= 		wEP1908_SenT.2 OR (g_xHMI_EP1908SenT3 AND NOT g_xHMI_EP1908_ErrClearPB) ;
+g_xHMI_EP1908SenT4 						:= 		wEP1908_SenT.3 OR (g_xHMI_EP1908SenT4 AND NOT g_xHMI_EP1908_ErrClearPB) ;
+g_xHMI_EP1908SenT5 						:= 		wEP1908_SenT.4 OR (g_xHMI_EP1908SenT5 AND NOT g_xHMI_EP1908_ErrClearPB) ;
+g_xHMI_EP1908SenT6 						:= 		wEP1908_SenT.5 OR (g_xHMI_EP1908SenT6 AND NOT g_xHMI_EP1908_ErrClearPB) ;
+g_xHMI_EP1908SenT7 						:= 		wEP1908_SenT.6 OR (g_xHMI_EP1908SenT7 AND NOT g_xHMI_EP1908_ErrClearPB) ;
+g_xHMI_EP1908SenT8 						:= 		wEP1908_SenT.7 OR (g_xHMI_EP1908SenT8 AND NOT g_xHMI_EP1908_ErrClearPB) ;
+
+
+// EP1908-002: 2-Channel Evaluation Error
+// The two channels contradict each other (not same value)
+fbEP1908_2CHEval_ADSRead(
+						NETID			:= 		gc_sADSNetID, 
+						PORT			:= 		gc_uiEP1908_EtherCATAdr, 
+						IDXGRP			:= 		16#F302, 
+						IDXOFFS			:= 		16#800E000B, 
+						LEN				:= 		2, 
+						DESTADDR		:= 		ADR(wEP1908_2CHEval), 
+						READ			:= 		xExecute, 
+						TMOUT			:= 		T#2S, 
+						BUSY			=> 		xEP1908_2CHEval_busy, 
+						ERR				=> 		xEP1908_2CHEval_Err, 
+						ERRID			=> 		udiEP1908_2CHEval_ErrID );
+
+//These errors may only be present temporarily so they need to be latched and then cleared
+//to be properly noted by the operator
+g_xHMI_EP1908_2CHEval_Pair1				:= 		wEP1908_2CHEval.0 OR (g_xHMI_EP1908_2CHEval_Pair1 AND NOT g_xHMI_EP1908_ErrClearPB) ;
+g_xHMI_EP1908_2CHEval_Pair2				:= 		wEP1908_2CHEval.1 OR (g_xHMI_EP1908_2CHEval_Pair2 AND NOT g_xHMI_EP1908_ErrClearPB) ;
+g_xHMI_EP1908_2CHEval_Pair3				:= 		wEP1908_2CHEval.2 OR (g_xHMI_EP1908_2CHEval_Pair3 AND NOT g_xHMI_EP1908_ErrClearPB) ;
+g_xHMI_EP1908_2CHEval_Pair4				:= 		wEP1908_2CHEval.3 OR (g_xHMI_EP1908_2CHEval_Pair4 AND NOT g_xHMI_EP1908_ErrClearPB) ;
+
+
+// EP1908-0002: Error In Safety Mat Operating Mode
+// Input pairs not in the same state (not same value)
+fbEP1908_SMiPair_ADSRead(
+						NETID			:= 		gc_sADSNetID, 
+						PORT			:= 		gc_uiEP1908_EtherCATAdr, 
+						IDXGRP			:= 		16#F302, 
+						IDXOFFS			:= 		16#800E000C, 
+						LEN				:= 		2, 
+						DESTADDR		:= 		ADR(wEP1908_SMiPair), 
+						READ			:= 		xExecute, 
+						TMOUT			:= 		T#2S, 
+						BUSY			=> 		xEP1908_SMiPair_busy, 
+						ERR				=> 		xEP1908_SMiPair_Err, 
+						ERRID			=> 		udiEP1908_SMiPair_ErrID );
+
+//These errors may only be present temporarily so they need to be latched and then cleared
+//to be properly noted by the operator
+g_xHMI_EP1908_SMiPair_Pair1				:= 		(wEP1908_SMiPair.0 AND wEP1908_SMiPair.1) OR (g_xHMI_EP1908_SMiPair_Pair1 AND NOT g_xHMI_EP1908_ErrClearPB) ;
+g_xHMI_EP1908_SMiPair_Pair2				:= 		(wEP1908_SMiPair.2 AND wEP1908_SMiPair.3) OR (g_xHMI_EP1908_SMiPair_Pair2 AND NOT g_xHMI_EP1908_ErrClearPB) ;
+g_xHMI_EP1908_SMiPair_Pair3				:= 		(wEP1908_SMiPair.4 AND wEP1908_SMiPair.5) OR (g_xHMI_EP1908_SMiPair_Pair3 AND NOT g_xHMI_EP1908_ErrClearPB) ;
+g_xHMI_EP1908_SMiPair_Pair4				:= 		(wEP1908_SMiPair.6 AND wEP1908_SMiPair.7) OR (g_xHMI_EP1908_SMiPair_Pair4 AND NOT g_xHMI_EP1908_ErrClearPB) ;
+
+
+// EP1908-0002: Error in Safety Mat Operating Supply
+// External supply detected (Input channel not getting test pulses)
+fbEP1908_SMExtSupply_ADSRead(
+						NETID			:= 		gc_sADSNetID, 
+						PORT			:= 		gc_uiEP1908_EtherCATAdr, 
+						IDXGRP			:= 		16#F302, 
+						IDXOFFS			:= 		16#800E000D, 
+						LEN				:= 		2, 
+						DESTADDR		:= 		ADR(wEP1908_SMExtSupply), 
+						READ			:= 		xExecute, 
+						TMOUT			:= 		T#2S, 
+						BUSY			=> 		xEP1908_SMExtSupply_busy, 
+						ERR				=> 		xEP1908_SMExtSupply_Err, 
+						ERRID			=> 		udiEP1908_SMExtSupply_ErrID );
+
+//These errors may only be present temporarily so they need to be latched and then cleared
+//to be properly noted by the operator
+g_xHMI_EP1908_SMExtSupply_CH1			:= 		wEP1908_SMExtSupply.0 OR (g_xHMI_EP1908_SMExtSupply_CH1 AND NOT g_xHMI_EP1908_ErrClearPB) ;
+g_xHMI_EP1908_SMExtSupply_CH2			:= 		wEP1908_SMExtSupply.1 OR (g_xHMI_EP1908_SMExtSupply_CH2 AND NOT g_xHMI_EP1908_ErrClearPB) ;
+g_xHMI_EP1908_SMExtSupply_CH3			:= 		wEP1908_SMExtSupply.2 OR (g_xHMI_EP1908_SMExtSupply_CH3 AND NOT g_xHMI_EP1908_ErrClearPB) ;
+g_xHMI_EP1908_SMExtSupply_CH4			:= 		wEP1908_SMExtSupply.3 OR (g_xHMI_EP1908_SMExtSupply_CH4 AND NOT g_xHMI_EP1908_ErrClearPB) ;
+g_xHMI_EP1908_SMExtSupply_CH5			:= 		wEP1908_SMExtSupply.4 OR (g_xHMI_EP1908_SMExtSupply_CH5 AND NOT g_xHMI_EP1908_ErrClearPB) ;
+g_xHMI_EP1908_SMExtSupply_CH6			:= 		wEP1908_SMExtSupply.5 OR (g_xHMI_EP1908_SMExtSupply_CH6 AND NOT g_xHMI_EP1908_ErrClearPB) ;
+g_xHMI_EP1908_SMExtSupply_CH7			:= 		wEP1908_SMExtSupply.6 OR (g_xHMI_EP1908_SMExtSupply_CH7 AND NOT g_xHMI_EP1908_ErrClearPB) ;
+g_xHMI_EP1908_SMExtSupply_CH8			:= 		wEP1908_SMExtSupply.7 OR (g_xHMI_EP1908_SMExtSupply_CH8 AND NOT g_xHMI_EP1908_ErrClearPB) ;
+
+
+// EP1908-0002: Error During Speed Monitoring
+// Frquency Greater Than 500Hz
+fbEP1908_FreqGT500_ADSRead(
+						NETID			:= 		gc_sADSNetID, 
+						PORT			:= 		gc_uiEP1908_EtherCATAdr, 
+						IDXGRP			:= 		16#F302, 
+						IDXOFFS			:= 		16#800E0013, 
+						LEN				:= 		2, 
+						DESTADDR		:= 		ADR(wEP1908_FreqGT500), 
+						READ			:= 		xExecute, 
+						TMOUT			:= 		T#2S, 
+						BUSY			=> 		xEP1908_FreqGT500_busy, 
+						ERR				=> 		xEP1908_FreqGT500_Err, 
+						ERRID			=> 		udiEP1908_FreqGT500_ErrID );
+
+//These errors may only be present temporarily so they need to be latched and then cleared
+//to be properly noted by the operator
+g_xHMI_EP1908_FreqGT500_CH1			:= 		wEP1908_FreqGT500.0 OR (g_xHMI_EP1908_FreqGT500_CH1 AND NOT g_xHMI_EP1908_ErrClearPB) ;
+g_xHMI_EP1908_FreqGT500_CH2			:= 		wEP1908_FreqGT500.1 OR (g_xHMI_EP1908_FreqGT500_CH2 AND NOT g_xHMI_EP1908_ErrClearPB) ;
+g_xHMI_EP1908_FreqGT500_CH3			:= 		wEP1908_FreqGT500.2 OR (g_xHMI_EP1908_FreqGT500_CH3 AND NOT g_xHMI_EP1908_ErrClearPB) ;
+g_xHMI_EP1908_FreqGT500_CH4			:= 		wEP1908_FreqGT500.3 OR (g_xHMI_EP1908_FreqGT500_CH4 AND NOT g_xHMI_EP1908_ErrClearPB) ;
+g_xHMI_EP1908_FreqGT500_CH5			:= 		wEP1908_FreqGT500.4 OR (g_xHMI_EP1908_FreqGT500_CH5 AND NOT g_xHMI_EP1908_ErrClearPB) ;
+g_xHMI_EP1908_FreqGT500_CH6			:= 		wEP1908_FreqGT500.5 OR (g_xHMI_EP1908_FreqGT500_CH6 AND NOT g_xHMI_EP1908_ErrClearPB) ;
+g_xHMI_EP1908_FreqGT500_CH7			:= 		wEP1908_FreqGT500.6 OR (g_xHMI_EP1908_FreqGT500_CH7 AND NOT g_xHMI_EP1908_ErrClearPB) ;
+g_xHMI_EP1908_FreqGT500_CH8			:= 		wEP1908_FreqGT500.7 OR (g_xHMI_EP1908_FreqGT500_CH8 AND NOT g_xHMI_EP1908_ErrClearPB) ;
+
+
+// EP1908-0002: Error In Operating Mode: Two Channel Sync Velocity Control
+// Both inputs of a "pair" cannot be inactive in this mode
+fbEP1908_BothInPairInact_ADSRead(
+						NETID			:= 		gc_sADSNetID, 
+						PORT			:= 		gc_uiEP1908_EtherCATAdr, 
+						IDXGRP			:= 		16#F302, 
+						IDXOFFS			:= 		16#800E0014, 
+						LEN				:= 		2, 
+						DESTADDR		:= 		ADR(wEP1908_BothInPairInact), 
+						READ			:= 		xExecute, 
+						TMOUT			:= 		T#2S, 
+						BUSY			=> 		xEP1908_BothInPairInact_busy, 
+						ERR				=> 		xEP1908_BothInPairInact_Err, 
+						ERRID			=> 		udiEP1908_BothInPairInact_ErrID );
+
+//These errors may only be present temporarily so they need to be latched and then cleared
+//to be properly noted by the operator
+g_xHMI_EP1908_BothInact_Pair1			:= 		wEP1908_BothInPairInact.0 OR (g_xHMI_EP1908_BothInact_Pair1 AND NOT g_xHMI_EP1908_ErrClearPB) ;
+g_xHMI_EP1908_BothInact_Pair2			:= 		wEP1908_BothInPairInact.1 OR (g_xHMI_EP1908_BothInact_Pair2 AND NOT g_xHMI_EP1908_ErrClearPB) ;
+g_xHMI_EP1908_BothInact_Pair3			:= 		wEP1908_BothInPairInact.2 OR (g_xHMI_EP1908_BothInact_Pair3 AND NOT g_xHMI_EP1908_ErrClearPB) ;
+g_xHMI_EP1908_BothInact_Pair4			:= 		wEP1908_BothInPairInact.3 OR (g_xHMI_EP1908_BothInact_Pair4 AND NOT g_xHMI_EP1908_ErrClearPB) ;
+
+
+// EP1908-0002: Error In Operating Modes: Two Channel Sync Velocity Control and Two Channel Encoder Velocity Control
+// For a channel pair, two different motor speeds detected
+fbEP1908_PairUnequalFreq_ADSRead(
+						NETID			:= 		gc_sADSNetID, 
+						PORT			:= 		gc_uiEP1908_EtherCATAdr, 
+						IDXGRP			:= 		16#F302, 
+						IDXOFFS			:= 		16#800E0015, 
+						LEN				:= 		2, 
+						DESTADDR		:= 		ADR(wEP1908_PairUnequalFreq), 
+						READ			:= 		xExecute, 
+						TMOUT			:= 		T#2S, 
+						BUSY			=> 		xEP1908_PairUnequalFreq_busy, 
+						ERR				=> 		xEP1908_PairUnequalFreq_Err, 
+						ERRID			=> 		udiEP1908_PairUnequalFreq_ErrID );
+
+//These errors may only be present temporarily so they need to be latched and then cleared
+//to be properly noted by the operator
+g_xHMI_EP1908_UnequalFreg_Pair1			:= 		wEP1908_PairUnequalFreq.0 OR (g_xHMI_EP1908_UnequalFreg_Pair1 AND NOT g_xHMI_EP1908_ErrClearPB) ;
+g_xHMI_EP1908_UnequalFreg_Pair2			:= 		wEP1908_PairUnequalFreq.1 OR (g_xHMI_EP1908_UnequalFreg_Pair2 AND NOT g_xHMI_EP1908_ErrClearPB) ;
+g_xHMI_EP1908_UnequalFreg_Pair3			:= 		wEP1908_PairUnequalFreq.2 OR (g_xHMI_EP1908_UnequalFreg_Pair3 AND NOT g_xHMI_EP1908_ErrClearPB) ;
+g_xHMI_EP1908_UnequalFreg_Pair4			:= 		wEP1908_PairUnequalFreq.3 OR (g_xHMI_EP1908_UnequalFreg_Pair4 AND NOT g_xHMI_EP1908_ErrClearPB) ;
+
+
+//Sum of all errors we know of in the EP1908 module
+IF 		g_xHMI_EP1908SenT1 
+	OR 	g_xHMI_EP1908SenT2 
+	OR 	g_xHMI_EP1908SenT3 
+	OR 	g_xHMI_EP1908SenT4
+	OR 	g_xHMI_EP1908SenT5 
+	OR 	g_xHMI_EP1908SenT6 
+	OR 	g_xHMI_EP1908SenT7	
+	OR 	g_xHMI_EP1908SenT8		
+	OR 	g_xHMI_EP1908_2CHEval_Pair1	
+	OR 	g_xHMI_EP1908_2CHEval_Pair2
+	OR 	g_xHMI_EP1908_2CHEval_Pair3	
+	OR 	g_xHMI_EP1908_2CHEval_Pair4	
+	OR 	g_xHMI_EP1908_SMiPair_Pair1
+	OR 	g_xHMI_EP1908_SMiPair_Pair2
+	OR 	g_xHMI_EP1908_SMiPair_Pair3
+	OR 	g_xHMI_EP1908_SMiPair_Pair4
+	OR 	g_xHMI_EP1908_SMExtSupply_CH1
+	OR 	g_xHMI_EP1908_SMExtSupply_CH2
+	OR 	g_xHMI_EP1908_SMExtSupply_CH3
+	OR 	g_xHMI_EP1908_SMExtSupply_CH4
+	OR 	g_xHMI_EP1908_SMExtSupply_CH5
+	OR 	g_xHMI_EP1908_SMExtSupply_CH6
+	OR 	g_xHMI_EP1908_SMExtSupply_CH7
+	OR 	g_xHMI_EP1908_SMExtSupply_CH8		
+	OR 	g_xHMI_EP1908_FreqGT500_CH1
+	OR 	g_xHMI_EP1908_FreqGT500_CH2
+	OR 	g_xHMI_EP1908_FreqGT500_CH3
+	OR 	g_xHMI_EP1908_FreqGT500_CH4
+	OR 	g_xHMI_EP1908_FreqGT500_CH5
+	OR 	g_xHMI_EP1908_FreqGT500_CH6
+	OR 	g_xHMI_EP1908_FreqGT500_CH7
+	OR 	g_xHMI_EP1908_FreqGT500_CH8
+	OR 	g_xHMI_EP1908_BothInact_Pair1
+	OR	g_xHMI_EP1908_BothInact_Pair2
+	OR	g_xHMI_EP1908_BothInact_Pair3
+	OR	g_xHMI_EP1908_BothInact_Pair4
+	OR	g_xHMI_EP1908_UnequalFreg_Pair1
+	OR	g_xHMI_EP1908_UnequalFreg_Pair2
+	OR	g_xHMI_EP1908_UnequalFreg_Pair3
+	OR	g_xHMI_EP1908_UnequalFreg_Pair4
+THEN g_xHMI_EP1908_General_Error := TRUE ;
+ELSE g_xHMI_EP1908_General_Error := FALSE ;
+END_IF ;
+
+]]></ST>
+    </Implementation>
+    <ObjectProperties />
+  </POU>
+</TcPlcObject>
